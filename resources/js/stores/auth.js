@@ -53,6 +53,31 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    function hasPermission(permission) {
+        if (!user.value) return false;
+        if (!user.value.permissions) return false;
+        return user.value.permissions.some(p => p.slug == permission);
+    }
+
+    function hasAnyPermission(permissions) {
+        if (!Array.isArray(permissions)) return false;
+        return permissions.some(permission => hasPermission(permission));
+    }
+
+    function hasAllPermissions(permissions) {
+        if (!Array.isArray(permissions)) return false;
+        return permissions.every(permission => hasPermission(permission));
+    }
+
+    function hasRole(role) {
+        if (!user.value) return false;
+        if (!user.value.roles) return false;
+        if (typeof role == 'string') {
+            return user.value.roles.some(r => r.slug == role);
+        }
+        return user.value.roles.some(r => r.id == role);
+    }
+
     return {
         user,
         token,
@@ -61,7 +86,11 @@ export const useAuthStore = defineStore('auth', () => {
         logout,
         fetchUser,
         setToken,
-        setUser
+        setUser,
+        hasPermission,
+        hasAnyPermission,
+        hasAllPermissions,
+        hasRole
     };
 });
 

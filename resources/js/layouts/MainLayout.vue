@@ -18,14 +18,14 @@
                     <template #title>仪表盘</template>
                 </el-menu-item>
                 
-                <el-sub-menu index="system">
+                <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('workflows.manage')">
                     <template #title>
                         <el-icon><Setting /></el-icon>
                         <span>系统管理</span>
                     </template>
-                    <el-menu-item index="/users">用户管理</el-menu-item>
-                    <el-menu-item index="/roles">角色管理</el-menu-item>
-                    <el-menu-item index="/workflows">审批流程</el-menu-item>
+                    <el-menu-item index="/users" v-if="hasMenuPermission('users.manage')">用户管理</el-menu-item>
+                    <el-menu-item index="/roles" v-if="hasMenuPermission('roles.manage')">角色管理</el-menu-item>
+                    <el-menu-item index="/workflows" v-if="hasMenuPermission('workflows.manage')">审批流程</el-menu-item>
                 </el-sub-menu>
 
                 <el-menu-item index="/products">
@@ -134,11 +134,12 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import { ElMessageBox } from 'element-plus';
+import { useConfirm } from '../utils/message';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const { confirm } = useConfirm();
 
 const isCollapse = ref(false);
 const unreadCount = ref(0);
@@ -150,14 +151,15 @@ const toggleCollapse = () => {
     isCollapse.value = !isCollapse.value;
 };
 
+const hasMenuPermission = (permission) => {
+    if (!permission) return true;
+    return authStore.hasPermission(permission);
+};
+
 const handleCommand = async (command) => {
     if (command === 'logout') {
         try {
-            await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            });
+            await confirm('确定要退出登录吗？', '退出确认');
             await authStore.logout();
             router.push('/login');
         } catch (error) {

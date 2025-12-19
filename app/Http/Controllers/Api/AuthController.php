@@ -38,8 +38,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
+        $user->load(['roles.permissions']);
+        $permissions = $user->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->unique('id')->values();
+
         return response()->json([
-            'user' => $user->load('roles'),
+            'user' => array_merge($user->toArray(), ['permissions' => $permissions]),
             'token' => $token,
         ]);
     }
@@ -53,6 +58,12 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return response()->json($request->user()->load('roles'));
+        $user = $request->user();
+        $user->load(['roles.permissions']);
+        $permissions = $user->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->unique('id')->values();
+
+        return response()->json(array_merge($user->toArray(), ['permissions' => $permissions]));
     }
 }
