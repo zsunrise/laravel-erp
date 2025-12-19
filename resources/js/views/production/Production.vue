@@ -789,6 +789,8 @@ const handleSubmitPlan = async () => {
             try {
                 const data = {
                     ...planForm,
+                    sales_order_id: planForm.sales_order_id || null,
+                    remark: planForm.remark || null,
                     items: planForm.items.map(item => ({
                         product_id: item.product_id,
                         bom_id: item.bom_id || null,
@@ -797,7 +799,7 @@ const handleSubmitPlan = async () => {
                         planned_start_date: item.planned_start_date,
                         planned_end_date: item.planned_end_date,
                         priority: item.priority || 0,
-                        remark: item.remark || ''
+                        remark: item.remark || null
                     }))
                 };
                 if (planForm.id) {
@@ -925,7 +927,15 @@ const handleSubmitWorkOrder = async () => {
         if (valid) {
             workOrderSubmitLoading.value = true;
             try {
-                const data = { ...workOrderForm };
+                const data = {
+                    ...workOrderForm,
+                    production_plan_id: workOrderForm.production_plan_id || null,
+                    production_plan_item_id: workOrderForm.production_plan_item_id || null,
+                    bom_id: workOrderForm.bom_id || null,
+                    process_route_id: workOrderForm.process_route_id || null,
+                    assigned_to: workOrderForm.assigned_to || null,
+                    remark: workOrderForm.remark || null
+                };
                 if (workOrderForm.id) {
                     await api.put(`/work-orders/${workOrderForm.id}`, data);
                     ElMessage.success('更新成功');

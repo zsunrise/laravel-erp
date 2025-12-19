@@ -665,13 +665,16 @@ const handleSubmitVoucher = async () => {
                         account_id: item.account_id,
                         direction: item.direction,
                         amount: item.amount,
-                        summary: item.summary || '',
+                        summary: item.summary || null,
                         reference_type: item.reference_type || null,
                         reference_id: item.reference_id || null,
-                        reference_no: item.reference_no || '',
+                        reference_no: item.reference_no || null,
                         sequence: item.sequence || 0
                     }))
                 };
+                // 清理空值
+                if (!data.remark) data.remark = null;
+                if (!data.attachment_count) data.attachment_count = 0;
                 if (voucherForm.id) {
                     await api.put(`/accounting-vouchers/${voucherForm.id}`, data);
                     ElMessage.success('更新成功');

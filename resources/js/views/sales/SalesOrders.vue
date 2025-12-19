@@ -54,7 +54,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="order_date" label="订单日期" width="120" />
-                <el-table-column prop="expected_date" label="预计交货" width="120" />
+                <el-table-column prop="delivery_date" label="预计交货" width="120" />
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
@@ -87,7 +87,7 @@
                 <el-descriptions-item label="订单号">{{ currentOrder.order_no }}</el-descriptions-item>
                 <el-descriptions-item label="客户">{{ currentOrder.customer?.name }}</el-descriptions-item>
                 <el-descriptions-item label="订单日期">{{ currentOrder.order_date }}</el-descriptions-item>
-                <el-descriptions-item label="预计交货">{{ currentOrder.expected_date }}</el-descriptions-item>
+                <el-descriptions-item label="预计交货">{{ currentOrder.delivery_date }}</el-descriptions-item>
                 <el-descriptions-item label="订单金额">¥{{ currentOrder.total_amount }}</el-descriptions-item>
                 <el-descriptions-item label="状态">
                     <el-tag :type="getStatusType(currentOrder.status)">{{ getStatusText(currentOrder.status) }}</el-tag>
@@ -137,8 +137,8 @@
                 </el-row>
                 <el-row :gutter="20">
                     <el-col :span="12">
-                        <el-form-item label="预计交货" prop="expected_date">
-                            <el-date-picker v-model="orderForm.expected_date" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%" />
+                        <el-form-item label="预计交货" prop="delivery_date">
+                            <el-date-picker v-model="orderForm.delivery_date" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
@@ -239,7 +239,7 @@ const pagination = reactive({
 const orderForm = reactive({
     customer_id: null,
     order_date: new Date().toISOString().split('T')[0],
-    expected_date: null,
+    delivery_date: null,
     warehouse_id: null,
     remark: '',
     items: []
@@ -248,7 +248,6 @@ const orderForm = reactive({
 const orderRules = {
     customer_id: [{ required: true, message: '请选择客户', trigger: 'change' }],
     order_date: [{ required: true, message: '请选择订单日期', trigger: 'change' }],
-    expected_date: [{ required: true, message: '请选择预计交货日期', trigger: 'change' }],
     warehouse_id: [{ required: true, message: '请选择仓库', trigger: 'change' }],
     items: [
         { required: true, message: '请添加订单明细', trigger: 'change' },
@@ -325,7 +324,7 @@ const handleAdd = () => {
     isEdit.value = false;
     orderForm.customer_id = null;
     orderForm.order_date = new Date().toISOString().split('T')[0];
-    orderForm.expected_date = null;
+    orderForm.delivery_date = null;
     orderForm.warehouse_id = null;
     orderForm.remark = '';
     orderForm.items = [];
@@ -349,7 +348,7 @@ const handleEdit = async (row) => {
         isEdit.value = true;
         orderForm.customer_id = order.customer_id;
         orderForm.order_date = order.order_date;
-        orderForm.expected_date = order.expected_date;
+        orderForm.delivery_date = order.delivery_date;
         orderForm.warehouse_id = order.warehouse_id;
         orderForm.remark = order.remark || '';
         orderForm.items = order.items.map(item => ({
@@ -466,10 +465,16 @@ const submitOrder = async () => {
             try {
                 const data = {
                     ...orderForm,
+                    delivery_date: orderForm.delivery_date || null,
+                    currency_id: orderForm.currency_id || null,
+                    remark: orderForm.remark || null,
                     items: orderForm.items.map(item => ({
                         product_id: item.product_id,
                         quantity: item.quantity,
-                        unit_price: item.unit_price
+                        unit_price: item.unit_price,
+                        tax_rate: item.tax_rate || null,
+                        discount_rate: item.discount_rate || null,
+                        remark: item.remark || null
                     }))
                 };
                 if (isEdit.value) {

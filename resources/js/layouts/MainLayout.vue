@@ -166,11 +166,9 @@ const handleCommand = async (command) => {
             // 用户取消
         }
     } else if (command === 'profile') {
-        // 跳转到个人中心
-        console.log('个人中心');
+        router.push('/profile');
     } else if (command === 'settings') {
-        // 跳转到系统设置
-        console.log('系统设置');
+        router.push('/settings');
     }
 };
 

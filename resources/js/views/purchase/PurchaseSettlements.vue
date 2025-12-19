@@ -520,10 +520,12 @@ const handleSubmit = async () => {
             try {
                 const data = {
                     ...form,
+                    currency_id: form.currency_id || null,
+                    remark: form.remark || null,
                     items: form.items.map(item => ({
                         reference_type: item.reference_type,
                         reference_id: item.reference_id,
-                        remark: item.remark || ''
+                        remark: item.remark || null
                     }))
                 };
                 await api.post('/purchase-settlements', data);

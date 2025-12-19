@@ -498,12 +498,15 @@ const handleSubmit = async () => {
             try {
                 const data = {
                     ...form,
+                    sales_order_id: form.sales_order_id || null,
+                    currency_id: form.currency_id || null,
+                    remark: form.remark || null,
                     items: form.items.map(item => ({
                         product_id: item.product_id,
                         quantity: item.quantity,
                         unit_price: item.unit_price,
-                        tax_rate: item.tax_rate || 0,
-                        remark: item.remark || ''
+                        tax_rate: item.tax_rate || null,
+                        remark: item.remark || null
                     }))
                 };
                 await api.post('/sales-returns', data);

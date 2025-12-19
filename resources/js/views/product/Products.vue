@@ -181,9 +181,7 @@ const form = reactive({
 
 const rules = {
     name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
-    sku: [{ required: true, message: '请输入SKU', trigger: 'blur' }],
-    category_id: [{ required: true, message: '请选择商品分类', trigger: 'change' }],
-    sale_price: [{ required: true, message: '请输入销售价', trigger: 'blur' }]
+    sku: [{ required: true, message: '请输入SKU', trigger: 'blur' }]
 };
 
 const loadProducts = async () => {
@@ -281,11 +279,20 @@ const handleSubmit = async () => {
     await formRef.value.validate(async (valid) => {
         if (valid) {
             try {
+                const data = {
+                    ...form,
+                    category_id: form.category_id || null,
+                    unit_id: form.unit_id || null,
+                    barcode: form.barcode || null,
+                    description: form.description || null,
+                    purchase_price: form.purchase_price || null,
+                    sale_price: form.sale_price || null
+                };
                 if (form.id) {
-                    await api.put(`/products/${form.id}`, form);
+                    await api.put(`/products/${form.id}`, data);
                     ElMessage.success('更新成功');
                 } else {
-                    await api.post('/products', form);
+                    await api.post('/products', data);
                     ElMessage.success('创建成功');
                 }
                 dialogVisible.value = false;

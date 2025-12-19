@@ -248,7 +248,6 @@ const orderForm = reactive({
 const orderRules = {
     supplier_id: [{ required: true, message: '请选择供应商', trigger: 'change' }],
     order_date: [{ required: true, message: '请选择订单日期', trigger: 'change' }],
-    expected_date: [{ required: true, message: '请选择预计到货日期', trigger: 'change' }],
     warehouse_id: [{ required: true, message: '请选择仓库', trigger: 'change' }],
     items: [
         { required: true, message: '请添加订单明细', trigger: 'change' },
@@ -432,10 +431,16 @@ const submitOrder = async () => {
             try {
                 const data = {
                     ...orderForm,
+                    expected_date: orderForm.expected_date || null,
+                    currency_id: orderForm.currency_id || null,
+                    remark: orderForm.remark || null,
                     items: orderForm.items.map(item => ({
                         product_id: item.product_id,
                         quantity: item.quantity,
-                        unit_price: item.unit_price
+                        unit_price: item.unit_price,
+                        tax_rate: item.tax_rate || null,
+                        discount_rate: item.discount_rate || null,
+                        remark: item.remark || null
                     }))
                 };
                 if (isEdit.value) {
