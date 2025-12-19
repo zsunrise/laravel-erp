@@ -78,7 +78,7 @@
                 </el-menu-item>
 
                 <el-menu-item index="/production">
-                    <el-icon><Setting /></el-icon>
+                    <el-icon><Operation /></el-icon>
                     <template #title>生产管理</template>
                 </el-menu-item>
 
