@@ -1,0 +1,737 @@
+<template>
+    <div class="financial-page">
+        <el-tabs v-model="activeTab">
+            <el-tab-pane label="会计凭证" name="vouchers">
+                <el-card>
+                    <template #header>
+                        <div class="card-header">
+                            <span>会计凭证</span>
+                            <el-button type="primary" @click="handleAddVoucher">新增凭证</el-button>
+                        </div>
+                    </template>
+
+                    <el-form :inline="true" :model="voucherSearchForm" class="search-form">
+                        <el-form-item label="凭证号">
+                            <el-input v-model="voucherSearchForm.voucher_no" placeholder="凭证号" clearable />
+                        </el-form-item>
+                        <el-form-item label="日期">
+                            <el-date-picker
+                                v-model="voucherSearchForm.date_range"
+                                type="daterange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                value-format="YYYY-MM-DD"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="handleVoucherSearch">查询</el-button>
+                            <el-button @click="handleVoucherReset">重置</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <el-table :data="vouchers" v-loading="voucherLoading" style="width: 100%">
+                        <el-table-column prop="id" label="ID" width="80" />
+                        <el-table-column prop="voucher_no" label="凭证号" width="150" />
+                        <el-table-column prop="voucher_date" label="凭证日期" width="120" />
+                        <el-table-column prop="type" label="类型" width="100">
+                            <template #default="{ row }">
+                                <el-tag>{{ getVoucherTypeText(row.type) }}</el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="total_debit" label="借方金额" width="120">
+                            <template #default="{ row }">¥{{ row.total_debit || 0 }}</template>
+                        </el-table-column>
+                        <el-table-column prop="total_credit" label="贷方金额" width="120">
+                            <template #default="{ row }">¥{{ row.total_credit || 0 }}</template>
+                        </el-table-column>
+                        <el-table-column prop="status" label="状态" width="100">
+                            <template #default="{ row }">
+                                <el-tag :type="row.status == 'posted' ? 'success' : 'warning'">
+                                    {{ row.status == 'posted' ? '已过账' : '草稿' }}
+                                </el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="250" fixed="right">
+                            <template #default="{ row }">
+                                <el-button type="primary" size="small" @click="handleViewVoucher(row)">查看</el-button>
+                                <el-button type="warning" size="small" @click="handleEditVoucher(row)" v-if="row.status == 'draft'">编辑</el-button>
+                                <el-button type="success" size="small" @click="handlePostVoucher(row)" v-if="row.status == 'draft'">过账</el-button>
+                                <el-button type="danger" size="small" @click="handleDeleteVoucher(row)" v-if="row.status == 'draft'">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+                    <el-pagination
+                        v-model:current-page="voucherPagination.page"
+                        v-model:page-size="voucherPagination.per_page"
+                        :total="voucherPagination.total"
+                        :page-sizes="[10, 20, 50, 100]"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        @size-change="handleVoucherSizeChange"
+                        @current-change="handleVoucherPageChange"
+                        style="margin-top: 20px;"
+                    />
+                </el-card>
+            </el-tab-pane>
+
+            <el-tab-pane label="应收应付" name="receivables">
+                <el-card>
+                    <template #header>
+                        <span>应收应付</span>
+                    </template>
+
+                    <el-tabs v-model="receivableTab">
+                        <el-tab-pane label="应收账款" name="receivable">
+                            <el-form :inline="true" :model="receivableSearchForm" class="search-form">
+                                <el-form-item label="客户">
+                                    <el-input v-model="receivableSearchForm.customer" placeholder="客户名称" clearable />
+                                </el-form-item>
+                                <el-form-item label="状态">
+                                    <el-select v-model="receivableSearchForm.status" placeholder="全部" clearable>
+                                        <el-option label="未结清" value="unpaid" />
+                                        <el-option label="已结清" value="paid" />
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="handleReceivableSearch">查询</el-button>
+                                    <el-button @click="handleReceivableReset">重置</el-button>
+                                </el-form-item>
+                            </el-form>
+
+                            <el-table :data="receivables" v-loading="receivableLoading" style="width: 100%">
+                                <el-table-column prop="id" label="ID" width="80" />
+                                <el-table-column prop="customer.name" label="客户" />
+                                <el-table-column prop="order_no" label="订单号" width="150" />
+                                <el-table-column prop="total_amount" label="应收金额" width="120">
+                                    <template #default="{ row }">¥{{ row.total_amount }}</template>
+                                </el-table-column>
+                                <el-table-column prop="paid_amount" label="已收金额" width="120">
+                                    <template #default="{ row }">¥{{ row.paid_amount }}</template>
+                                </el-table-column>
+                                <el-table-column prop="balance" label="余额" width="120">
+                                    <template #default="{ row }">¥{{ row.balance }}</template>
+                                </el-table-column>
+                                <el-table-column prop="due_date" label="到期日" width="120" />
+                                <el-table-column prop="status" label="状态" width="100">
+                                    <template #default="{ row }">
+                                        <el-tag :type="row.status == 'paid' ? 'success' : 'warning'">
+                                            {{ row.status == 'paid' ? '已结清' : '未结清' }}
+                                        </el-tag>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-tab-pane>
+
+                        <el-tab-pane label="应付账款" name="payable">
+                            <el-form :inline="true" :model="payableSearchForm" class="search-form">
+                                <el-form-item label="供应商">
+                                    <el-input v-model="payableSearchForm.supplier" placeholder="供应商名称" clearable />
+                                </el-form-item>
+                                <el-form-item label="状态">
+                                    <el-select v-model="payableSearchForm.status" placeholder="全部" clearable>
+                                        <el-option label="未结清" value="unpaid" />
+                                        <el-option label="已结清" value="paid" />
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="handlePayableSearch">查询</el-button>
+                                    <el-button @click="handlePayableReset">重置</el-button>
+                                </el-form-item>
+                            </el-form>
+
+                            <el-table :data="payables" v-loading="payableLoading" style="width: 100%">
+                                <el-table-column prop="id" label="ID" width="80" />
+                                <el-table-column prop="supplier.name" label="供应商" />
+                                <el-table-column prop="order_no" label="订单号" width="150" />
+                                <el-table-column prop="total_amount" label="应付金额" width="120">
+                                    <template #default="{ row }">¥{{ row.total_amount }}</template>
+                                </el-table-column>
+                                <el-table-column prop="paid_amount" label="已付金额" width="120">
+                                    <template #default="{ row }">¥{{ row.paid_amount }}</template>
+                                </el-table-column>
+                                <el-table-column prop="balance" label="余额" width="120">
+                                    <template #default="{ row }">¥{{ row.balance }}</template>
+                                </el-table-column>
+                                <el-table-column prop="due_date" label="到期日" width="120" />
+                                <el-table-column prop="status" label="状态" width="100">
+                                    <template #default="{ row }">
+                                        <el-tag :type="row.status == 'paid' ? 'success' : 'warning'">
+                                            {{ row.status == 'paid' ? '已结清' : '未结清' }}
+                                        </el-tag>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-card>
+            </el-tab-pane>
+        </el-tabs>
+
+        <!-- 凭证表单对话框 -->
+        <el-dialog
+            v-model="voucherDialogVisible"
+            :title="voucherDialogTitle"
+            width="1400px"
+            @close="handleVoucherDialogClose"
+        >
+            <el-form
+                ref="voucherFormRef"
+                :model="voucherForm"
+                :rules="voucherRules"
+                label-width="120px"
+            >
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <el-form-item label="凭证日期" prop="voucher_date">
+                            <el-date-picker v-model="voucherForm.voucher_date" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="凭证类型" prop="type">
+                            <el-select v-model="voucherForm.type" placeholder="请选择类型" style="width: 100%">
+                                <el-option label="普通凭证" value="general" />
+                                <el-option label="调整凭证" value="adjustment" />
+                                <el-option label="结账凭证" value="closing" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <el-form-item label="附件数" prop="attachment_count">
+                            <el-input-number v-model="voucherForm.attachment_count" :min="0" style="width: 100%" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="借贷平衡" prop="balance">
+                            <el-tag :type="isVoucherBalanced ? 'success' : 'danger'" size="large">
+                                {{ isVoucherBalanced ? '已平衡' : '不平衡' }}
+                            </el-tag>
+                            <span style="margin-left: 10px;">
+                                借方: ¥{{ totalDebit.toFixed(2) }} | 贷方: ¥{{ totalCredit.toFixed(2) }}
+                            </span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="备注" prop="remark">
+                    <el-input v-model="voucherForm.remark" type="textarea" :rows="2" />
+                </el-form-item>
+                <el-form-item label="凭证明细" prop="items">
+                    <el-button type="primary" size="small" @click="handleAddVoucherItem">添加明细</el-button>
+                    <el-table :data="voucherForm.items" style="margin-top: 10px;" border>
+                        <el-table-column prop="sequence" label="序号" width="80">
+                            <template #default="{ row, $index }">
+                                <el-input-number v-model="row.sequence" :min="0" @change="handleVoucherItemChange($index)" style="width: 100%" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="account.name" label="会计科目" width="250">
+                            <template #default="{ row, $index }">
+                                <el-select v-model="row.account_id" filterable placeholder="请选择科目" @change="handleVoucherItemAccountChange($index)" style="width: 100%">
+                                    <el-option-group
+                                        v-for="group in accountGroups"
+                                        :key="group.type"
+                                        :label="getAccountTypeText(group.type)"
+                                    >
+                                        <el-option
+                                            v-for="account in group.accounts"
+                                            :key="account.id"
+                                            :label="`${account.code} ${account.name}`"
+                                            :value="account.id"
+                                        />
+                                    </el-option-group>
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="方向" width="120">
+                            <template #default="{ row, $index }">
+                                <el-select v-model="row.direction" @change="handleVoucherItemChange($index)" style="width: 100%">
+                                    <el-option label="借方" value="debit" />
+                                    <el-option label="贷方" value="credit" />
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="金额" width="150">
+                            <template #default="{ row, $index }">
+                                <el-input-number v-model="row.amount" :min="0" :precision="2" @change="handleVoucherItemChange($index)" style="width: 100%" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="摘要" width="200">
+                            <template #default="{ row, $index }">
+                                <el-input v-model="row.summary" placeholder="摘要" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="关联类型" width="120">
+                            <template #default="{ row, $index }">
+                                <el-input v-model="row.reference_type" placeholder="关联类型" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="关联编号" width="120">
+                            <template #default="{ row, $index }">
+                                <el-input v-model="row.reference_no" placeholder="关联编号" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="100">
+                            <template #default="{ $index }">
+                                <el-button type="danger" size="small" @click="handleRemoveVoucherItem($index)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="voucherDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleSubmitVoucher" :loading="voucherSubmitLoading">确定</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 凭证详情对话框 -->
+        <el-dialog
+            v-model="voucherDetailVisible"
+            title="凭证详情"
+            width="1200px"
+        >
+            <el-descriptions :column="2" border v-if="currentVoucher">
+                <el-descriptions-item label="凭证号">{{ currentVoucher.voucher_no }}</el-descriptions-item>
+                <el-descriptions-item label="凭证日期">{{ currentVoucher.voucher_date }}</el-descriptions-item>
+                <el-descriptions-item label="凭证类型">{{ getVoucherTypeText(currentVoucher.type) }}</el-descriptions-item>
+                <el-descriptions-item label="状态">
+                    <el-tag :type="currentVoucher.status == 'posted' ? 'success' : 'warning'">
+                        {{ currentVoucher.status == 'posted' ? '已过账' : '草稿' }}
+                    </el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="借方总额">¥{{ currentVoucher.total_debit || 0 }}</el-descriptions-item>
+                <el-descriptions-item label="贷方总额">¥{{ currentVoucher.total_credit || 0 }}</el-descriptions-item>
+                <el-descriptions-item label="附件数">{{ currentVoucher.attachment_count || 0 }}</el-descriptions-item>
+                <el-descriptions-item label="创建人">{{ currentVoucher.creator?.name || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="过账人" v-if="currentVoucher.status == 'posted'">{{ currentVoucher.poster?.name || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="过账时间" v-if="currentVoucher.status == 'posted'">{{ currentVoucher.posted_at || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="备注" :span="2">{{ currentVoucher.remark || '-' }}</el-descriptions-item>
+            </el-descriptions>
+            <el-table :data="currentVoucher?.items || []" style="margin-top: 20px;" border>
+                <el-table-column prop="sequence" label="序号" width="80" />
+                <el-table-column prop="account.code" label="科目编码" width="120" />
+                <el-table-column prop="account.name" label="科目名称" />
+                <el-table-column prop="direction" label="方向" width="100">
+                    <template #default="{ row }">
+                        <el-tag :type="row.direction == 'debit' ? 'success' : 'primary'">
+                            {{ row.direction == 'debit' ? '借方' : '贷方' }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="amount" label="金额" width="120">
+                    <template #default="{ row }">¥{{ row.amount }}</template>
+                </el-table-column>
+                <el-table-column prop="summary" label="摘要" />
+                <el-table-column prop="reference_type" label="关联类型" width="120" />
+                <el-table-column prop="reference_no" label="关联编号" width="120" />
+            </el-table>
+        </el-dialog>
+    </div>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted, computed } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import api from '../../services/api';
+
+const activeTab = ref('vouchers');
+const receivableTab = ref('receivable');
+const voucherLoading = ref(false);
+const receivableLoading = ref(false);
+const payableLoading = ref(false);
+const voucherDialogVisible = ref(false);
+const voucherDetailVisible = ref(false);
+const voucherSubmitLoading = ref(false);
+const voucherFormRef = ref(null);
+const vouchers = ref([]);
+const receivables = ref([]);
+const payables = ref([]);
+const accounts = ref([]);
+const accountGroups = ref([]);
+const currentVoucher = ref(null);
+
+const voucherSearchForm = reactive({
+    voucher_no: '',
+    date_range: null
+});
+
+const voucherPagination = reactive({
+    page: 1,
+    per_page: 15,
+    total: 0
+});
+
+const voucherForm = reactive({
+    id: null,
+    voucher_date: new Date().toISOString().split('T')[0],
+    type: 'general',
+    attachment_count: 0,
+    remark: '',
+    items: []
+});
+
+const voucherRules = {
+    voucher_date: [{ required: true, message: '请选择凭证日期', trigger: 'change' }],
+    type: [{ required: true, message: '请选择凭证类型', trigger: 'change' }],
+    items: [
+        { required: true, message: '请添加凭证明细', trigger: 'change' },
+        { type: 'array', min: 2, message: '至少添加两条凭证明细', trigger: 'change' }
+    ]
+};
+
+const voucherDialogTitle = ref('新增凭证');
+
+const totalDebit = computed(() => {
+    return voucherForm.items
+        .filter(item => item.direction == 'debit')
+        .reduce((sum, item) => sum + (item.amount || 0), 0);
+});
+
+const totalCredit = computed(() => {
+    return voucherForm.items
+        .filter(item => item.direction == 'credit')
+        .reduce((sum, item) => sum + (item.amount || 0), 0);
+});
+
+const isVoucherBalanced = computed(() => {
+    return Math.abs(totalDebit.value - totalCredit.value) < 0.01;
+});
+
+const getVoucherTypeText = (type) => {
+    const typeMap = {
+        'general': '普通凭证',
+        'adjustment': '调整凭证',
+        'closing': '结账凭证'
+    };
+    return typeMap[type] || type;
+};
+
+const getAccountTypeText = (type) => {
+    const typeMap = {
+        'asset': '资产',
+        'liability': '负债',
+        'equity': '权益',
+        'revenue': '收入',
+        'expense': '费用'
+    };
+    return typeMap[type] || type;
+};
+
+const receivableSearchForm = reactive({
+    customer: '',
+    status: null
+});
+
+const payableSearchForm = reactive({
+    supplier: '',
+    status: null
+});
+
+const loadVouchers = async () => {
+    voucherLoading.value = true;
+    try {
+        const params = {
+            page: voucherPagination.page,
+            per_page: voucherPagination.per_page,
+            ...voucherSearchForm
+        };
+        if (voucherSearchForm.date_range && voucherSearchForm.date_range.length == 2) {
+            params.start_date = voucherSearchForm.date_range[0];
+            params.end_date = voucherSearchForm.date_range[1];
+        }
+        const response = await api.get('/accounting-vouchers', { params });
+        vouchers.value = response.data.data;
+        voucherPagination.total = response.data.total;
+    } catch (error) {
+        ElMessage.error('加载凭证列表失败');
+    } finally {
+        voucherLoading.value = false;
+    }
+};
+
+const loadAccounts = async () => {
+    try {
+        const response = await api.get('/chart-of-accounts', { params: { per_page: 1000, is_active: 1 } });
+        accounts.value = response.data.data;
+        
+        // 按类型分组
+        const groups = {};
+        accounts.value.forEach(account => {
+            if (!groups[account.type]) {
+                groups[account.type] = [];
+            }
+            groups[account.type].push(account);
+        });
+        
+        accountGroups.value = Object.keys(groups).map(type => ({
+            type,
+            accounts: groups[type]
+        }));
+    } catch (error) {
+        console.error('加载会计科目列表失败:', error);
+    }
+};
+
+const loadReceivables = async () => {
+    receivableLoading.value = true;
+    try {
+        const params = { ...receivableSearchForm };
+        const response = await api.get('/accounts-receivable', { params });
+        receivables.value = response.data.data;
+    } catch (error) {
+        ElMessage.error('加载应收账款失败');
+    } finally {
+        receivableLoading.value = false;
+    }
+};
+
+const loadPayables = async () => {
+    payableLoading.value = true;
+    try {
+        const params = { ...payableSearchForm };
+        const response = await api.get('/accounts-payable', { params });
+        payables.value = response.data.data;
+    } catch (error) {
+        ElMessage.error('加载应付账款失败');
+    } finally {
+        payableLoading.value = false;
+    }
+};
+
+const handleVoucherSearch = () => {
+    voucherPagination.page = 1;
+    loadVouchers();
+};
+
+const handleVoucherReset = () => {
+    voucherSearchForm.voucher_no = '';
+    voucherSearchForm.date_range = null;
+    handleVoucherSearch();
+};
+
+const handleVoucherSizeChange = () => {
+    loadVouchers();
+};
+
+const handleVoucherPageChange = () => {
+    loadVouchers();
+};
+
+const handleReceivableSearch = () => {
+    loadReceivables();
+};
+
+const handleReceivableReset = () => {
+    receivableSearchForm.customer = '';
+    receivableSearchForm.status = null;
+    handleReceivableSearch();
+};
+
+const handlePayableSearch = () => {
+    loadPayables();
+};
+
+const handlePayableReset = () => {
+    payableSearchForm.supplier = '';
+    payableSearchForm.status = null;
+    handlePayableSearch();
+};
+
+const handleAddVoucher = () => {
+    voucherDialogTitle.value = '新增凭证';
+    Object.assign(voucherForm, {
+        id: null,
+        voucher_date: new Date().toISOString().split('T')[0],
+        type: 'general',
+        attachment_count: 0,
+        remark: '',
+        items: []
+    });
+    voucherDialogVisible.value = true;
+};
+
+const handleEditVoucher = async (row) => {
+    try {
+        const response = await api.get(`/accounting-vouchers/${row.id}`);
+        const voucher = response.data.data;
+        if (voucher.status != 'draft') {
+            ElMessage.warning('只能编辑草稿状态的凭证');
+            return;
+        }
+        voucherDialogTitle.value = '编辑凭证';
+        Object.assign(voucherForm, {
+            id: voucher.id,
+            voucher_date: voucher.voucher_date,
+            type: voucher.type || 'general',
+            attachment_count: voucher.attachment_count || 0,
+            remark: voucher.remark || '',
+            items: voucher.items.map(item => ({
+                account_id: item.account_id,
+                account: item.account,
+                direction: item.direction,
+                amount: item.amount,
+                summary: item.summary || '',
+                reference_type: item.reference_type || '',
+                reference_id: item.reference_id,
+                reference_no: item.reference_no || '',
+                sequence: item.sequence || 0
+            }))
+        });
+        voucherDialogVisible.value = true;
+    } catch (error) {
+        ElMessage.error('加载凭证失败');
+    }
+};
+
+const handleViewVoucher = async (row) => {
+    try {
+        const response = await api.get(`/accounting-vouchers/${row.id}`);
+        currentVoucher.value = response.data.data;
+        voucherDetailVisible.value = true;
+    } catch (error) {
+        ElMessage.error('加载凭证详情失败');
+    }
+};
+
+const handleDeleteVoucher = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要删除该凭证吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.delete(`/accounting-vouchers/${row.id}`);
+        ElMessage.success('删除成功');
+        loadVouchers();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '删除失败');
+        }
+    }
+};
+
+const handleAddVoucherItem = () => {
+    voucherForm.items.push({
+        account_id: null,
+        account: null,
+        direction: 'debit',
+        amount: 0,
+        summary: '',
+        reference_type: '',
+        reference_id: null,
+        reference_no: '',
+        sequence: voucherForm.items.length + 1
+    });
+};
+
+const handleRemoveVoucherItem = (index) => {
+    voucherForm.items.splice(index, 1);
+    voucherForm.items.forEach((item, idx) => {
+        item.sequence = idx + 1;
+    });
+};
+
+const handleVoucherItemAccountChange = (index) => {
+    const accountId = voucherForm.items[index].account_id;
+    const account = accounts.value.find(a => a.id == accountId);
+    if (account) {
+        voucherForm.items[index].account = account;
+    }
+};
+
+const handleVoucherItemChange = () => {
+    // 触发计算
+};
+
+const handleSubmitVoucher = async () => {
+    if (!voucherFormRef.value) return;
+    
+    await voucherFormRef.value.validate(async (valid) => {
+        if (valid) {
+            if (voucherForm.items.length < 2) {
+                ElMessage.warning('至少添加两条凭证明细');
+                return;
+            }
+            if (!isVoucherBalanced.value) {
+                ElMessage.warning('借贷不平衡，请检查金额');
+                return;
+            }
+            voucherSubmitLoading.value = true;
+            try {
+                const data = {
+                    ...voucherForm,
+                    items: voucherForm.items.map(item => ({
+                        account_id: item.account_id,
+                        direction: item.direction,
+                        amount: item.amount,
+                        summary: item.summary || '',
+                        reference_type: item.reference_type || null,
+                        reference_id: item.reference_id || null,
+                        reference_no: item.reference_no || '',
+                        sequence: item.sequence || 0
+                    }))
+                };
+                if (voucherForm.id) {
+                    await api.put(`/accounting-vouchers/${voucherForm.id}`, data);
+                    ElMessage.success('更新成功');
+                } else {
+                    await api.post('/accounting-vouchers', data);
+                    ElMessage.success('创建成功');
+                }
+                voucherDialogVisible.value = false;
+                loadVouchers();
+            } catch (error) {
+                ElMessage.error(error.response?.data?.message || '操作失败');
+            } finally {
+                voucherSubmitLoading.value = false;
+            }
+        }
+    });
+};
+
+const handleVoucherDialogClose = () => {
+    voucherFormRef.value?.resetFields();
+};
+
+const handlePostVoucher = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要过账该凭证吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/accounting-vouchers/${row.id}/post`);
+        ElMessage.success('过账成功');
+        loadVouchers();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error('过账失败');
+        }
+    }
+};
+
+onMounted(() => {
+    loadVouchers();
+    loadReceivables();
+    loadPayables();
+    loadAccounts();
+});
+</script>
+
+<style scoped>
+.financial-page {
+    padding: 0;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-form {
+    margin-bottom: 20px;
+}
+</style>
+

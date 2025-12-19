@@ -1,0 +1,542 @@
+<template>
+    <div class="sales-orders-page">
+        <el-card>
+            <template #header>
+                <div class="card-header">
+                    <span>销售订单</span>
+                    <el-button type="primary" @click="handleAdd">新增订单</el-button>
+                </div>
+            </template>
+
+            <el-form :inline="true" :model="searchForm" class="search-form">
+                <el-form-item label="订单号">
+                    <el-input v-model="searchForm.order_no" placeholder="订单号" clearable />
+                </el-form-item>
+                <el-form-item label="客户">
+                    <el-input v-model="searchForm.customer" placeholder="客户名称" clearable />
+                </el-form-item>
+                <el-form-item label="状态">
+                    <el-select v-model="searchForm.status" placeholder="全部" clearable>
+                        <el-option label="待审核" value="pending" />
+                        <el-option label="已审核" value="approved" />
+                        <el-option label="已取消" value="cancelled" />
+                        <el-option label="已完成" value="completed" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="日期">
+                    <el-date-picker
+                        v-model="searchForm.date_range"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        value-format="YYYY-MM-DD"
+                    />
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="handleSearch">查询</el-button>
+                    <el-button @click="handleReset">重置</el-button>
+                </el-form-item>
+            </el-form>
+
+            <el-table :data="orders" v-loading="loading" style="width: 100%">
+                <el-table-column prop="id" label="ID" width="80" />
+                <el-table-column prop="order_no" label="订单号" width="150" />
+                <el-table-column prop="customer.name" label="客户" />
+                <el-table-column prop="total_amount" label="订单金额" width="120">
+                    <template #default="{ row }">
+                        ¥{{ row.total_amount }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="status" label="状态" width="100">
+                    <template #default="{ row }">
+                        <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="order_date" label="订单日期" width="120" />
+                <el-table-column prop="expected_date" label="预计交货" width="120" />
+                <el-table-column label="操作" width="250" fixed="right">
+                    <template #default="{ row }">
+                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
+                        <el-button type="warning" size="small" @click="handleEdit(row)" v-if="row.status == 'pending'">编辑</el-button>
+                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'">审核</el-button>
+                        <el-button type="danger" size="small" @click="handleDelete(row)" v-if="row.status == 'pending'">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+
+            <el-pagination
+                v-model:current-page="pagination.page"
+                v-model:page-size="pagination.per_page"
+                :total="pagination.total"
+                :page-sizes="[10, 20, 50, 100]"
+                layout="total, sizes, prev, pager, next, jumper"
+                @size-change="handleSizeChange"
+                @current-change="handlePageChange"
+                style="margin-top: 20px;"
+            />
+        </el-card>
+
+        <!-- 订单详情对话框 -->
+        <el-dialog
+            v-model="detailVisible"
+            title="订单详情"
+            width="1000px"
+        >
+            <el-descriptions :column="2" border v-if="currentOrder">
+                <el-descriptions-item label="订单号">{{ currentOrder.order_no }}</el-descriptions-item>
+                <el-descriptions-item label="客户">{{ currentOrder.customer?.name }}</el-descriptions-item>
+                <el-descriptions-item label="订单日期">{{ currentOrder.order_date }}</el-descriptions-item>
+                <el-descriptions-item label="预计交货">{{ currentOrder.expected_date }}</el-descriptions-item>
+                <el-descriptions-item label="订单金额">¥{{ currentOrder.total_amount }}</el-descriptions-item>
+                <el-descriptions-item label="状态">
+                    <el-tag :type="getStatusType(currentOrder.status)">{{ getStatusText(currentOrder.status) }}</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="备注" :span="2">{{ currentOrder.remark || '-' }}</el-descriptions-item>
+            </el-descriptions>
+            <el-table :data="currentOrder?.items || []" style="margin-top: 20px;">
+                <el-table-column prop="product.name" label="商品名称" />
+                <el-table-column prop="quantity" label="数量" width="100" />
+                <el-table-column prop="unit_price" label="单价" width="120">
+                    <template #default="{ row }">¥{{ row.unit_price }}</template>
+                </el-table-column>
+                <el-table-column prop="total_price" label="小计" width="120">
+                    <template #default="{ row }">¥{{ row.total_price }}</template>
+                </el-table-column>
+            </el-table>
+            <template #footer v-if="currentOrder && currentOrder.status == 'approved'">
+                <el-button type="success" @click="handleShip(currentOrder)">出库</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 新增/编辑订单对话框 -->
+        <el-dialog
+            v-model="formVisible"
+            :title="formTitle"
+            width="1200px"
+        >
+            <el-form :model="orderForm" :rules="orderRules" ref="orderFormRef" label-width="120px">
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <el-form-item label="客户" prop="customer_id">
+                            <el-select v-model="orderForm.customer_id" filterable placeholder="请选择客户" style="width: 100%">
+                                <el-option
+                                    v-for="customer in customers"
+                                    :key="customer.id"
+                                    :label="customer.name"
+                                    :value="customer.id"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="订单日期" prop="order_date">
+                            <el-date-picker v-model="orderForm.order_date" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%" />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <el-form-item label="预计交货" prop="expected_date">
+                            <el-date-picker v-model="orderForm.expected_date" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="仓库" prop="warehouse_id">
+                            <el-select v-model="orderForm.warehouse_id" placeholder="请选择仓库" style="width: 100%">
+                                <el-option
+                                    v-for="warehouse in warehouses"
+                                    :key="warehouse.id"
+                                    :label="warehouse.name"
+                                    :value="warehouse.id"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="备注">
+                    <el-input v-model="orderForm.remark" type="textarea" :rows="2" placeholder="请输入备注" />
+                </el-form-item>
+                <el-form-item label="订单明细" prop="items">
+                    <el-button type="primary" size="small" @click="handleAddItem">添加商品</el-button>
+                    <el-table :data="orderForm.items" style="margin-top: 10px;" border>
+                        <el-table-column prop="product.name" label="商品名称" width="200">
+                            <template #default="{ row, $index }">
+                                <el-select v-model="row.product_id" filterable placeholder="请选择商品" @change="handleItemProductChange($index)" style="width: 100%">
+                                    <el-option
+                                        v-for="product in products"
+                                        :key="product.id"
+                                        :label="`${product.name} (${product.sku})`"
+                                        :value="product.id"
+                                    />
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="数量" width="150">
+                            <template #default="{ row, $index }">
+                                <el-input-number v-model="row.quantity" :min="0.01" :precision="2" @change="handleItemChange($index)" style="width: 100%" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="单价" width="150">
+                            <template #default="{ row, $index }">
+                                <el-input-number v-model="row.unit_price" :min="0" :precision="2" @change="handleItemChange($index)" style="width: 100%" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="小计" width="120">
+                            <template #default="{ row }">
+                                ¥{{ (row.quantity * row.unit_price).toFixed(2) }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="100">
+                            <template #default="{ $index }">
+                                <el-button type="danger" size="small" @click="handleRemoveItem($index)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div style="margin-top: 10px; text-align: right;">
+                        <span style="font-size: 16px; font-weight: bold;">订单总额: ¥{{ totalAmount.toFixed(2) }}</span>
+                    </div>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="formVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitOrder" :loading="submitLoading">确定</el-button>
+            </template>
+        </el-dialog>
+    </div>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted, computed } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import api from '../../services/api';
+
+const loading = ref(false);
+const detailVisible = ref(false);
+const formVisible = ref(false);
+const submitLoading = ref(false);
+const orders = ref([]);
+const currentOrder = ref(null);
+const customers = ref([]);
+const products = ref([]);
+const warehouses = ref([]);
+const orderFormRef = ref(null);
+const isEdit = ref(false);
+
+const searchForm = reactive({
+    order_no: '',
+    customer: '',
+    status: null,
+    date_range: null
+});
+
+const pagination = reactive({
+    page: 1,
+    per_page: 15,
+    total: 0
+});
+
+const orderForm = reactive({
+    customer_id: null,
+    order_date: new Date().toISOString().split('T')[0],
+    expected_date: null,
+    warehouse_id: null,
+    remark: '',
+    items: []
+});
+
+const orderRules = {
+    customer_id: [{ required: true, message: '请选择客户', trigger: 'change' }],
+    order_date: [{ required: true, message: '请选择订单日期', trigger: 'change' }],
+    expected_date: [{ required: true, message: '请选择预计交货日期', trigger: 'change' }],
+    warehouse_id: [{ required: true, message: '请选择仓库', trigger: 'change' }],
+    items: [
+        { required: true, message: '请添加订单明细', trigger: 'change' },
+        { type: 'array', min: 1, message: '至少添加一条订单明细', trigger: 'change' }
+    ]
+};
+
+const totalAmount = computed(() => {
+    return orderForm.items.reduce((sum, item) => {
+        return sum + (item.quantity || 0) * (item.unit_price || 0);
+    }, 0);
+});
+
+const formTitle = computed(() => {
+    return isEdit.value ? '编辑订单' : '新增订单';
+});
+
+const getStatusType = (status) => {
+    const statusMap = {
+        'pending': 'warning',
+        'approved': 'success',
+        'cancelled': 'danger',
+        'completed': 'info'
+    };
+    return statusMap[status] || 'info';
+};
+
+const getStatusText = (status) => {
+    const statusMap = {
+        'pending': '待审核',
+        'approved': '已审核',
+        'cancelled': '已取消',
+        'completed': '已完成'
+    };
+    return statusMap[status] || status;
+};
+
+const loadOrders = async () => {
+    loading.value = true;
+    try {
+        const params = {
+            page: pagination.page,
+            per_page: pagination.per_page,
+            ...searchForm
+        };
+        if (searchForm.date_range && searchForm.date_range.length == 2) {
+            params.start_date = searchForm.date_range[0];
+            params.end_date = searchForm.date_range[1];
+        }
+        const response = await api.get('/sales-orders', { params });
+        orders.value = response.data.data;
+        pagination.total = response.data.total;
+    } catch (error) {
+        ElMessage.error('加载订单列表失败');
+    } finally {
+        loading.value = false;
+    }
+};
+
+const handleSearch = () => {
+    pagination.page = 1;
+    loadOrders();
+};
+
+const handleReset = () => {
+    searchForm.order_no = '';
+    searchForm.customer = '';
+    searchForm.status = null;
+    searchForm.date_range = null;
+    handleSearch();
+};
+
+const handleAdd = () => {
+    isEdit.value = false;
+    orderForm.customer_id = null;
+    orderForm.order_date = new Date().toISOString().split('T')[0];
+    orderForm.expected_date = null;
+    orderForm.warehouse_id = null;
+    orderForm.remark = '';
+    orderForm.items = [];
+    formVisible.value = true;
+};
+
+const handleView = async (row) => {
+    try {
+        const response = await api.get(`/sales-orders/${row.id}`);
+        currentOrder.value = response.data.data;
+        detailVisible.value = true;
+    } catch (error) {
+        ElMessage.error('加载订单详情失败');
+    }
+};
+
+const handleEdit = async (row) => {
+    try {
+        const response = await api.get(`/sales-orders/${row.id}`);
+        const order = response.data.data;
+        isEdit.value = true;
+        orderForm.customer_id = order.customer_id;
+        orderForm.order_date = order.order_date;
+        orderForm.expected_date = order.expected_date;
+        orderForm.warehouse_id = order.warehouse_id;
+        orderForm.remark = order.remark || '';
+        orderForm.items = order.items.map(item => ({
+            product_id: item.product_id,
+            product: item.product,
+            quantity: item.quantity,
+            unit_price: item.unit_price
+        }));
+        orderForm.id = order.id;
+        formVisible.value = true;
+    } catch (error) {
+        ElMessage.error('加载订单失败');
+    }
+};
+
+const handleApprove = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要审核通过该订单吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/sales-orders/${row.id}/approve`);
+        ElMessage.success('审核成功');
+        loadOrders();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error('审核失败');
+        }
+    }
+};
+
+const handleDelete = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要删除该订单吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.delete(`/sales-orders/${row.id}`);
+        ElMessage.success('删除成功');
+        loadOrders();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error('删除失败');
+        }
+    }
+};
+
+const loadCustomers = async () => {
+    try {
+        const response = await api.get('/customers', { params: { per_page: 1000 } });
+        customers.value = response.data.data;
+    } catch (error) {
+        console.error('加载客户列表失败:', error);
+    }
+};
+
+const loadProducts = async () => {
+    try {
+        const response = await api.get('/products', { params: { per_page: 1000 } });
+        products.value = response.data.data;
+    } catch (error) {
+        console.error('加载商品列表失败:', error);
+    }
+};
+
+const loadWarehouses = async () => {
+    try {
+        const response = await api.get('/warehouses', { params: { per_page: 1000 } });
+        warehouses.value = response.data.data;
+    } catch (error) {
+        console.error('加载仓库列表失败:', error);
+    }
+};
+
+const handleAddItem = () => {
+    orderForm.items.push({
+        product_id: null,
+        product: null,
+        quantity: 1,
+        unit_price: 0
+    });
+};
+
+const handleRemoveItem = (index) => {
+    orderForm.items.splice(index, 1);
+};
+
+const handleItemProductChange = (index) => {
+    const productId = orderForm.items[index].product_id;
+    const product = products.value.find(p => p.id == productId);
+    if (product) {
+        orderForm.items[index].product = product;
+        if (!orderForm.items[index].unit_price) {
+            orderForm.items[index].unit_price = product.sale_price || 0;
+        }
+    }
+};
+
+const handleItemChange = () => {
+    // 触发计算
+};
+
+const submitOrder = async () => {
+    if (!orderFormRef.value) return;
+    await orderFormRef.value.validate(async (valid) => {
+        if (valid) {
+            if (orderForm.items.length == 0) {
+                ElMessage.warning('请至少添加一条订单明细');
+                return;
+            }
+            submitLoading.value = true;
+            try {
+                const data = {
+                    ...orderForm,
+                    items: orderForm.items.map(item => ({
+                        product_id: item.product_id,
+                        quantity: item.quantity,
+                        unit_price: item.unit_price
+                    }))
+                };
+                if (isEdit.value) {
+                    await api.put(`/sales-orders/${orderForm.id}`, data);
+                    ElMessage.success('订单更新成功');
+                } else {
+                    await api.post('/sales-orders', data);
+                    ElMessage.success('订单创建成功');
+                }
+                formVisible.value = false;
+                loadOrders();
+            } catch (error) {
+                ElMessage.error(error.response?.data?.message || '操作失败');
+            } finally {
+                submitLoading.value = false;
+            }
+        }
+    });
+};
+
+const handleShip = async (order) => {
+    try {
+        await ElMessageBox.confirm('确定要执行出库操作吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/sales-orders/${order.id}/ship`);
+        ElMessage.success('出库成功');
+        detailVisible.value = false;
+        loadOrders();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '出库失败');
+        }
+    }
+};
+
+const handleSizeChange = () => {
+    loadOrders();
+};
+
+const handlePageChange = () => {
+    loadOrders();
+};
+
+onMounted(() => {
+    loadOrders();
+    loadCustomers();
+    loadProducts();
+    loadWarehouses();
+});
+</script>
+
+<style scoped>
+.sales-orders-page {
+    padding: 0;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-form {
+    margin-bottom: 20px;
+}
+</style>
+
