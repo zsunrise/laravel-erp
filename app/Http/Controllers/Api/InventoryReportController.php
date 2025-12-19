@@ -17,14 +17,14 @@ class InventoryReportController extends Controller
         $endDate = $request->end_date ?? now()->toDateString();
 
         $report = Inventory::select('products.id', 'products.name', 'products.sku')
-            ->selectRaw('SUM(inventory.quantity) as current_quantity')
-            ->selectRaw('SUM(inventory.available_quantity) as available_quantity')
-            ->selectRaw('SUM(inventory.quantity * inventory.average_cost) as total_value')
+            ->selectRaw('SUM(inventories.quantity) as current_quantity')
+            ->selectRaw('SUM(inventories.available_quantity) as available_quantity')
+            ->selectRaw('SUM(inventories.quantity * inventories.average_cost) as total_value')
             ->selectRaw('COALESCE(SUM(CASE WHEN inventory_transactions.type = "out" THEN inventory_transactions.quantity ELSE 0 END), 0) as out_quantity')
-            ->join('products', 'inventory.product_id', '=', 'products.id')
+            ->join('products', 'inventories.product_id', '=', 'products.id')
             ->leftJoin('inventory_transactions', function($join) use ($startDate, $endDate) {
-                $join->on('inventory_transactions.product_id', '=', 'inventory.product_id')
-                     ->on('inventory_transactions.warehouse_id', '=', 'inventory.warehouse_id')
+                $join->on('inventory_transactions.product_id', '=', 'inventories.product_id')
+                     ->on('inventory_transactions.warehouse_id', '=', 'inventories.warehouse_id')
                      ->whereBetween('inventory_transactions.transaction_date', [$startDate, $endDate]);
             })
             ->groupBy('products.id', 'products.name', 'products.sku')
@@ -47,13 +47,13 @@ class InventoryReportController extends Controller
         $days = $request->days ?? 90;
 
         $report = Inventory::select('products.id', 'products.name', 'products.sku')
-            ->selectRaw('SUM(inventory.quantity) as current_quantity')
-            ->selectRaw('SUM(inventory.quantity * inventory.average_cost) as total_value')
+            ->selectRaw('SUM(inventories.quantity) as current_quantity')
+            ->selectRaw('SUM(inventories.quantity * inventories.average_cost) as total_value')
             ->selectRaw('MAX(inventory_transactions.transaction_date) as last_transaction_date')
-            ->join('products', 'inventory.product_id', '=', 'products.id')
+            ->join('products', 'inventories.product_id', '=', 'products.id')
             ->leftJoin('inventory_transactions', function($join) {
-                $join->on('inventory_transactions.product_id', '=', 'inventory.product_id')
-                     ->on('inventory_transactions.warehouse_id', '=', 'inventory.warehouse_id');
+                $join->on('inventory_transactions.product_id', '=', 'inventories.product_id')
+                     ->on('inventory_transactions.warehouse_id', '=', 'inventories.warehouse_id');
             })
             ->groupBy('products.id', 'products.name', 'products.sku')
             ->get()
@@ -75,10 +75,10 @@ class InventoryReportController extends Controller
     public function valuation(Request $request)
     {
         $report = Inventory::select('warehouses.id', 'warehouses.name')
-            ->selectRaw('COUNT(DISTINCT inventory.product_id) as product_count')
-            ->selectRaw('SUM(inventory.quantity) as total_quantity')
-            ->selectRaw('SUM(inventory.quantity * inventory.average_cost) as total_value')
-            ->join('warehouses', 'inventory.warehouse_id', '=', 'warehouses.id')
+            ->selectRaw('COUNT(DISTINCT inventories.product_id) as product_count')
+            ->selectRaw('SUM(inventories.quantity) as total_quantity')
+            ->selectRaw('SUM(inventories.quantity * inventories.average_cost) as total_value')
+            ->join('warehouses', 'inventories.warehouse_id', '=', 'warehouses.id')
             ->groupBy('warehouses.id', 'warehouses.name')
             ->orderBy('total_value', 'desc')
             ->get();

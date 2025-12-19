@@ -45,6 +45,30 @@ const routes = [
                 meta: { title: '商品管理', icon: 'Goods' }
             },
             {
+                path: 'product-categories',
+                name: 'ProductCategories',
+                component: () => import('../views/basic/ProductCategories.vue'),
+                meta: { title: '商品分类', icon: 'Folder' }
+            },
+            {
+                path: 'units',
+                name: 'Units',
+                component: () => import('../views/basic/Units.vue'),
+                meta: { title: '计量单位', icon: 'Scale' }
+            },
+            {
+                path: 'currencies',
+                name: 'Currencies',
+                component: () => import('../views/basic/Currencies.vue'),
+                meta: { title: '币种管理', icon: 'Money' }
+            },
+            {
+                path: 'regions',
+                name: 'Regions',
+                component: () => import('../views/basic/Regions.vue'),
+                meta: { title: '地区管理', icon: 'Location' }
+            },
+            {
                 path: 'suppliers',
                 name: 'Suppliers',
                 component: () => import('../views/supplier/Suppliers.vue'),

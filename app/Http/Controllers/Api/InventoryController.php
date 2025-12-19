@@ -35,7 +35,7 @@ class InventoryController extends Controller
         }
 
         if ($request->has('low_stock')) {
-            $query->whereRaw('quantity <= (SELECT min_stock FROM products WHERE products.id = inventory.product_id)');
+            $query->whereRaw('inventories.quantity <= (SELECT min_stock FROM products WHERE products.id = inventories.product_id)');
         }
 
         return response()->json($query->paginate($request->get('per_page', 15)));

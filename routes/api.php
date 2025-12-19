@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\InventoryReportController;
 use App\Http\Controllers\Api\CustomReportController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\NotificationTemplateController;
+use App\Http\Controllers\Api\OperationLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -167,4 +168,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('notifications/send-by-template', [NotificationController::class, 'sendByTemplate']);
     Route::apiResource('notification-templates', NotificationTemplateController::class);
     Route::post('notification-templates/{id}/preview', [NotificationTemplateController::class, 'preview']);
+    Route::get('operation-logs', [OperationLogController::class, 'index']);
+    Route::get('operation-logs/{id}', [OperationLogController::class, 'show']);
 });
