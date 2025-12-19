@@ -25,6 +25,7 @@
                     </template>
                     <el-menu-item index="/users">用户管理</el-menu-item>
                     <el-menu-item index="/roles">角色管理</el-menu-item>
+                    <el-menu-item index="/workflows">审批流程</el-menu-item>
                 </el-sub-menu>
 
                 <el-menu-item index="/products">
@@ -51,15 +52,25 @@
                     <template #title>库存管理</template>
                 </el-menu-item>
 
-                <el-menu-item index="/purchase-orders">
-                    <el-icon><ShoppingCart /></el-icon>
-                    <template #title>采购管理</template>
-                </el-menu-item>
+                <el-sub-menu index="purchase">
+                    <template #title>
+                        <el-icon><ShoppingCart /></el-icon>
+                        <span>采购管理</span>
+                    </template>
+                    <el-menu-item index="/purchase-orders">采购订单</el-menu-item>
+                    <el-menu-item index="/purchase-returns">采购退货</el-menu-item>
+                    <el-menu-item index="/purchase-settlements">采购结算</el-menu-item>
+                </el-sub-menu>
 
-                <el-menu-item index="/sales-orders">
-                    <el-icon><ShoppingBag /></el-icon>
-                    <template #title>销售管理</template>
-                </el-menu-item>
+                <el-sub-menu index="sales">
+                    <template #title>
+                        <el-icon><ShoppingBag /></el-icon>
+                        <span>销售管理</span>
+                    </template>
+                    <el-menu-item index="/sales-orders">销售订单</el-menu-item>
+                    <el-menu-item index="/sales-returns">销售退货</el-menu-item>
+                    <el-menu-item index="/sales-settlements">销售结算</el-menu-item>
+                </el-sub-menu>
 
                 <el-menu-item index="/boms">
                     <el-icon><Document /></el-icon>

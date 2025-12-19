@@ -34,7 +34,7 @@ export default defineConfig({
             // 宿主机 IP，虚拟机需要能访问到这个地址
             // 如果虚拟机通过 NAT 访问，使用宿主机在虚拟机网络中的 IP
             // 如果通过桥接，使用宿主机的实际 IP
-            host: process.env.VITE_HMR_HOST || '192.168.31.115',
+            host: process.env.VITE_HMR_HOST,
             port: 5173,
             protocol: 'ws'
         }

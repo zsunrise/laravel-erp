@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\UnitController;
+use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WarehouseLocationController;
 use App\Http\Controllers\Api\InventoryController;
@@ -55,6 +56,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('regions/{id}', [RegionController::class, 'show']);
     Route::get('units', [UnitController::class, 'index']);
     Route::get('units/{id}', [UnitController::class, 'show']);
+    Route::get('currencies', [CurrencyController::class, 'index']);
+    Route::get('currencies/{id}', [CurrencyController::class, 'show']);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('warehouses', WarehouseController::class);
     Route::get('warehouse-locations', [WarehouseLocationController::class, 'index']);

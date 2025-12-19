@@ -33,6 +33,12 @@ const routes = [
                 meta: { title: '角色管理', icon: 'UserFilled' }
             },
             {
+                path: 'workflows',
+                name: 'Workflows',
+                component: () => import('../views/system/Workflows.vue'),
+                meta: { title: '审批流程', icon: 'DocumentChecked' }
+            },
+            {
                 path: 'products',
                 name: 'Products',
                 component: () => import('../views/product/Products.vue'),
@@ -69,10 +75,34 @@ const routes = [
                 meta: { title: '采购订单', icon: 'ShoppingCart' }
             },
             {
+                path: 'purchase-returns',
+                name: 'PurchaseReturns',
+                component: () => import('../views/purchase/PurchaseReturns.vue'),
+                meta: { title: '采购退货', icon: 'RefreshLeft' }
+            },
+            {
+                path: 'purchase-settlements',
+                name: 'PurchaseSettlements',
+                component: () => import('../views/purchase/PurchaseSettlements.vue'),
+                meta: { title: '采购结算', icon: 'CreditCard' }
+            },
+            {
                 path: 'sales-orders',
                 name: 'SalesOrders',
                 component: () => import('../views/sales/SalesOrders.vue'),
                 meta: { title: '销售订单', icon: 'ShoppingBag' }
+            },
+            {
+                path: 'sales-returns',
+                name: 'SalesReturns',
+                component: () => import('../views/sales/SalesReturns.vue'),
+                meta: { title: '销售退货', icon: 'RefreshRight' }
+            },
+            {
+                path: 'sales-settlements',
+                name: 'SalesSettlements',
+                component: () => import('../views/sales/SalesSettlements.vue'),
+                meta: { title: '销售结算', icon: 'Wallet' }
             },
             {
                 path: 'boms',
