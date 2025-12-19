@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
 
 const routes = [
     {
@@ -164,22 +163,22 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const token = localStorage.getItem('token');
     const isAuthenticated = !!token;
-    
+
     if (to.meta.requiresAuth && !isAuthenticated) {
         next({ name: 'Login' });
         return;
     }
-    
+
     if (to.name === 'Login' && isAuthenticated) {
         next({ name: 'Dashboard' });
         return;
     }
-    
+
     // 权限检查
     if (to.meta.requiresAuth && isAuthenticated) {
         const { useAuthStore } = await import('../stores/auth');
         const authStore = useAuthStore();
-        
+
         // 如果用户信息未加载，先加载
         if (!authStore.user) {
             try {
@@ -189,7 +188,7 @@ router.beforeEach(async (to, from, next) => {
                 return;
             }
         }
-        
+
         // 检查路由权限
         if (to.meta.permission) {
             if (!authStore.hasPermission(to.meta.permission)) {
@@ -197,7 +196,7 @@ router.beforeEach(async (to, from, next) => {
                 return;
             }
         }
-        
+
         if (to.meta.permissions && Array.isArray(to.meta.permissions)) {
             if (!authStore.hasAnyPermission(to.meta.permissions)) {
                 next({ name: 'Dashboard' });
@@ -205,7 +204,7 @@ router.beforeEach(async (to, from, next) => {
             }
         }
     }
-    
+
     next();
 });
 

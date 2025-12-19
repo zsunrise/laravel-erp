@@ -86,8 +86,6 @@ export const useConfirm = () => {
     };
 };
 
-import { ElMessage } from 'element-plus';
-
 /**
  * 统一错误处理工具
  */
