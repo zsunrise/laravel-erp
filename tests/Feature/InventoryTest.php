@@ -5,8 +5,10 @@ namespace Tests\Feature;
 use App\Models\Inventory;
 use App\Models\InventoryTransaction;
 use App\Models\Product;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Warehouse;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -18,7 +20,10 @@ class InventoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(RolePermissionSeeder::class);
         $this->user = User::factory()->create();
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $this->user->roles()->syncWithoutDetaching([$adminRole->id]);
         Sanctum::actingAs($this->user);
         
         $this->product = Product::factory()->create();
