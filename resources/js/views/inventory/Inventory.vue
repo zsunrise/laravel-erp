@@ -1,19 +1,29 @@
 <template>
-    <div class="inventory-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>库存管理</span>
-                    <div>
-                        <el-button type="success" @click="handleStockIn">入库</el-button>
-                        <el-button type="warning" @click="handleStockOut">出库</el-button>
-                        <el-button type="info" @click="handleTransfer">调拨</el-button>
-                        <el-button type="primary" @click="handleStocktake">盘点</el-button>
-                    </div>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">库存管理</h2>
+                <div class="page-actions">
+                    <el-button type="success" @click="handleStockIn" class="interactive">
+                        <ArrowDownCircle :size="16" style="margin-right: 6px;" />
+                        入库
+                    </el-button>
+                    <el-button type="warning" @click="handleStockOut" class="interactive">
+                        <ArrowUpCircle :size="16" style="margin-right: 6px;" />
+                        出库
+                    </el-button>
+                    <el-button type="info" @click="handleTransfer" class="interactive">
+                        <ArrowRightLeft :size="16" style="margin-right: 6px;" />
+                        调拨
+                    </el-button>
+                    <el-button type="primary" @click="handleStocktake" class="interactive">
+                        <ClipboardList :size="16" style="margin-right: 6px;" />
+                        盘点
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="商品">
                     <el-input v-model="searchForm.search" placeholder="商品名称/SKU" clearable />
                 </el-form-item>
@@ -40,7 +50,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-table :data="inventory" v-loading="loading" style="width: 100%">
+            <div class="modern-table" style="margin: 0 24px;">
+                <el-table :data="inventory" v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80" />
                 <el-table-column prop="product.name" label="商品名称" />
                 <el-table-column prop="product.sku" label="SKU" width="120" />
@@ -57,30 +68,35 @@
                 <el-table-column prop="product.unit?.name" label="单位" width="80" />
                 <el-table-column label="库存状态" width="100">
                     <template #default="{ row }">
-                        <el-tag :type="getStockStatusType(row.quantity, row.product?.min_stock || 0)">
+                        <span 
+                            :class="getStockStatusClass(row.quantity, row.product?.min_stock || 0)"
+                            class="status-badge"
+                        >
                             {{ getStockStatus(row.quantity, row.product?.min_stock || 0) }}
-                        </el-tag>
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
-                        <el-button type="info" size="small" @click="handleTransactions(row)">流水</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" class="interactive">查看</el-button>
+                        <el-button type="info" size="small" @click="handleTransactions(row)" class="interactive">流水</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
+                </el-table>
+            </div>
 
-            <el-pagination
-                v-model:current-page="pagination.page"
-                v-model:page-size="pagination.per_page"
-                :total="pagination.total"
-                :page-sizes="[10, 20, 50, 100]"
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handlePageChange"
-                style="margin-top: 20px;"
-            />
-        </el-card>
+            <div class="modern-pagination">
+                <el-pagination
+                    v-model:current-page="pagination.page"
+                    v-model:page-size="pagination.per_page"
+                    :total="pagination.total"
+                    :page-sizes="[10, 20, 50, 100]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    @size-change="handleSizeChange"
+                    @current-change="handlePageChange"
+                />
+            </div>
+        </div>
 
         <!-- 入库对话框 -->
         <el-dialog v-model="stockInVisible" title="入库操作" width="600px">
@@ -342,6 +358,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { ArrowDownCircle, ArrowUpCircle, ArrowRightLeft, ClipboardList } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const loading = ref(false);
@@ -469,6 +486,12 @@ const getStockStatusType = (quantity, minStock) => {
     if (quantity <= 0) return 'danger';
     if (quantity < minStock) return 'warning';
     return 'success';
+};
+
+const getStockStatusClass = (quantity, minStock) => {
+    if (quantity <= 0) return 'badge-muted';
+    if (quantity < minStock) return 'badge-warning';
+    return 'badge-success';
 };
 
 const getTransactionTypeText = (type) => {

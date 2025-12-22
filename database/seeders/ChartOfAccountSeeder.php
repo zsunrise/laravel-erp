@@ -75,17 +75,19 @@ class ChartOfAccountSeeder extends Seeder
                 }
             }
 
-            ChartOfAccount::create([
-                'code' => $account['code'],
-                'name' => $account['name'],
-                'parent_id' => $parentId,
-                'type' => $account['type'],
-                'category' => $account['category'],
-                'level' => $account['level'],
-                'order' => $account['order'],
-                'is_detail' => $account['is_detail'] ?? false,
-                'is_active' => true,
-            ]);
+            ChartOfAccount::firstOrCreate(
+                ['code' => $account['code']],
+                [
+                    'name' => $account['name'],
+                    'parent_id' => $parentId,
+                    'type' => $account['type'],
+                    'category' => $account['category'],
+                    'level' => $account['level'],
+                    'order' => $account['order'],
+                    'is_detail' => $account['is_detail'] ?? false,
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

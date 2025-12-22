@@ -1,14 +1,17 @@
 <template>
-    <div class="regions-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>地区管理</span>
-                    <el-button type="primary" @click="handleAdd">新增地区</el-button>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">地区管理</h2>
+                <div class="page-actions">
+                    <el-button type="primary" @click="handleAdd" class="interactive">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        新增地区
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
-            <el-row :gutter="20">
+            <el-row :gutter="20" style="margin: 24px;">
                 <el-col :span="12">
                     <el-tree
                         ref="treeRef"
@@ -51,7 +54,7 @@
                     </el-card>
                 </el-col>
             </el-row>
-        </el-card>
+        </div>
 
         <!-- 地区表单对话框 -->
         <el-dialog
@@ -108,6 +111,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const treeRef = ref(null);
@@ -262,16 +266,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.regions-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .tree-node {
     flex: 1;
     display: flex;

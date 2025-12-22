@@ -1,21 +1,23 @@
 <template>
     <div class="reports-page">
-        <el-row :gutter="20">
-            <el-col :span="24">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span>报表分析</span>
-                            <el-button-group>
-                                <el-button type="primary" @click="handleExportExcel">导出Excel</el-button>
-                                <el-button type="primary" @click="handleExportPDF">导出PDF</el-button>
-                            </el-button-group>
-                        </div>
-                    </template>
+        <div class="bento-card">
+            <div class="card-header-modern">
+                <h2 class="page-title text-primary">报表分析</h2>
+                <div class="header-actions">
+                    <el-button type="primary" @click="handleExportExcel" class="interactive">
+                        <Download :size="16" style="margin-right: 6px;" />
+                        导出Excel
+                    </el-button>
+                    <el-button type="primary" @click="handleExportPDF" class="interactive">
+                        <FileText :size="16" style="margin-right: 6px;" />
+                        导出PDF
+                    </el-button>
+                </div>
+            </div>
 
-                    <el-tabs v-model="activeTab">
-                        <el-tab-pane label="销售报表" name="sales">
-                            <el-form :inline="true" :model="salesReportForm" class="search-form">
+            <el-tabs v-model="activeTab" class="modern-tabs">
+                <el-tab-pane label="销售报表" name="sales">
+                    <el-form :inline="true" :model="salesReportForm" class="search-form-modern">
                                 <el-form-item label="日期范围">
                                     <el-date-picker
                                         v-model="salesReportForm.date_range"
@@ -64,7 +66,7 @@
                         </el-tab-pane>
 
                         <el-tab-pane label="采购报表" name="purchase">
-                            <el-form :inline="true" :model="purchaseReportForm" class="search-form">
+                            <el-form :inline="true" :model="purchaseReportForm" class="search-form-modern">
                                 <el-form-item label="日期范围">
                                     <el-date-picker
                                         v-model="purchaseReportForm.date_range"
@@ -113,7 +115,7 @@
                         </el-tab-pane>
 
                         <el-tab-pane label="库存报表" name="inventory">
-                            <el-form :inline="true" :model="inventoryReportForm" class="search-form">
+                            <el-form :inline="true" :model="inventoryReportForm" class="search-form-modern">
                                 <el-form-item label="仓库">
                                     <el-select v-model="inventoryReportForm.warehouse_id" placeholder="全部" clearable>
                                         <el-option label="全部仓库" :value="null" />
@@ -137,7 +139,7 @@
                         </el-tab-pane>
 
                         <el-tab-pane label="财务报表" name="financial">
-                            <el-form :inline="true" :model="financialReportForm" class="search-form">
+                            <el-form :inline="true" :model="financialReportForm" class="search-form-modern">
                                 <el-form-item label="日期范围">
                                     <el-date-picker
                                         v-model="financialReportForm.date_range"
@@ -176,17 +178,16 @@
                                     </el-statistic>
                                 </el-col>
                             </el-row>
-                        </el-tab-pane>
-                    </el-tabs>
-                </el-card>
-            </el-col>
-        </el-row>
+                    </el-tab-pane>
+                </el-tabs>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, watch, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Download, FileText } from 'lucide-vue-next';
 import api from '../../services/api';
 import { exportToExcel, exportToPDF } from '../../utils/export';
 import { useChart } from '../../composables/useChart';
@@ -666,14 +667,90 @@ onMounted(() => {
     padding: 0;
 }
 
-.card-header {
+.card-header-modern {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
 }
 
 .search-form {
-    margin-bottom: 20px;
+    margin: 24px;
+    padding: 20px;
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius);
+}
+
+.modern-tabs {
+    padding: 0 24px 24px;
+}
+
+.modern-tabs :deep(.el-tabs__header) {
+    margin-bottom: 24px;
+}
+
+.modern-tabs :deep(.el-tabs__item) {
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: var(--transition);
+}
+
+.modern-tabs :deep(.el-tabs__item.is-active) {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.modern-tabs :deep(.el-tabs__active-bar) {
+    background-color: var(--color-primary);
+}
+
+.modern-tabs :deep(.el-table) {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.modern-tabs :deep(.el-table th) {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.modern-tabs :deep(.el-table td) {
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.modern-tabs :deep(.el-table tr:hover) {
+    background-color: var(--color-bg-secondary);
+}
+
+/* 统计卡片样式 */
+:deep(.el-statistic) {
+    text-align: center;
+}
+
+:deep(.el-statistic__head) {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+:deep(.el-statistic__number) {
+    color: var(--color-text-primary);
+    font-weight: 600;
+    font-size: 24px;
 }
 </style>
 

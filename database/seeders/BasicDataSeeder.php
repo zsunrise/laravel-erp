@@ -24,7 +24,10 @@ class BasicDataSeeder extends Seeder
         ];
 
         foreach ($units as $unit) {
-            Unit::create($unit);
+            Unit::firstOrCreate(
+                ['code' => $unit['code']],
+                $unit
+            );
         }
 
         // 创建币种
@@ -36,7 +39,10 @@ class BasicDataSeeder extends Seeder
         ];
 
         foreach ($currencies as $currency) {
-            Currency::create($currency);
+            Currency::firstOrCreate(
+                ['code' => $currency['code']],
+                $currency
+            );
         }
 
         // 创建地区（示例：中国省份）
@@ -75,17 +81,22 @@ class BasicDataSeeder extends Seeder
         ];
 
         foreach ($provinces as $province) {
-            Region::create($province);
+            Region::firstOrCreate(
+                ['code' => $province['code']],
+                $province
+            );
         }
 
         // 创建默认仓库
-        $warehouse = Warehouse::create([
-            'name' => '主仓库',
-            'code' => 'WH001',
-            'address' => '默认地址',
-            'is_default' => true,
-            'is_active' => true,
-            'description' => '系统默认仓库',
-        ]);
+        $warehouse = Warehouse::firstOrCreate(
+            ['code' => 'WH001'],
+            [
+                'name' => '主仓库',
+                'address' => '默认地址',
+                'is_default' => true,
+                'is_active' => true,
+                'description' => '系统默认仓库',
+            ]
+        );
     }
 }

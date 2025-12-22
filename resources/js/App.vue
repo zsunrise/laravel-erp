@@ -6,19 +6,6 @@
 </script>
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-#app {
-    height: 100vh;
-    overflow: hidden;
-}
+/* 全局样式已在 app.css 中定义 */
 </style>
 

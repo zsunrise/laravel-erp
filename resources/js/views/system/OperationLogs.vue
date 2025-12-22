@@ -1,13 +1,11 @@
 <template>
-    <div class="operation-logs-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>操作日志</span>
-                </div>
-            </template>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">操作日志</h2>
+            </div>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="搜索">
                     <el-input v-model="searchForm.search" placeholder="操作动作/路径/用户" clearable />
                 </el-form-item>
@@ -59,7 +57,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-table :data="logs" v-loading="loading" style="width: 100%">
+            <div class="modern-table" style="margin: 0 24px;">
+                <el-table :data="logs" v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80" />
                 <el-table-column prop="user.name" label="用户" width="150" />
                 <el-table-column prop="module" label="模块" width="120" />
@@ -82,19 +81,21 @@
                         <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
+                </el-table>
+            </div>
 
-            <el-pagination
-                v-model:current-page="pagination.page"
-                v-model:page-size="pagination.per_page"
-                :total="pagination.total"
-                :page-sizes="[10, 20, 50, 100]"
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handlePageChange"
-                style="margin-top: 20px;"
-            />
-        </el-card>
+            <div class="modern-pagination">
+                <el-pagination
+                    v-model:current-page="pagination.page"
+                    v-model:page-size="pagination.per_page"
+                    :total="pagination.total"
+                    :page-sizes="[10, 20, 50, 100]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    @size-change="handleSizeChange"
+                    @current-change="handlePageChange"
+                />
+            </div>
+        </div>
 
         <!-- 日志详情对话框 -->
         <el-dialog
@@ -264,18 +265,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.operation-logs-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
 

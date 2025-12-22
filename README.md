@@ -6,13 +6,23 @@
 
 本系统是一个功能完整的企业资源规划系统，涵盖采购、销售、库存、生产、财务等核心业务模块，支持多仓库管理、审批流程、报表分析等功能。
 
+系统采用前后端分离架构，后端提供 RESTful API，前端使用 Vue 3 + Element Plus 构建现代化的单页应用（SPA），所有页面采用统一的现代化界面设计，提供流畅的用户体验。
+
 ## 技术栈
 
-- **后端框架**: Laravel 9.x
+### 后端
+- **框架**: Laravel 9.x
 - **PHP 版本**: PHP 8.0.2+
 - **认证方式**: Laravel Sanctum
-- **前端构建**: Vite
 - **数据库**: MySQL/MariaDB/PostgreSQL（支持 Laravel 支持的所有数据库）
+
+### 前端
+- **框架**: Vue 3 (Composition API)
+- **UI 组件库**: Element Plus
+- **图标库**: Lucide Vue Next
+- **构建工具**: Vite
+- **状态管理**: Pinia
+- **路由**: Vue Router
 
 ## 核心功能模块
 
@@ -254,11 +264,34 @@ database/
 ├── migrations/       # 数据库迁移
 └── seeders/          # 数据填充
 
+resources/
+├── js/
+│   ├── components/   # Vue 组件
+│   ├── layouts/      # 布局组件
+│   ├── views/        # 页面视图
+│   ├── services/     # API 服务
+│   └── stores/       # Pinia 状态管理
+└── css/              # 样式文件
+
 routes/
 ├── api.php           # API 路由
 ├── web.php           # Web 路由
 └── channels.php      # 广播频道
 ```
+
+### 前端界面规范
+
+系统采用统一的现代化界面设计规范：
+
+- **页面布局**: 所有页面使用统一的 `page-container` 和 `page-card` 结构
+- **页面头部**: 使用 `page-header`、`page-title` 和 `page-actions` 组件
+- **搜索表单**: 统一使用 `search-form-modern` 样式类
+- **数据表格**: 使用 `modern-table` 包装，提供统一的表格样式
+- **分页组件**: 使用 `modern-pagination` 包装，提供统一的分页样式
+- **交互按钮**: 统一使用 `interactive` 类，提供一致的交互效果
+- **图标使用**: 统一使用 Lucide Vue Next 图标库
+
+所有页面已统一布局和样式，确保用户体验的一致性。
 
 ## 安全说明
 
@@ -273,7 +306,13 @@ routes/
 
 ## 更新日志
 
-- **2025-12-18**: 完成所有核心功能模块开发，包括系统管理、基础数据、商品管理、库存管理、采购管理、销售管理、BOM 管理、生产管理、财务管理、审批流程、报表分析、消息通知等模块
+- **2025-12-18**: 
+  - 完成所有核心功能模块开发，包括系统管理、基础数据、商品管理、库存管理、采购管理、销售管理、BOM 管理、生产管理、财务管理、审批流程、报表分析、消息通知等模块
+  - 统一所有页面布局和样式，采用现代化的界面设计规范
+  - 所有页面使用统一的 `page-container`、`page-card`、`page-header` 结构
+  - 统一搜索表单样式为 `search-form-modern`
+  - 统一表格和分页组件样式
+  - 统一图标库为 Lucide Vue Next
 
 ## 贡献
 

@@ -1,14 +1,17 @@
 <template>
-    <div class="system-configs-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>系统配置管理</span>
-                    <el-button type="primary" @click="handleAdd">新增配置</el-button>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">系统配置管理</h2>
+                <div class="page-actions">
+                    <el-button type="primary" @click="handleAdd" class="interactive">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        新增配置
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="搜索">
                     <el-input v-model="searchForm.search" placeholder="配置键/描述" clearable />
                 </el-form-item>
@@ -21,7 +24,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-table :data="configs" v-loading="loading" style="width: 100%">
+            <div class="modern-table" style="margin: 0 24px;">
+                <el-table :data="configs" v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80" />
                 <el-table-column prop="key" label="配置键" min-width="200" />
                 <el-table-column prop="value" label="配置值" min-width="200" show-overflow-tooltip />
@@ -38,7 +42,8 @@
                         <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
+                </el-table>
+            </div>
 
             <el-pagination
                 v-model:current-page="pagination.page"
@@ -48,9 +53,9 @@
                 layout="total, sizes, prev, pager, next, jumper"
                 @size-change="handleSizeChange"
                 @current-change="handlePageChange"
-                style="margin-top: 20px;"
+                class="modern-pagination"
             />
-        </el-card>
+        </div>
 
         <!-- 配置表单对话框 -->
         <el-dialog
@@ -97,6 +102,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const loading = ref(false);
@@ -259,18 +265,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.system-configs-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
 

@@ -1,14 +1,17 @@
 <template>
-    <div class="products-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>商品管理</span>
-                    <el-button type="primary" @click="handleAdd">新增商品</el-button>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">商品管理</h2>
+                <div class="page-actions">
+                    <el-button type="primary" @click="handleAdd" class="interactive">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        新增商品
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="搜索">
                     <el-input v-model="searchForm.search" placeholder="商品名称/SKU/条码" clearable />
                 </el-form-item>
@@ -28,7 +31,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-table :data="products" v-loading="loading" style="width: 100%">
+            <div class="modern-table" style="margin: 0 24px;">
+                <el-table :data="products" v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80" />
                 <el-table-column prop="name" label="商品名称" />
                 <el-table-column prop="sku" label="SKU" />
@@ -40,9 +44,12 @@
                 </el-table-column>
                 <el-table-column prop="is_active" label="状态" width="100">
                     <template #default="{ row }">
-                        <el-tag :type="row.is_active ? 'success' : 'danger'">
+                        <span 
+                            :class="row.is_active ? 'badge-success' : 'badge-muted'"
+                            class="status-badge"
+                        >
                             {{ row.is_active ? '启用' : '禁用' }}
-                        </el-tag>
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="200" fixed="right">
@@ -51,19 +58,21 @@
                         <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
+                </el-table>
+            </div>
 
-            <el-pagination
-                v-model:current-page="pagination.page"
-                v-model:page-size="pagination.per_page"
-                :total="pagination.total"
-                :page-sizes="[10, 20, 50, 100]"
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handlePageChange"
-                style="margin-top: 20px;"
-            />
-        </el-card>
+            <div class="modern-pagination">
+                <el-pagination
+                    v-model:current-page="pagination.page"
+                    v-model:page-size="pagination.per_page"
+                    :total="pagination.total"
+                    :page-sizes="[10, 20, 50, 100]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    @size-change="handleSizeChange"
+                    @current-change="handlePageChange"
+                />
+            </div>
+        </div>
 
         <!-- 商品表单对话框 -->
         <el-dialog
@@ -146,6 +155,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const loading = ref(false);
@@ -323,18 +333,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.products-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类，无需额外样式 */
 </style>
 

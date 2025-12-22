@@ -1,14 +1,17 @@
 <template>
-    <div class="units-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>计量单位管理</span>
-                    <el-button type="primary" @click="handleAdd">新增单位</el-button>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">计量单位管理</h2>
+                <div class="page-actions">
+                    <el-button type="primary" @click="handleAdd" class="interactive">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        新增单位
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item>
                     <el-input v-model="searchForm.search" placeholder="单位名称/编码" clearable />
                 </el-form-item>
@@ -18,7 +21,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-table :data="units" v-loading="loading" style="width: 100%" border>
+            <div class="modern-table" style="margin: 0 24px;">
+                <el-table :data="units" v-loading="loading" style="width: 100%" border>
                 <el-table-column prop="id" label="ID" width="80" />
                 <el-table-column prop="name" label="单位名称" />
                 <el-table-column prop="code" label="单位编码" />
@@ -37,19 +41,21 @@
                         <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
+                </el-table>
+            </div>
 
-            <el-pagination
-                v-model:current-page="pagination.page"
-                v-model:page-size="pagination.per_page"
-                :total="pagination.total"
-                :page-sizes="[10, 20, 50, 100]"
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handlePageChange"
-                style="margin-top: 20px;"
-            />
-        </el-card>
+            <div class="modern-pagination">
+                <el-pagination
+                    v-model:current-page="pagination.page"
+                    v-model:page-size="pagination.per_page"
+                    :total="pagination.total"
+                    :page-sizes="[10, 20, 50, 100]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    @size-change="handleSizeChange"
+                    @current-change="handlePageChange"
+                />
+            </div>
+        </div>
 
         <!-- 单位表单对话框 -->
         <el-dialog
@@ -91,6 +97,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const formRef = ref(null);
@@ -243,18 +250,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.units-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
 

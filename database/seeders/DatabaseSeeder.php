@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             BasicDataSeeder::class,
             ChartOfAccountSeeder::class,
             UserSeeder::class,
+            BusinessDataSeeder::class,
         ]);
     }
 }

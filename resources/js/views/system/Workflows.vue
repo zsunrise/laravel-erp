@@ -2,15 +2,18 @@
     <div class="workflows-page">
         <el-tabs v-model="activeTab">
             <el-tab-pane label="流程设计" name="design">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span>审批流程</span>
-                            <el-button type="primary" @click="handleAdd">新增流程</el-button>
+                <div class="page-card">
+                    <div class="page-header">
+                        <h2 class="page-title text-primary">审批流程</h2>
+                        <div class="page-actions">
+                            <el-button type="primary" @click="handleAdd" class="interactive">
+                                <Plus :size="16" style="margin-right: 6px;" />
+                                新增流程
+                            </el-button>
                         </div>
-                    </template>
+                    </div>
 
-                    <el-form :inline="true" :model="searchForm" class="search-form">
+                    <el-form :inline="true" :model="searchForm" class="search-form-modern">
                         <el-form-item label="流程名称">
                             <el-input v-model="searchForm.name" placeholder="流程名称" clearable />
                         </el-form-item>
@@ -35,7 +38,8 @@
                         </el-form-item>
                     </el-form>
 
-                    <el-table :data="workflows" v-loading="loading" style="width: 100%">
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="workflows" v-loading="loading" style="width: 100%">
                         <el-table-column prop="id" label="ID" width="80" />
                         <el-table-column prop="name" label="流程名称" />
                         <el-table-column prop="code" label="流程编码" width="150" />
@@ -63,28 +67,31 @@
                                 <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
+                        </el-table>
+                    </div>
 
-                    <el-pagination
-                        v-model:current-page="pagination.page"
-                        v-model:page-size="pagination.per_page"
-                        :total="pagination.total"
-                        :page-sizes="[10, 20, 50, 100]"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        @size-change="handleSizeChange"
-                        @current-change="handlePageChange"
-                        style="margin-top: 20px;"
-                    />
-                </el-card>
+                    <div class="modern-pagination">
+                        <el-pagination
+                            v-model:current-page="pagination.page"
+                            v-model:page-size="pagination.per_page"
+                            :total="pagination.total"
+                            :page-sizes="[10, 20, 50, 100]"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handleSizeChange"
+                            @current-change="handlePageChange"
+                        />
+                    </div>
+                </div>
             </el-tab-pane>
 
             <el-tab-pane label="待审批" name="pending">
-                <el-card>
-                    <template #header>
-                        <span>待审批事项</span>
-                    </template>
+                <div class="page-card">
+                    <div class="page-header">
+                        <h2 class="page-title text-primary">待审批事项</h2>
+                    </div>
 
-                    <el-table :data="pendingApprovals" v-loading="pendingLoading" style="width: 100%">
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="pendingApprovals" v-loading="pendingLoading" style="width: 100%">
                         <el-table-column prop="instance_no" label="实例编号" width="180" />
                         <el-table-column prop="workflow.name" label="流程名称" />
                         <el-table-column prop="reference_type" label="关联类型" width="150">
@@ -101,17 +108,18 @@
                                 <el-button type="danger" size="small" @click="handleReject(row)">拒绝</el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
-                </el-card>
+                        </el-table>
+                    </div>
+                </div>
             </el-tab-pane>
 
             <el-tab-pane label="流程实例" name="instances">
-                <el-card>
-                    <template #header>
-                        <span>流程实例</span>
-                    </template>
+                <div class="page-card">
+                    <div class="page-header">
+                        <h2 class="page-title text-primary">流程实例</h2>
+                    </div>
 
-                    <el-form :inline="true" :model="instanceSearchForm" class="search-form">
+                    <el-form :inline="true" :model="instanceSearchForm" class="search-form-modern">
                         <el-form-item label="实例编号">
                             <el-input v-model="instanceSearchForm.instance_no" placeholder="实例编号" clearable />
                         </el-form-item>
@@ -129,7 +137,8 @@
                         </el-form-item>
                     </el-form>
 
-                    <el-table :data="instances" v-loading="instanceLoading" style="width: 100%">
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="instances" v-loading="instanceLoading" style="width: 100%">
                         <el-table-column prop="id" label="ID" width="80" />
                         <el-table-column prop="instance_no" label="实例编号" width="180" />
                         <el-table-column prop="workflow.name" label="流程名称" />
@@ -150,19 +159,21 @@
                                 <el-button type="primary" size="small" @click="handleViewInstance(row)">查看</el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
+                        </el-table>
+                    </div>
 
-                    <el-pagination
-                        v-model:current-page="instancePagination.page"
-                        v-model:page-size="instancePagination.per_page"
-                        :total="instancePagination.total"
-                        :page-sizes="[10, 20, 50, 100]"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        @size-change="handleInstanceSizeChange"
-                        @current-change="handleInstancePageChange"
-                        style="margin-top: 20px;"
-                    />
-                </el-card>
+                    <div class="modern-pagination">
+                        <el-pagination
+                            v-model:current-page="instancePagination.page"
+                            v-model:page-size="instancePagination.per_page"
+                            :total="instancePagination.total"
+                            :page-sizes="[10, 20, 50, 100]"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handleInstanceSizeChange"
+                            @current-change="handleInstancePageChange"
+                        />
+                    </div>
+                </div>
             </el-tab-pane>
         </el-tabs>
 
@@ -374,6 +385,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const activeTab = ref('design');
@@ -790,18 +802,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.workflows-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
 

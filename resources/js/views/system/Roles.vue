@@ -1,14 +1,18 @@
 <template>
-    <div class="roles-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>角色管理</span>
-                    <el-button type="primary" @click="handleAdd">新增角色</el-button>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">角色管理</h2>
+                <div class="page-actions">
+                    <el-button type="primary" @click="handleAdd" class="interactive">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        新增角色
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
-            <el-table :data="roles" v-loading="loading" style="width: 100%">
+            <div class="modern-table" style="margin: 0 24px;">
+                <el-table :data="roles" v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80" />
                 <el-table-column prop="name" label="角色名称" />
                 <el-table-column prop="slug" label="标识" />
@@ -22,19 +26,23 @@
                 </el-table-column>
                 <el-table-column prop="is_active" label="状态" width="100">
                     <template #default="{ row }">
-                        <el-tag :type="row.is_active ? 'success' : 'danger'">
+                        <span 
+                            :class="row.is_active ? 'badge-success' : 'badge-muted'"
+                            class="status-badge"
+                        >
                             {{ row.is_active ? '启用' : '禁用' }}
-                        </el-tag>
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="200" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-                        <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+                        <el-button type="primary" size="small" @click="handleEdit(row)" class="interactive">编辑</el-button>
+                        <el-button type="danger" size="small" @click="handleDelete(row)" class="interactive">删除</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
-        </el-card>
+                </el-table>
+            </div>
+        </div>
 
         <!-- 角色表单对话框 -->
         <el-dialog
@@ -83,6 +91,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const loading = ref(false);
@@ -213,14 +222,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.roles-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+/* 使用全局样式类 */
 </style>
 

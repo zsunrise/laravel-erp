@@ -75,30 +75,39 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create($permission);
+            Permission::firstOrCreate(
+                ['slug' => $permission['slug']],
+                $permission
+            );
         }
 
         // 创建角色
-        $adminRole = Role::create([
-            'name' => '系统管理员',
-            'slug' => 'admin',
-            'description' => '拥有所有权限',
-            'is_active' => true,
-        ]);
+        $adminRole = Role::firstOrCreate(
+            ['slug' => 'admin'],
+            [
+                'name' => '系统管理员',
+                'description' => '拥有所有权限',
+                'is_active' => true,
+            ]
+        );
 
-        $managerRole = Role::create([
-            'name' => '经理',
-            'slug' => 'manager',
-            'description' => '拥有业务管理权限',
-            'is_active' => true,
-        ]);
+        $managerRole = Role::firstOrCreate(
+            ['slug' => 'manager'],
+            [
+                'name' => '经理',
+                'description' => '拥有业务管理权限',
+                'is_active' => true,
+            ]
+        );
 
-        $operatorRole = Role::create([
-            'name' => '操作员',
-            'slug' => 'operator',
-            'description' => '拥有基础操作权限',
-            'is_active' => true,
-        ]);
+        $operatorRole = Role::firstOrCreate(
+            ['slug' => 'operator'],
+            [
+                'name' => '操作员',
+                'description' => '拥有基础操作权限',
+                'is_active' => true,
+            ]
+        );
 
         // 分配权限
         $adminRole->permissions()->sync(Permission::pluck('id'));

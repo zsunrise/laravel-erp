@@ -1,14 +1,17 @@
 <template>
-    <div class="purchase-orders-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>采购订单</span>
-                    <el-button type="primary" @click="handleAdd">新增订单</el-button>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">采购订单</h2>
+                <div class="page-actions">
+                    <el-button type="primary" @click="handleAdd" class="interactive">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        新增订单
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="订单号">
                     <el-input v-model="searchForm.order_no" placeholder="订单号" clearable />
                 </el-form-item>
@@ -39,7 +42,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-table :data="orders" v-loading="loading" style="width: 100%">
+            <div class="modern-table" style="margin: 0 24px;">
+                <el-table :data="orders" v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80" />
                 <el-table-column prop="order_no" label="订单号" width="150" />
                 <el-table-column prop="supplier.name" label="供应商" />
@@ -50,32 +54,39 @@
                 </el-table-column>
                 <el-table-column prop="status" label="状态" width="100">
                     <template #default="{ row }">
-                        <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
+                        <span 
+                            :class="getStatusClass(row.status)"
+                            class="status-badge"
+                        >
+                            {{ getStatusText(row.status) }}
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="order_date" label="订单日期" width="120" />
                 <el-table-column prop="expected_date" label="预计到货" width="120" />
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
-                        <el-button type="warning" size="small" @click="handleEdit(row)" v-if="row.status == 'pending'">编辑</el-button>
-                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'">审核</el-button>
-                        <el-button type="danger" size="small" @click="handleDelete(row)" v-if="row.status == 'pending'">删除</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" class="interactive">查看</el-button>
+                        <el-button type="warning" size="small" @click="handleEdit(row)" v-if="row.status == 'pending'" class="interactive">编辑</el-button>
+                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'" class="interactive">审核</el-button>
+                        <el-button type="danger" size="small" @click="handleDelete(row)" v-if="row.status == 'pending'" class="interactive">删除</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
+                </el-table>
+            </div>
 
-            <el-pagination
-                v-model:current-page="pagination.page"
-                v-model:page-size="pagination.per_page"
-                :total="pagination.total"
-                :page-sizes="[10, 20, 50, 100]"
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="handleSizeChange"
-                @current-change="handlePageChange"
-                style="margin-top: 20px;"
-            />
-        </el-card>
+            <div class="modern-pagination">
+                <el-pagination
+                    v-model:current-page="pagination.page"
+                    v-model:page-size="pagination.per_page"
+                    :total="pagination.total"
+                    :page-sizes="[10, 20, 50, 100]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    @size-change="handleSizeChange"
+                    @current-change="handlePageChange"
+                />
+            </div>
+        </div>
 
         <!-- 订单详情对话框 -->
         <el-dialog
@@ -209,6 +220,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const loading = ref(false);
@@ -273,6 +285,16 @@ const getStatusType = (status) => {
         'completed': 'info'
     };
     return statusMap[status] || 'info';
+};
+
+const getStatusClass = (status) => {
+    const classMap = {
+        'pending': 'badge-warning',
+        'approved': 'badge-success',
+        'cancelled': 'badge-muted',
+        'completed': 'badge-success'
+    };
+    return classMap[status] || 'badge-muted';
 };
 
 const getStatusText = (status) => {
@@ -527,18 +549,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.purchase-orders-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
 

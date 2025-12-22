@@ -1,15 +1,13 @@
 <template>
-    <div class="settings-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>系统设置</span>
-                </div>
-            </template>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">系统设置</h2>
+            </div>
 
             <el-tabs v-model="activeTab" type="border-card">
                 <el-tab-pane label="系统配置" name="config">
-                    <el-form :inline="true" :model="searchForm" class="search-form">
+                    <el-form :inline="true" :model="searchForm" class="search-form-modern">
                         <el-form-item label="搜索">
                             <el-input v-model="searchForm.search" placeholder="配置键/描述" clearable />
                         </el-form-item>
@@ -22,7 +20,8 @@
                         </el-form-item>
                     </el-form>
 
-                    <el-table :data="configs" v-loading="loading" style="width: 100%">
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="configs" v-loading="loading" style="width: 100%">
                         <el-table-column prop="id" label="ID" width="80" />
                         <el-table-column prop="key" label="配置键" min-width="200" />
                         <el-table-column prop="value" label="配置值" min-width="200" show-overflow-tooltip />
@@ -38,32 +37,36 @@
                                 <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
+                        </el-table>
+                    </div>
 
-                    <el-pagination
-                        v-model:current-page="pagination.page"
-                        v-model:page-size="pagination.per_page"
-                        :total="pagination.total"
-                        :page-sizes="[10, 20, 50, 100]"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        @size-change="handleSizeChange"
-                        @current-change="handlePageChange"
-                        style="margin-top: 20px;"
-                    />
+                    <div class="modern-pagination">
+                        <el-pagination
+                            v-model:current-page="pagination.page"
+                            v-model:page-size="pagination.per_page"
+                            :total="pagination.total"
+                            :page-sizes="[10, 20, 50, 100]"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handleSizeChange"
+                            @current-change="handlePageChange"
+                        />
+                    </div>
                 </el-tab-pane>
 
                 <el-tab-pane label="系统信息" name="info">
-                    <el-descriptions :column="2" border>
-                        <el-descriptions-item label="系统名称">ERP管理系统</el-descriptions-item>
-                        <el-descriptions-item label="系统版本">1.0.0</el-descriptions-item>
-                        <el-descriptions-item label="PHP版本">{{ systemInfo.php_version || '-' }}</el-descriptions-item>
-                        <el-descriptions-item label="Laravel版本">{{ systemInfo.laravel_version || '-' }}</el-descriptions-item>
-                        <el-descriptions-item label="数据库">{{ systemInfo.database || '-' }}</el-descriptions-item>
-                        <el-descriptions-item label="服务器时间">{{ currentTime }}</el-descriptions-item>
-                    </el-descriptions>
+                    <div style="padding: 24px;">
+                        <el-descriptions :column="2" border>
+                            <el-descriptions-item label="系统名称">ERP管理系统</el-descriptions-item>
+                            <el-descriptions-item label="系统版本">1.0.0</el-descriptions-item>
+                            <el-descriptions-item label="PHP版本">{{ systemInfo.php_version || '-' }}</el-descriptions-item>
+                            <el-descriptions-item label="Laravel版本">{{ systemInfo.laravel_version || '-' }}</el-descriptions-item>
+                            <el-descriptions-item label="数据库">{{ systemInfo.database || '-' }}</el-descriptions-item>
+                            <el-descriptions-item label="服务器时间">{{ currentTime }}</el-descriptions-item>
+                        </el-descriptions>
+                    </div>
                 </el-tab-pane>
             </el-tabs>
-        </el-card>
+        </div>
 
         <!-- 配置编辑对话框 -->
         <el-dialog
@@ -247,17 +250,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.settings-page {
-    padding: 20px;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
