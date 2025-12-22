@@ -321,10 +321,36 @@ onMounted(async () => {
 @media (max-width: 768px) {
     .bento-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
     
     .dashboard {
         padding: 0;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+    }
+
+    .card-header {
+        padding: 16px;
+    }
+
+    .card-title {
+        font-size: 15px;
     }
 }
 </style>

@@ -25,7 +25,8 @@ class PermissionController extends Controller
             });
         }
 
-        return response()->json($query->paginate($request->get('per_page', 15)));
+        $permissions = $query->paginate($request->get('per_page', 15));
+        return ApiResponse::paginated($permissions, '获取成功');
     }
 
     public function store(Request $request)
@@ -39,7 +40,7 @@ class PermissionController extends Controller
 
         $permission = Permission::create($validated);
 
-        return response()->json($permission, 201);
+        return ApiResponse::success($permission, '创建成功', 201);
     }
 
     public function show($id)
@@ -61,7 +62,7 @@ class PermissionController extends Controller
 
         $permission->update($validated);
 
-        return response()->json($permission);
+        return ApiResponse::success($permission, '更新成功');
     }
 
     public function destroy($id)
@@ -69,11 +70,11 @@ class PermissionController extends Controller
         $permission = Permission::findOrFail($id);
 
         if ($permission->roles()->count() > 0) {
-            return response()->json(['message' => '该权限已被角色使用，无法删除'], 400);
+            return ApiResponse::error('该权限已被角色使用，无法删除', 400);
         }
 
         $permission->delete();
 
-        return response()->json(['message' => '权限删除成功']);
+        return ApiResponse::success(null, '删除成功');
     }
 }

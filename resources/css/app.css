@@ -250,3 +250,147 @@ body {
     justify-content: flex-end;
 }
 
+/* 移动端响应式优化 */
+@media (max-width: 768px) {
+    /* 页面容器 */
+    .page-container {
+        padding: 0;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .page-title {
+        font-size: 18px;
+    }
+
+    .page-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    /* 搜索表单 */
+    .search-form-modern {
+        margin: 16px;
+        padding: 16px;
+    }
+
+    /* 表格优化 */
+    .modern-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modern-table :deep(.el-table) {
+        min-width: 600px;
+    }
+
+    .modern-table :deep(.el-table th),
+    .modern-table :deep(.el-table td) {
+        padding: 8px 4px;
+        font-size: 12px;
+    }
+
+    /* 分页优化 */
+    .modern-pagination {
+        margin-top: 16px;
+        padding: 0 16px 16px;
+        justify-content: center;
+    }
+
+    .modern-pagination :deep(.el-pagination) {
+        justify-content: center;
+    }
+
+    .modern-pagination :deep(.el-pagination .el-pager li),
+    .modern-pagination :deep(.el-pagination .btn-prev),
+    .modern-pagination :deep(.el-pagination .btn-next) {
+        min-width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 12px;
+    }
+
+    /* 卡片样式优化 */
+    .bento-card {
+        padding: 16px;
+    }
+
+    /* 按钮组优化 */
+    .page-actions .el-button {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* 表单优化 */
+    .el-form-item {
+        margin-bottom: 16px;
+    }
+
+    /* Element Plus 表格移动端优化 */
+    .el-table {
+        font-size: 12px;
+    }
+
+    .el-table th,
+    .el-table td {
+        padding: 8px 4px;
+    }
+
+    /* 对话框优化 */
+    .el-dialog {
+        width: 95% !important;
+        margin: 5vh auto !important;
+    }
+
+    .el-dialog__body {
+        padding: 16px;
+    }
+
+    /* 抽屉优化 */
+    .el-drawer {
+        width: 80% !important;
+    }
+}
+
+/* 平板端响应式优化 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .page-header {
+        padding: 20px;
+    }
+
+    .search-form-modern {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .modern-pagination {
+        padding: 0 20px 20px;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    /* 增加触摸目标大小 */
+    .interactive,
+    .el-button,
+    .el-menu-item,
+    .tab-item {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* 移除悬停效果 */
+    .interactive:hover {
+        transform: none;
+    }
+
+    .bento-card:hover {
+        transform: none;
+    }
+}
+

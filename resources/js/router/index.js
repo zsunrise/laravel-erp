@@ -32,6 +32,12 @@ const routes = [
                 meta: { title: '角色管理', icon: 'UserFilled' }
             },
             {
+                path: 'permissions',
+                name: 'Permissions',
+                component: () => import('../views/system/Permissions.vue'),
+                meta: { title: '权限管理', icon: 'Lock' }
+            },
+            {
                 path: 'workflows',
                 name: 'Workflows',
                 component: () => import('../views/system/Workflows.vue'),

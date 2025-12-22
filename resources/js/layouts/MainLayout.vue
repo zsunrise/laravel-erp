@@ -1,7 +1,18 @@
 <template>
     <el-container class="main-container">
-        <!-- 左侧导航栏 - 靛蓝色主题 -->
-        <el-aside :width="isCollapse ? '64px' : '240px'" class="sidebar">
+        <!-- 移动端遮罩层 -->
+        <div 
+            v-if="isMobile && drawerVisible" 
+            class="mobile-overlay"
+            @click="closeDrawer"
+        ></div>
+
+        <!-- 左侧导航栏 - 桌面端固定，移动端抽屉 -->
+        <el-aside 
+            v-if="!isMobile"
+            :width="isCollapse ? '64px' : '240px'" 
+            class="sidebar"
+        >
             <div class="logo">
                 <span v-if="!isCollapse" class="logo-text">ERP系统</span>
                 <span v-else class="logo-text-short">ERP</span>
@@ -20,13 +31,14 @@
                     <template #title>仪表盘</template>
                 </el-menu-item>
                 
-                <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('workflows.manage')">
+                <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('permissions.manage') || hasMenuPermission('workflows.manage')">
                     <template #title>
                         <Settings :size="20" />
                         <span>系统管理</span>
                     </template>
                     <el-menu-item index="/users" v-if="hasMenuPermission('users.manage')">用户管理</el-menu-item>
                     <el-menu-item index="/roles" v-if="hasMenuPermission('roles.manage')">角色管理</el-menu-item>
+                    <el-menu-item index="/permissions" v-if="hasMenuPermission('permissions.manage')">权限管理</el-menu-item>
                     <el-menu-item index="/workflows" v-if="hasMenuPermission('workflows.manage')">审批流程</el-menu-item>
                 </el-sub-menu>
 
@@ -96,32 +108,137 @@
             </el-menu>
         </el-aside>
 
+        <!-- 移动端抽屉式侧边栏 -->
+        <el-drawer
+            v-model="drawerVisible"
+            :with-header="false"
+            direction="ltr"
+            size="240px"
+            class="mobile-drawer"
+            :modal="false"
+        >
+            <div class="mobile-sidebar">
+                <div class="logo">
+                    <span class="logo-text">ERP系统</span>
+                </div>
+                <el-menu
+                    :default-active="activeMenu"
+                    router
+                    class="sidebar-menu"
+                    background-color="var(--color-primary)"
+                    text-color="rgba(255, 255, 255, 0.7)"
+                    active-text-color="#ffffff"
+                    @select="handleMenuSelect"
+                >
+                    <el-menu-item index="/dashboard" class="menu-item">
+                        <Gauge :size="20" />
+                        <template #title>仪表盘</template>
+                    </el-menu-item>
+                    
+                    <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('permissions.manage') || hasMenuPermission('workflows.manage')">
+                        <template #title>
+                            <Settings :size="20" />
+                            <span>系统管理</span>
+                        </template>
+                        <el-menu-item index="/users" v-if="hasMenuPermission('users.manage')">用户管理</el-menu-item>
+                        <el-menu-item index="/roles" v-if="hasMenuPermission('roles.manage')">角色管理</el-menu-item>
+                        <el-menu-item index="/permissions" v-if="hasMenuPermission('permissions.manage')">权限管理</el-menu-item>
+                        <el-menu-item index="/workflows" v-if="hasMenuPermission('workflows.manage')">审批流程</el-menu-item>
+                    </el-sub-menu>
+
+                    <el-menu-item index="/products" class="menu-item">
+                        <Package :size="20" />
+                        <template #title>商品管理</template>
+                    </el-menu-item>
+
+                    <el-sub-menu index="partner">
+                        <template #title>
+                            <Users :size="20" />
+                            <span>合作伙伴</span>
+                        </template>
+                        <el-menu-item index="/suppliers">供应商管理</el-menu-item>
+                        <el-menu-item index="/customers">客户管理</el-menu-item>
+                    </el-sub-menu>
+
+                    <el-menu-item index="/warehouses" class="menu-item">
+                        <Warehouse :size="20" />
+                        <template #title>仓库管理</template>
+                    </el-menu-item>
+
+                    <el-menu-item index="/inventory" class="menu-item">
+                        <Boxes :size="20" />
+                        <template #title>库存管理</template>
+                    </el-menu-item>
+
+                    <el-sub-menu index="purchase">
+                        <template #title>
+                            <ShoppingCart :size="20" />
+                            <span>采购管理</span>
+                        </template>
+                        <el-menu-item index="/purchase-orders">采购订单</el-menu-item>
+                        <el-menu-item index="/purchase-returns">采购退货</el-menu-item>
+                        <el-menu-item index="/purchase-settlements">采购结算</el-menu-item>
+                    </el-sub-menu>
+
+                    <el-sub-menu index="sales">
+                        <template #title>
+                            <ShoppingBag :size="20" />
+                            <span>销售管理</span>
+                        </template>
+                        <el-menu-item index="/sales-orders">销售订单</el-menu-item>
+                        <el-menu-item index="/sales-returns">销售退货</el-menu-item>
+                        <el-menu-item index="/sales-settlements">销售结算</el-menu-item>
+                    </el-sub-menu>
+
+                    <el-menu-item index="/boms" class="menu-item">
+                        <FileText :size="20" />
+                        <template #title>BOM管理</template>
+                    </el-menu-item>
+
+                    <el-menu-item index="/production" class="menu-item">
+                        <Cog :size="20" />
+                        <template #title>生产管理</template>
+                    </el-menu-item>
+
+                    <el-menu-item index="/financial" class="menu-item">
+                        <DollarSign :size="20" />
+                        <template #title>财务管理</template>
+                    </el-menu-item>
+
+                    <el-menu-item index="/reports" class="menu-item">
+                        <BarChart3 :size="20" />
+                        <template #title>报表分析</template>
+                    </el-menu-item>
+                </el-menu>
+            </div>
+        </el-drawer>
+
         <el-container>
             <!-- 顶部头部 - 包含搜索栏和用户信息 -->
             <el-header class="header">
                 <div class="header-left">
+                    <!-- 移动端显示菜单按钮 -->
                     <Menu 
-                        v-if="isCollapse"
+                        v-if="isMobile"
                         :size="20" 
                         class="collapse-icon interactive"
-                        @click="toggleCollapse"
+                        @click="openDrawer"
                     />
-                    <X 
-                        v-else
-                        :size="20" 
-                        class="collapse-icon interactive"
-                        @click="toggleCollapse"
-                    />
-                    <el-input
-                        v-model="searchQuery"
-                        placeholder="全局搜索..."
-                        class="global-search"
-                        clearable
-                    >
-                        <template #prefix>
-                            <Search :size="18" />
-                        </template>
-                    </el-input>
+                    <!-- 桌面端显示折叠按钮 -->
+                    <template v-else>
+                        <Menu 
+                            v-if="isCollapse"
+                            :size="20" 
+                            class="collapse-icon interactive"
+                            @click="toggleCollapse"
+                        />
+                        <X 
+                            v-else
+                            :size="20" 
+                            class="collapse-icon interactive"
+                            @click="toggleCollapse"
+                        />
+                    </template>
                 </div>
                 <div class="header-right">
                     <el-badge :value="unreadCount" class="notification-badge interactive">
@@ -129,9 +246,9 @@
                     </el-badge>
                     <el-dropdown @command="handleCommand">
                         <span class="user-info interactive">
-                            <el-avatar :size="32" :src="user?.avatar">{{ user?.name?.charAt(0) }}</el-avatar>
-                            <span class="username">{{ user?.name }}</span>
-                            <ChevronDown :size="16" />
+                            <el-avatar :size="isMobile ? 28 : 32" :src="user?.avatar">{{ user?.name?.charAt(0) }}</el-avatar>
+                            <span v-if="!isMobile" class="username">{{ user?.name }}</span>
+                            <ChevronDown v-if="!isMobile" :size="16" />
                         </span>
                         <template #dropdown>
                             <el-dropdown-menu>
@@ -144,8 +261,8 @@
                 </div>
             </el-header>
 
-            <!-- 标签页 -->
-            <TabsView />
+            <!-- 标签页 - 移动端隐藏 -->
+            <TabsView v-if="!isMobile" />
 
             <el-main class="main-content">
                 <router-view />
@@ -155,7 +272,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useConfirm } from '../utils/message';
@@ -163,7 +280,7 @@ import TabsView from '../components/TabsView.vue';
 import { 
     Gauge, Settings, Package, Users, Warehouse, Boxes, 
     ShoppingCart, ShoppingBag, FileText, Cog, DollarSign, 
-    BarChart3, Menu, X, Search, Bell, ChevronDown 
+    BarChart3, Menu, X, Bell, ChevronDown 
 } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -173,13 +290,38 @@ const { confirm } = useConfirm();
 
 const isCollapse = ref(false);
 const unreadCount = ref(0);
-const searchQuery = ref('');
+const drawerVisible = ref(false);
+const isMobile = ref(false);
 
 const user = computed(() => authStore.user);
 const activeMenu = computed(() => route.path);
 
+// 检测是否为移动端
+const checkMobile = () => {
+    isMobile.value = window.innerWidth < 768;
+    // 移动端默认收起侧边栏
+    if (isMobile.value) {
+        isCollapse.value = true;
+    }
+};
+
 const toggleCollapse = () => {
     isCollapse.value = !isCollapse.value;
+};
+
+const openDrawer = () => {
+    drawerVisible.value = true;
+};
+
+const closeDrawer = () => {
+    drawerVisible.value = false;
+};
+
+const handleMenuSelect = () => {
+    // 移动端选择菜单后自动关闭抽屉
+    if (isMobile.value) {
+        closeDrawer();
+    }
 };
 
 const hasMenuPermission = (permission) => {
@@ -207,6 +349,12 @@ onMounted(async () => {
     if (!authStore.user) {
         await authStore.fetchUser();
     }
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', checkMobile);
 });
 </script>
 
@@ -372,8 +520,6 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     gap: 16px;
-    flex: 1;
-    max-width: 600px;
 }
 
 .collapse-icon {
@@ -383,21 +529,6 @@ onMounted(async () => {
 
 .collapse-icon:hover {
     color: var(--color-primary);
-}
-
-.global-search {
-    flex: 1;
-    max-width: 400px;
-}
-
-.global-search :deep(.el-input__wrapper) {
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-
-.global-search :deep(.el-input__wrapper:hover) {
-    box-shadow: var(--shadow);
 }
 
 .header-right {
@@ -511,6 +642,73 @@ onMounted(async () => {
     );
     background-clip: padding-box;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 移动端遮罩层 */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1998;
+    transition: opacity 0.3s;
+}
+
+/* 移动端抽屉样式 */
+.mobile-drawer :deep(.el-drawer__body) {
+    padding: 0;
+}
+
+.mobile-sidebar {
+    height: 100%;
+    background-color: var(--color-primary);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 移动端响应式样式 */
+@media (max-width: 768px) {
+    .main-container {
+        position: relative;
+    }
+
+    .header {
+        padding: 0 16px;
+        height: 56px;
+    }
+
+    .header-right {
+        gap: 12px;
+    }
+
+    .username {
+        display: none;
+    }
+
+    .main-content {
+        padding: 16px;
+    }
+
+    .notification-badge {
+        padding: 6px;
+    }
+
+    .user-info {
+        padding: 2px 4px;
+    }
+}
+
+/* 平板端响应式样式 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .header {
+        padding: 0 20px;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
 }
 </style>
 
