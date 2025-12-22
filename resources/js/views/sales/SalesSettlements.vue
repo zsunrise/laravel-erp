@@ -568,6 +568,7 @@ const handleDialogClose = () => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadSettlements();
 };
 

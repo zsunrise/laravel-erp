@@ -485,6 +485,7 @@ const handleSubmitLocation = async () => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadWarehouses();
 };
 

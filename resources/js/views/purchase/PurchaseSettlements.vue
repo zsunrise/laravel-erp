@@ -432,6 +432,10 @@ const handleView = async (row) => {
         currentSettlement.value = response.data.data;
     } catch (error) {
         ElMessage.error('加载结算详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 
@@ -567,6 +571,7 @@ const handleDialogClose = () => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadSettlements();
 };
 

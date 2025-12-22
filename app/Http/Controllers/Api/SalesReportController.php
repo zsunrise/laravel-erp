@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\Customer;
@@ -16,20 +17,36 @@ class SalesReportController extends Controller
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
         $endDate = $request->end_date ?? now()->toDateString();
 
+        // 按日期分组的数据
+        $data = SalesOrder::selectRaw("DATE_FORMAT(order_date, '%Y-%m-%d') as date")
+            ->selectRaw('COUNT(*) as order_count')
+            ->selectRaw('SUM(total_amount) as total_amount')
+            ->selectRaw('COUNT(DISTINCT customer_id) as customer_count')
+            ->whereBetween('order_date', [$startDate, $endDate])
+            ->where('status', '!=', 'cancelled')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // 统计信息
         $query = SalesOrder::whereBetween('order_date', [$startDate, $endDate])
             ->where('status', '!=', 'cancelled');
 
-        $summary = [
-            'total_orders' => $query->count(),
-            'total_amount' => $query->sum('total_amount'),
-            'total_quantity' => SalesOrderItem::whereHas('salesOrder', function($q) use ($startDate, $endDate) {
-                $q->whereBetween('order_date', [$startDate, $endDate])
-                  ->where('status', '!=', 'cancelled');
-            })->sum('quantity'),
-            'average_order_amount' => $query->avg('total_amount'),
+        $totalAmount = $query->sum('total_amount');
+        $orderCount = $query->count();
+        $customerCount = $query->distinct('customer_id')->count('customer_id');
+
+        $stats = [
+            'total_amount' => $totalAmount ?? 0,
+            'order_count' => $orderCount,
+            'avg_amount' => $orderCount > 0 ? round($totalAmount / $orderCount, 2) : 0,
+            'customer_count' => $customerCount,
         ];
 
-        return response()->json($summary);
+        return ApiResponse::success([
+            'data' => $data,
+            'stats' => $stats,
+        ], '获取成功');
     }
 
     public function byCustomer(Request $request)

@@ -554,6 +554,7 @@ const handleDelete = async (row) => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadOrders();
 };
 

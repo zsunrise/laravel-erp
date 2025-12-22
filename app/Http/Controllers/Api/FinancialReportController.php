@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\GeneralLedger;
 use App\Models\ChartOfAccount;
 use Illuminate\Http\Request;
@@ -102,15 +103,19 @@ class FinancialReportController extends Controller
         $totalRevenue = $revenue->sum('amount');
         $totalExpenses = $expenses->sum('amount');
         $netIncome = $totalRevenue - $totalExpenses;
+        $profitRate = $totalRevenue > 0 ? round(($netIncome / $totalRevenue) * 100, 2) : 0;
 
-        return response()->json([
-            'start_date' => $startDate,
-            'end_date' => $endDate,
+        $stats = [
+            'revenue' => $totalRevenue,
+            'cost' => $totalExpenses,
+            'profit' => $netIncome,
+            'profit_rate' => $profitRate,
+        ];
+
+        return ApiResponse::success([
+            'stats' => $stats,
             'revenue' => $revenue,
             'expenses' => $expenses,
-            'total_revenue' => $totalRevenue,
-            'total_expenses' => $totalExpenses,
-            'net_income' => $netIncome,
-        ]);
+        ], '获取成功');
     }
 }

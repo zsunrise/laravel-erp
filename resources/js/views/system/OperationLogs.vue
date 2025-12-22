@@ -269,6 +269,7 @@ const handleView = async (row) => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadLogs();
 };
 

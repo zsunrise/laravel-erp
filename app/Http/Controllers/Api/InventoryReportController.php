@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Inventory;
 use App\Models\InventoryTransaction;
 use App\Models\Product;
@@ -74,16 +75,34 @@ class InventoryReportController extends Controller
 
     public function valuation(Request $request)
     {
-        $report = Inventory::select('warehouses.id', 'warehouses.name')
-            ->selectRaw('COUNT(DISTINCT inventories.product_id) as product_count')
-            ->selectRaw('SUM(inventories.quantity) as total_quantity')
-            ->selectRaw('SUM(inventories.quantity * inventories.average_cost) as total_value')
-            ->join('warehouses', 'inventories.warehouse_id', '=', 'warehouses.id')
-            ->groupBy('warehouses.id', 'warehouses.name')
-            ->orderBy('total_value', 'desc')
-            ->get();
+        $warehouseId = $request->warehouse_id;
+        
+        $query = Inventory::select('inventories.id', 'inventories.product_id', 'inventories.warehouse_id', 'inventories.quantity')
+            ->selectRaw('inventories.quantity * inventories.average_cost as total_value')
+            ->with(['product', 'warehouse']);
 
-        return response()->json($report);
+        if ($warehouseId) {
+            $query->where('inventories.warehouse_id', $warehouseId);
+        }
+
+        $report = $query->get()
+            ->map(function($item) {
+                return [
+                    'product' => [
+                        'id' => $item->product_id,
+                        'name' => $item->product->name ?? '',
+                        'sku' => $item->product->sku ?? '',
+                    ],
+                    'warehouse' => [
+                        'id' => $item->warehouse_id,
+                        'name' => $item->warehouse->name ?? '',
+                    ],
+                    'quantity' => $item->quantity,
+                    'total_value' => $item->total_value ?? 0,
+                ];
+            });
+
+        return ApiResponse::success($report, '获取成功');
     }
 
     public function movement(Request $request)

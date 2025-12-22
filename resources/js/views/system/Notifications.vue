@@ -367,6 +367,9 @@ const handleView = async (row) => {
     } catch (error) {
         ElMessage.error('加载消息详情失败');
         detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 
@@ -457,6 +460,7 @@ const handleSendDialogClose = () => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadNotifications();
 };
 

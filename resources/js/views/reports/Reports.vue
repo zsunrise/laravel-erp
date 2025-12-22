@@ -252,8 +252,13 @@ const loadSalesReport = async () => {
             params.end_date = salesReportForm.date_range[1];
         }
         const response = await api.get('/sales-reports/summary', { params });
-        salesReportData.value = response.data.data || [];
-        Object.assign(salesStats, response.data.stats || {});
+        if (response.data.success && response.data.data) {
+            salesReportData.value = response.data.data.data || [];
+            Object.assign(salesStats, response.data.data.stats || {});
+        } else {
+            salesReportData.value = [];
+            Object.assign(salesStats, { total_amount: 0, order_count: 0, avg_amount: 0, customer_count: 0 });
+        }
         
         // 更新图表
         await nextTick();
@@ -261,7 +266,10 @@ const loadSalesReport = async () => {
             updateSalesChart();
         }
     } catch (error) {
-        ElMessage.error('加载销售报表失败');
+        console.error('加载销售报表失败:', error);
+        ElMessage.error(error.response?.data?.message || '加载销售报表失败');
+        salesReportData.value = [];
+        Object.assign(salesStats, { total_amount: 0, order_count: 0, avg_amount: 0, customer_count: 0 });
     } finally {
         salesReportLoading.value = false;
     }
@@ -357,8 +365,13 @@ const loadPurchaseReport = async () => {
             params.end_date = purchaseReportForm.date_range[1];
         }
         const response = await api.get('/purchase-reports/summary', { params });
-        purchaseReportData.value = response.data.data || [];
-        Object.assign(purchaseStats, response.data.stats || {});
+        if (response.data.success && response.data.data) {
+            purchaseReportData.value = response.data.data.data || [];
+            Object.assign(purchaseStats, response.data.data.stats || {});
+        } else {
+            purchaseReportData.value = [];
+            Object.assign(purchaseStats, { total_amount: 0, order_count: 0, avg_amount: 0, supplier_count: 0 });
+        }
         
         // 更新图表
         await nextTick();
@@ -366,7 +379,10 @@ const loadPurchaseReport = async () => {
             updatePurchaseChart();
         }
     } catch (error) {
-        ElMessage.error('加载采购报表失败');
+        console.error('加载采购报表失败:', error);
+        ElMessage.error(error.response?.data?.message || '加载采购报表失败');
+        purchaseReportData.value = [];
+        Object.assign(purchaseStats, { total_amount: 0, order_count: 0, avg_amount: 0, supplier_count: 0 });
     } finally {
         purchaseReportLoading.value = false;
     }
@@ -458,9 +474,15 @@ const loadInventoryReport = async () => {
     try {
         const params = { ...inventoryReportForm };
         const response = await api.get('/inventory-reports/valuation', { params });
-        inventoryReportData.value = response.data.data || [];
+        if (response.data.success && response.data.data) {
+            inventoryReportData.value = response.data.data || [];
+        } else {
+            inventoryReportData.value = [];
+        }
     } catch (error) {
-        ElMessage.error('加载库存报表失败');
+        console.error('加载库存报表失败:', error);
+        ElMessage.error(error.response?.data?.message || '加载库存报表失败');
+        inventoryReportData.value = [];
     } finally {
         inventoryReportLoading.value = false;
     }
@@ -474,9 +496,15 @@ const loadFinancialReport = async () => {
             params.end_date = financialReportForm.date_range[1];
         }
         const response = await api.get('/financial-reports/income-statement', { params });
-        Object.assign(financialStats, response.data.stats || {});
+        if (response.data.success && response.data.data && response.data.data.stats) {
+            Object.assign(financialStats, response.data.data.stats);
+        } else {
+            Object.assign(financialStats, { revenue: 0, cost: 0, profit: 0, profit_rate: 0 });
+        }
     } catch (error) {
-        ElMessage.error('加载财务报表失败');
+        console.error('加载财务报表失败:', error);
+        ElMessage.error(error.response?.data?.message || '加载财务报表失败');
+        Object.assign(financialStats, { revenue: 0, cost: 0, profit: 0, profit_rate: 0 });
     }
 };
 

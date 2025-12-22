@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ApprovalRecord;
 use App\Models\WorkflowInstance;
 use App\Services\ApprovalService;
@@ -72,15 +73,22 @@ class ApprovalRecordController extends Controller
 
     public function history($instanceId)
     {
-        $instance = WorkflowInstance::findOrFail($instanceId);
+        $instance = WorkflowInstance::with([
+            'workflow',
+            'currentNode',
+            'starter',
+            'approvalRecords.approver',
+            'approvalRecords.node'
+        ])->findOrFail($instanceId);
+        
         $records = ApprovalRecord::with(['node', 'approver', 'transferredTo'])
             ->where('instance_id', $instanceId)
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return response()->json([
+        return ApiResponse::success([
             'instance' => $instance,
             'records' => $records,
-        ]);
+        ], '获取成功');
     }
 }

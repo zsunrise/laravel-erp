@@ -527,6 +527,7 @@ const handleVoucherReset = () => {
 };
 
 const handleVoucherSizeChange = () => {
+    voucherPagination.page = 1;
     loadVouchers();
 };
 

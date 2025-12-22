@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
@@ -15,20 +16,36 @@ class PurchaseReportController extends Controller
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
         $endDate = $request->end_date ?? now()->toDateString();
 
+        // 按日期分组的数据
+        $data = PurchaseOrder::selectRaw("DATE_FORMAT(order_date, '%Y-%m-%d') as date")
+            ->selectRaw('COUNT(*) as order_count')
+            ->selectRaw('SUM(total_amount) as total_amount')
+            ->selectRaw('COUNT(DISTINCT supplier_id) as supplier_count')
+            ->whereBetween('order_date', [$startDate, $endDate])
+            ->where('status', '!=', 'cancelled')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // 统计信息
         $query = PurchaseOrder::whereBetween('order_date', [$startDate, $endDate])
             ->where('status', '!=', 'cancelled');
 
-        $summary = [
-            'total_orders' => $query->count(),
-            'total_amount' => $query->sum('total_amount'),
-            'total_quantity' => PurchaseOrderItem::whereHas('purchaseOrder', function($q) use ($startDate, $endDate) {
-                $q->whereBetween('order_date', [$startDate, $endDate])
-                  ->where('status', '!=', 'cancelled');
-            })->sum('quantity'),
-            'average_order_amount' => $query->avg('total_amount'),
+        $totalAmount = $query->sum('total_amount');
+        $orderCount = $query->count();
+        $supplierCount = $query->distinct('supplier_id')->count('supplier_id');
+
+        $stats = [
+            'total_amount' => $totalAmount ?? 0,
+            'order_count' => $orderCount,
+            'avg_amount' => $orderCount > 0 ? round($totalAmount / $orderCount, 2) : 0,
+            'supplier_count' => $supplierCount,
         ];
 
-        return response()->json($summary);
+        return ApiResponse::success([
+            'data' => $data,
+            'stats' => $stats,
+        ], '获取成功');
     }
 
     public function bySupplier(Request $request)

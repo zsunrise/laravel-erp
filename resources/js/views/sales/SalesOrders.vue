@@ -554,6 +554,7 @@ const handleShip = async (order) => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadOrders();
 };
 

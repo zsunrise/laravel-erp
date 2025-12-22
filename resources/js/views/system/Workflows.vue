@@ -804,10 +804,15 @@ const handleViewInstance = async (row) => {
     
     try {
         const response = await api.get(`/approval-records/${row.id}/history`);
-        currentInstance.value = response.data.data.instance;
-        approvalHistory.value = response.data.data.records || [];
+        if (response.data.success && response.data.data) {
+            currentInstance.value = response.data.data.instance;
+            approvalHistory.value = response.data.data.records || [];
+        } else {
+            throw new Error('返回数据格式错误');
+        }
     } catch (error) {
-        ElMessage.error('加载实例详情失败');
+        console.error('加载实例详情失败:', error);
+        ElMessage.error(error.response?.data?.message || error.message || '加载实例详情失败');
         instanceDetailVisible.value = false;
     } finally {
         instanceDetailLoading.value = false;
@@ -816,6 +821,7 @@ const handleViewInstance = async (row) => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadWorkflows();
 };
 
@@ -824,6 +830,7 @@ const handlePageChange = () => {
 };
 
 const handleInstanceSizeChange = () => {
+    instancePagination.page = 1;
     loadInstances();
 };
 

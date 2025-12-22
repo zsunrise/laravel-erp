@@ -188,6 +188,7 @@ const handleReset = () => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadConfigs();
 };
 

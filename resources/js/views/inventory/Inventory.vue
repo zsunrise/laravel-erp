@@ -850,6 +850,7 @@ const loadTransactions = async (row) => {
 };
 
 const handleTransactionsSizeChange = () => {
+    transactionsPagination.page = 1;
     if (currentInventory.value) {
         loadTransactions(currentInventory.value);
     }
@@ -862,6 +863,7 @@ const handleTransactionsPageChange = () => {
 };
 
 const handleSizeChange = () => {
+    pagination.page = 1;
     loadInventory();
 };
 

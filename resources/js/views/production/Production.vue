@@ -720,6 +720,7 @@ const handlePlanReset = () => {
 };
 
 const handlePlanSizeChange = () => {
+    planPagination.page = 1;
     loadPlans();
 };
 
@@ -739,6 +740,7 @@ const handleWorkOrderReset = () => {
 };
 
 const handleWorkOrderSizeChange = () => {
+    workOrderPagination.page = 1;
     loadWorkOrders();
 };
 
