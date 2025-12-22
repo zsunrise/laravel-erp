@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\OperationLog;
 use Illuminate\Http\Request;
 
@@ -34,15 +35,16 @@ class OperationLogController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('action', 'like', "%{$search}%")
-                  ->orWhere('path', 'like', "%{$search}%")
-                  ->orWhere('message', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                  });
-            });
+            $query->leftJoin('users', 'operation_logs.user_id', '=', 'users.id')
+                  ->where(function($q) use ($search) {
+                      $q->where('operation_logs.action', 'like', "%{$search}%")
+                        ->orWhere('operation_logs.path', 'like', "%{$search}%")
+                        ->orWhere('operation_logs.message', 'like', "%{$search}%")
+                        ->orWhere('users.name', 'like', "%{$search}%")
+                        ->orWhere('users.email', 'like', "%{$search}%");
+                  })
+                  ->select('operation_logs.*')
+                  ->distinct();
         }
 
         if ($request->has('date_from')) {
@@ -59,7 +61,7 @@ class OperationLogController extends Controller
     public function show($id)
     {
         $log = OperationLog::with(['user'])->findOrFail($id);
-        return response()->json($log);
+        return ApiResponse::success($log, '获取成功');
     }
 }
 

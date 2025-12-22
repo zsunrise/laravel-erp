@@ -8,7 +8,7 @@
                 </div>
             </template>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="结算单号">
                     <el-input v-model="searchForm.settlement_no" placeholder="结算单号" clearable />
                 </el-form-item>

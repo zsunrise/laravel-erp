@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Role;
 use Illuminate\Http\Request;
 
@@ -50,7 +51,7 @@ class RoleController extends Controller
     public function show($id)
     {
         $role = Role::with(['permissions', 'users'])->findOrFail($id);
-        return response()->json($role);
+        return ApiResponse::success($role, '获取成功');
     }
 
     public function update(Request $request, $id)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 
@@ -51,7 +52,7 @@ class ProductCategoryController extends Controller
     public function show($id)
     {
         $category = ProductCategory::with(['parent', 'children'])->findOrFail($id);
-        return response()->json($category);
+        return ApiResponse::success($category, '获取成功');
     }
 
     public function update(Request $request, $id)

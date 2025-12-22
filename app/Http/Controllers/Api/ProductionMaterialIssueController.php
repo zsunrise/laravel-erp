@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ProductionMaterialIssue;
 use Illuminate\Http\Request;
 
@@ -37,6 +38,6 @@ class ProductionMaterialIssueController extends Controller
             'workOrder', 'warehouse', 'creator', 'approver',
             'items.product', 'items.location'
         ])->findOrFail($id);
-        return response()->json($materialIssue);
+        return ApiResponse::success($materialIssue, '获取成功');
     }
 }

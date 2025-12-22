@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Workflow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -66,7 +67,7 @@ class WorkflowController extends Controller
     public function show($id)
     {
         $workflow = Workflow::with(['nodes', 'creator'])->findOrFail($id);
-        return response()->json($workflow);
+        return ApiResponse::success($workflow, '获取成功');
     }
 
     public function update(Request $request, $id)

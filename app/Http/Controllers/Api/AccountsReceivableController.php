@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\AccountsReceivable;
 use App\Services\FinancialService;
 use Illuminate\Http\Request;
@@ -61,7 +62,7 @@ class AccountsReceivableController extends Controller
     public function show($id)
     {
         $receivable = AccountsReceivable::with(['customer', 'currency'])->findOrFail($id);
-        return response()->json($receivable);
+        return ApiResponse::success($receivable, '获取成功');
     }
 
     public function receivePayment($id, Request $request)

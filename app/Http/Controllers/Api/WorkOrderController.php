@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\WorkOrder;
 use App\Models\ProductionMaterialIssue;
 use App\Models\ProductionReport;
@@ -80,7 +81,7 @@ class WorkOrderController extends Controller
             'items.processRouteStep', 'items.assignedTo',
             'materialIssues.items.product', 'reports.reporter'
         ])->findOrFail($id);
-        return response()->json($workOrder);
+        return ApiResponse::success($workOrder, '获取成功');
     }
 
     public function update(Request $request, $id)

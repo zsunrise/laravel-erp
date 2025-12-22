@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ProcessRoute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,14 @@ class ProcessRouteController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('version', 'like', "%{$search}%")
-                  ->orWhereHas('product', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('sku', 'like', "%{$search}%");
-                  });
-            });
+            $query->leftJoin('products', 'process_routes.product_id', '=', 'products.id')
+                  ->where(function($q) use ($search) {
+                      $q->where('process_routes.version', 'like', "%{$search}%")
+                        ->orWhere('products.name', 'like', "%{$search}%")
+                        ->orWhere('products.sku', 'like', "%{$search}%");
+                  })
+                  ->select('process_routes.*')
+                  ->distinct();
         }
 
         return response()->json($query->orderBy('effective_date', 'desc')->paginate($request->get('per_page', 15)));
@@ -102,7 +104,7 @@ class ProcessRouteController extends Controller
     {
         $processRoute = ProcessRoute::with(['product', 'steps', 'creator'])
             ->findOrFail($id);
-        return response()->json($processRoute);
+        return ApiResponse::success($processRoute, '获取成功');
     }
 
     public function update(Request $request, $id)

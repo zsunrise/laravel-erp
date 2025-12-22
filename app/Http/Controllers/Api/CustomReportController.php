@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ReportDefinition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +54,7 @@ class CustomReportController extends Controller
     public function show($id)
     {
         $report = ReportDefinition::with(['creator', 'schedules'])->findOrFail($id);
-        return response()->json($report);
+        return ApiResponse::success($report, '获取成功');
     }
 
     public function update(Request $request, $id)

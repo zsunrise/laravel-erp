@@ -2,15 +2,18 @@
     <div class="financial-page">
         <el-tabs v-model="activeTab">
             <el-tab-pane label="会计凭证" name="vouchers">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span>会计凭证</span>
-                            <el-button type="primary" @click="handleAddVoucher">新增凭证</el-button>
+                <div class="page-card">
+                    <div class="page-header">
+                        <h2 class="page-title text-primary">会计凭证</h2>
+                        <div class="page-actions">
+                            <el-button type="primary" @click="handleAddVoucher" class="interactive">
+                                <Plus :size="16" style="margin-right: 6px;" />
+                                新增凭证
+                            </el-button>
                         </div>
-                    </template>
+                    </div>
 
-                    <el-form :inline="true" :model="voucherSearchForm" class="search-form">
+                    <el-form :inline="true" :model="voucherSearchForm" class="search-form-modern">
                         <el-form-item label="凭证号">
                             <el-input v-model="voucherSearchForm.voucher_no" placeholder="凭证号" clearable />
                         </el-form-item>
@@ -30,7 +33,8 @@
                         </el-form-item>
                     </el-form>
 
-                    <el-table :data="vouchers" v-loading="voucherLoading" style="width: 100%">
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="vouchers" v-loading="voucherLoading" style="width: 100%">
                         <el-table-column prop="id" label="ID" width="80" />
                         <el-table-column prop="voucher_no" label="凭证号" width="150" />
                         <el-table-column prop="voucher_date" label="凭证日期" width="120" />
@@ -60,30 +64,32 @@
                                 <el-button type="danger" size="small" @click="handleDeleteVoucher(row)" v-if="row.status == 'draft'">删除</el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
+                        </el-table>
+                    </div>
 
-                    <el-pagination
-                        v-model:current-page="voucherPagination.page"
-                        v-model:page-size="voucherPagination.per_page"
-                        :total="voucherPagination.total"
-                        :page-sizes="[10, 20, 50, 100]"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        @size-change="handleVoucherSizeChange"
-                        @current-change="handleVoucherPageChange"
-                        style="margin-top: 20px;"
-                    />
-                </el-card>
+                    <div class="modern-pagination">
+                        <el-pagination
+                            v-model:current-page="voucherPagination.page"
+                            v-model:page-size="voucherPagination.per_page"
+                            :total="voucherPagination.total"
+                            :page-sizes="[10, 20, 50, 100]"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handleVoucherSizeChange"
+                            @current-change="handleVoucherPageChange"
+                        />
+                    </div>
+                </div>
             </el-tab-pane>
 
             <el-tab-pane label="应收应付" name="receivables">
-                <el-card>
-                    <template #header>
-                        <span>应收应付</span>
-                    </template>
+                <div class="page-card">
+                    <div class="page-header">
+                        <h2 class="page-title text-primary">应收应付</h2>
+                    </div>
 
                     <el-tabs v-model="receivableTab">
                         <el-tab-pane label="应收账款" name="receivable">
-                            <el-form :inline="true" :model="receivableSearchForm" class="search-form">
+                            <el-form :inline="true" :model="receivableSearchForm" class="search-form-modern">
                                 <el-form-item label="客户">
                                     <el-input v-model="receivableSearchForm.customer" placeholder="客户名称" clearable />
                                 </el-form-item>
@@ -99,7 +105,8 @@
                                 </el-form-item>
                             </el-form>
 
-                            <el-table :data="receivables" v-loading="receivableLoading" style="width: 100%">
+                            <div class="modern-table" style="margin: 0 24px;">
+                                <el-table :data="receivables" v-loading="receivableLoading" style="width: 100%">
                                 <el-table-column prop="id" label="ID" width="80" />
                                 <el-table-column prop="customer.name" label="客户" />
                                 <el-table-column prop="order_no" label="订单号" width="150" />
@@ -120,11 +127,12 @@
                                         </el-tag>
                                     </template>
                                 </el-table-column>
-                            </el-table>
+                                </el-table>
+                            </div>
                         </el-tab-pane>
 
                         <el-tab-pane label="应付账款" name="payable">
-                            <el-form :inline="true" :model="payableSearchForm" class="search-form">
+                            <el-form :inline="true" :model="payableSearchForm" class="search-form-modern">
                                 <el-form-item label="供应商">
                                     <el-input v-model="payableSearchForm.supplier" placeholder="供应商名称" clearable />
                                 </el-form-item>
@@ -140,7 +148,8 @@
                                 </el-form-item>
                             </el-form>
 
-                            <el-table :data="payables" v-loading="payableLoading" style="width: 100%">
+                            <div class="modern-table" style="margin: 0 24px;">
+                                <el-table :data="payables" v-loading="payableLoading" style="width: 100%">
                                 <el-table-column prop="id" label="ID" width="80" />
                                 <el-table-column prop="supplier.name" label="供应商" />
                                 <el-table-column prop="order_no" label="订单号" width="150" />
@@ -161,10 +170,11 @@
                                         </el-tag>
                                     </template>
                                 </el-table-column>
-                            </el-table>
+                                </el-table>
+                            </div>
                         </el-tab-pane>
                     </el-tabs>
-                </el-card>
+                </div>
             </el-tab-pane>
         </el-tabs>
 
@@ -333,6 +343,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const activeTab = ref('vouchers');
@@ -723,18 +734,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.financial-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
 

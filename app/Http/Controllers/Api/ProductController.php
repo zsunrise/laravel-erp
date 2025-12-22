@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -58,7 +59,7 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with(['category', 'unit'])->findOrFail($id);
-        return response()->json($product);
+        return ApiResponse::success($product, '获取成功');
     }
 
     public function update(Request $request, $id)

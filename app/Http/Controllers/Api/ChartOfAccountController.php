@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ChartOfAccount;
 use Illuminate\Http\Request;
 
@@ -69,7 +70,7 @@ class ChartOfAccountController extends Controller
     public function show($id)
     {
         $account = ChartOfAccount::with(['parent', 'children'])->findOrFail($id);
-        return response()->json($account);
+        return ApiResponse::success($account, '获取成功');
     }
 
     public function update(Request $request, $id)

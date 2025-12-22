@@ -345,7 +345,7 @@ const handleReset = () => {
 const handleView = async (row) => {
     try {
         const response = await api.get(`/notifications/${row.id}`);
-        currentNotification.value = response.data;
+        currentNotification.value = response.data.data;
         detailVisible.value = true;
         if (row.status == 'unread') {
             loadNotifications();

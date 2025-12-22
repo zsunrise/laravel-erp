@@ -8,7 +8,7 @@
                 </div>
             </template>
 
-            <el-form :inline="true" :model="searchForm" class="search-form">
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="搜索">
                     <el-input v-model="searchForm.search" placeholder="产品名称/SKU/版本" clearable />
                 </el-form-item>

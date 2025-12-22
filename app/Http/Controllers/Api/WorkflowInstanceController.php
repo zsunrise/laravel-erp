@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\WorkflowInstance;
 use App\Services\ApprovalService;
 use Illuminate\Http\Request;
@@ -70,6 +71,6 @@ class WorkflowInstanceController extends Controller
             'approvalRecords.approver',
             'approvalRecords.node'
         ])->findOrFail($id);
-        return response()->json($instance);
+        return ApiResponse::success($instance, '获取成功');
     }
 }

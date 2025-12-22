@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseSettlement;
@@ -44,12 +45,13 @@ class PurchaseOrderController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('order_no', 'like', "%{$search}%")
-                  ->orWhereHas('supplier', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
-            });
+            $query->leftJoin('suppliers', 'purchase_orders.supplier_id', '=', 'suppliers.id')
+                  ->where(function($q) use ($search) {
+                      $q->where('purchase_orders.order_no', 'like', "%{$search}%")
+                        ->orWhere('suppliers.name', 'like', "%{$search}%");
+                  })
+                  ->select('purchase_orders.*')
+                  ->distinct();
         }
 
         return response()->json($query->orderBy('order_date', 'desc')->paginate($request->get('per_page', 15)));
@@ -86,7 +88,7 @@ class PurchaseOrderController extends Controller
     {
         $order = PurchaseOrder::with(['supplier', 'warehouse', 'currency', 'creator', 'approver', 'items.product'])
             ->findOrFail($id);
-        return response()->json($order);
+        return ApiResponse::success($order, '获取成功');
     }
 
     public function update(Request $request, $id)
@@ -209,7 +211,7 @@ class PurchaseOrderController extends Controller
     {
         $return = PurchaseReturn::with(['supplier', 'warehouse', 'currency', 'creator', 'approver', 'items.product'])
             ->findOrFail($id);
-        return response()->json($return);
+        return ApiResponse::success($return, '获取成功');
     }
 
     public function approveReturn($id)
@@ -262,7 +264,7 @@ class PurchaseOrderController extends Controller
     {
         $settlement = PurchaseSettlement::with(['supplier', 'currency', 'creator', 'approver', 'items'])
             ->findOrFail($id);
-        return response()->json($settlement);
+        return ApiResponse::success($settlement, '获取成功');
     }
 
     public function approveSettlement($id)

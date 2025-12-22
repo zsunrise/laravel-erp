@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Inventory;
 use App\Models\InventoryTransaction;
 use App\Models\InventoryStocktake;
@@ -44,7 +45,7 @@ class InventoryController extends Controller
     public function show($id)
     {
         $inventory = Inventory::with(['product', 'warehouse', 'location'])->findOrFail($id);
-        return response()->json($inventory);
+        return ApiResponse::success($inventory, '获取成功');
     }
 
     public function stockIn(Request $request)
@@ -247,7 +248,7 @@ class InventoryController extends Controller
     {
         $stocktake = InventoryStocktake::with(['warehouse', 'creator', 'completer', 'items.product', 'items.location'])
             ->findOrFail($id);
-        return response()->json($stocktake);
+        return ApiResponse::success($stocktake, '获取成功');
     }
 
     public function addStocktakeItem(Request $request, $id)

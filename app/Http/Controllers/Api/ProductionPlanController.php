@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ProductionPlan;
 use App\Services\ProductionService;
 use Illuminate\Http\Request;
@@ -71,7 +72,7 @@ class ProductionPlanController extends Controller
     {
         $plan = ProductionPlan::with(['warehouse', 'salesOrder', 'creator', 'approver', 'items.product', 'items.bom', 'items.processRoute'])
             ->findOrFail($id);
-        return response()->json($plan);
+        return ApiResponse::success($plan, '获取成功');
     }
 
     public function update(Request $request, $id)

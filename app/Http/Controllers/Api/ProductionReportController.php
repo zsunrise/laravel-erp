@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ProductionReport;
 use App\Models\WorkOrder;
 use App\Services\ProductionService;
@@ -62,6 +63,6 @@ class ProductionReportController extends Controller
     {
         $report = ProductionReport::with(['workOrder', 'workOrderItem', 'reporter'])
             ->findOrFail($id);
-        return response()->json($report);
+        return ApiResponse::success($report, '获取成功');
     }
 }

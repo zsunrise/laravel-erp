@@ -2,15 +2,18 @@
     <div class="production-page">
         <el-tabs v-model="activeTab">
             <el-tab-pane label="生产计划" name="plans">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span>生产计划</span>
-                            <el-button type="primary" @click="handleAddPlan">新增计划</el-button>
+                <div class="page-card">
+                    <div class="page-header">
+                        <h2 class="page-title text-primary">生产计划</h2>
+                        <div class="page-actions">
+                            <el-button type="primary" @click="handleAddPlan" class="interactive">
+                                <Plus :size="16" style="margin-right: 6px;" />
+                                新增计划
+                            </el-button>
                         </div>
-                    </template>
+                    </div>
 
-                    <el-form :inline="true" :model="planSearchForm" class="search-form">
+                    <el-form :inline="true" :model="planSearchForm" class="search-form-modern">
                         <el-form-item label="计划号">
                             <el-input v-model="planSearchForm.plan_no" placeholder="计划号" clearable />
                         </el-form-item>
@@ -28,7 +31,8 @@
                         </el-form-item>
                     </el-form>
 
-                    <el-table :data="plans" v-loading="planLoading" style="width: 100%">
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="plans" v-loading="planLoading" style="width: 100%">
                         <el-table-column prop="id" label="ID" width="80" />
                         <el-table-column prop="plan_no" label="计划号" width="150" />
                         <el-table-column prop="plan_date" label="计划日期" width="120" />
@@ -48,31 +52,36 @@
                                 <el-button type="danger" size="small" @click="handleDeletePlan(row)" v-if="row.status == 'draft'">删除</el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
+                        </el-table>
+                    </div>
 
-                    <el-pagination
-                        v-model:current-page="planPagination.page"
-                        v-model:page-size="planPagination.per_page"
-                        :total="planPagination.total"
-                        :page-sizes="[10, 20, 50, 100]"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        @size-change="handlePlanSizeChange"
-                        @current-change="handlePlanPageChange"
-                        style="margin-top: 20px;"
-                    />
-                </el-card>
+                    <div class="modern-pagination">
+                        <el-pagination
+                            v-model:current-page="planPagination.page"
+                            v-model:page-size="planPagination.per_page"
+                            :total="planPagination.total"
+                            :page-sizes="[10, 20, 50, 100]"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handlePlanSizeChange"
+                            @current-change="handlePlanPageChange"
+                        />
+                    </div>
+                </div>
             </el-tab-pane>
 
             <el-tab-pane label="工单管理" name="workorders">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span>工单管理</span>
-                            <el-button type="primary" @click="handleAddWorkOrder">新增工单</el-button>
+                <div class="page-card">
+                    <div class="page-header">
+                        <h2 class="page-title text-primary">工单管理</h2>
+                        <div class="page-actions">
+                            <el-button type="primary" @click="handleAddWorkOrder" class="interactive">
+                                <Plus :size="16" style="margin-right: 6px;" />
+                                新增工单
+                            </el-button>
                         </div>
-                    </template>
+                    </div>
 
-                    <el-form :inline="true" :model="workOrderSearchForm" class="search-form">
+                    <el-form :inline="true" :model="workOrderSearchForm" class="search-form-modern">
                         <el-form-item label="工单号">
                             <el-input v-model="workOrderSearchForm.work_order_no" placeholder="工单号" clearable />
                         </el-form-item>
@@ -90,7 +99,8 @@
                         </el-form-item>
                     </el-form>
 
-                    <el-table :data="workOrders" v-loading="workOrderLoading" style="width: 100%">
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="workOrders" v-loading="workOrderLoading" style="width: 100%">
                         <el-table-column prop="id" label="ID" width="80" />
                         <el-table-column prop="work_order_no" label="工单号" width="150" />
                         <el-table-column prop="product.name" label="产品" />
@@ -110,19 +120,21 @@
                                 <el-button type="danger" size="small" @click="handleDeleteWorkOrder(row)" v-if="row.status == 'draft'">删除</el-button>
                             </template>
                         </el-table-column>
-                    </el-table>
+                        </el-table>
+                    </div>
 
-                    <el-pagination
-                        v-model:current-page="workOrderPagination.page"
-                        v-model:page-size="workOrderPagination.per_page"
-                        :total="workOrderPagination.total"
-                        :page-sizes="[10, 20, 50, 100]"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        @size-change="handleWorkOrderSizeChange"
-                        @current-change="handleWorkOrderPageChange"
-                        style="margin-top: 20px;"
-                    />
-                </el-card>
+                    <div class="modern-pagination">
+                        <el-pagination
+                            v-model:current-page="workOrderPagination.page"
+                            v-model:page-size="workOrderPagination.per_page"
+                            :total="workOrderPagination.total"
+                            :page-sizes="[10, 20, 50, 100]"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handleWorkOrderSizeChange"
+                            @current-change="handleWorkOrderPageChange"
+                        />
+                    </div>
+                </div>
             </el-tab-pane>
         </el-tabs>
 
@@ -370,18 +382,64 @@
                 <el-button type="primary" @click="handleSubmitWorkOrder" :loading="workOrderSubmitLoading">确定</el-button>
             </template>
         </el-dialog>
+
+        <!-- 生产计划详情对话框 -->
+        <el-dialog
+            v-model="planDetailVisible"
+            title="生产计划详情"
+            width="1200px"
+        >
+            <div v-if="currentPlan" style="padding: 20px;">
+                <el-descriptions :column="2" border>
+                    <el-descriptions-item label="计划号">{{ currentPlan.plan_no }}</el-descriptions-item>
+                    <el-descriptions-item label="计划日期">{{ currentPlan.plan_date }}</el-descriptions-item>
+                    <el-descriptions-item label="仓库">{{ currentPlan.warehouse?.name || '-' }}</el-descriptions-item>
+                    <el-descriptions-item label="状态">
+                        <el-tag :type="getPlanStatusType(currentPlan.status)">
+                            {{ getPlanStatusText(currentPlan.status) }}
+                        </el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="开始日期">{{ currentPlan.start_date || '-' }}</el-descriptions-item>
+                    <el-descriptions-item label="结束日期">{{ currentPlan.end_date || '-' }}</el-descriptions-item>
+                    <el-descriptions-item label="关联销售订单" :span="2">
+                        {{ currentPlan.sales_order?.order_no || '-' }}
+                    </el-descriptions-item>
+                    <el-descriptions-item label="备注" :span="2">{{ currentPlan.remark || '-' }}</el-descriptions-item>
+                </el-descriptions>
+
+                <el-divider content-position="left">计划明细</el-divider>
+                
+                <el-table :data="currentPlan.items || []" border style="width: 100%">
+                    <el-table-column type="index" label="序号" width="60" />
+                    <el-table-column prop="product.name" label="产品名称" min-width="200" />
+                    <el-table-column prop="product.sku" label="SKU" width="150" />
+                    <el-table-column prop="bom.version" label="BOM版本" width="120" />
+                    <el-table-column prop="processRoute.version" label="工艺路线版本" width="150" />
+                    <el-table-column prop="planned_quantity" label="计划数量" width="120" align="right" />
+                    <el-table-column prop="planned_start_date" label="计划开始日期" width="150" />
+                    <el-table-column prop="planned_end_date" label="计划结束日期" width="150" />
+                    <el-table-column prop="priority" label="优先级" width="100" align="center" />
+                    <el-table-column prop="remark" label="备注" min-width="200" show-overflow-tooltip />
+                </el-table>
+            </div>
+            <template #footer>
+                <el-button @click="planDetailVisible = false">关闭</el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const activeTab = ref('plans');
 const planLoading = ref(false);
 const workOrderLoading = ref(false);
 const planDialogVisible = ref(false);
+const planDetailVisible = ref(false);
 const workOrderDialogVisible = ref(false);
 const planSubmitLoading = ref(false);
 const workOrderSubmitLoading = ref(false);
@@ -708,7 +766,7 @@ const handleViewPlan = async (row) => {
     try {
         const response = await api.get(`/production-plans/${row.id}`);
         currentPlan.value = response.data.data;
-        ElMessageBox.alert(JSON.stringify(currentPlan.value, null, 2), '生产计划详情', { type: 'info' });
+        planDetailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载生产计划详情失败');
     }
@@ -971,18 +1029,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.production-page {
-    padding: 0;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-form {
-    margin-bottom: 20px;
-}
+/* 使用全局样式类 */
 </style>
 

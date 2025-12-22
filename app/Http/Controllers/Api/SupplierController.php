@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -61,7 +62,7 @@ class SupplierController extends Controller
     public function show($id)
     {
         $supplier = Supplier::with(['region'])->findOrFail($id);
-        return response()->json($supplier);
+        return ApiResponse::success($supplier, '获取成功');
     }
 
     public function update(Request $request, $id)

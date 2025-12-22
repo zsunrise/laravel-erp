@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Currency;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,7 @@ class CurrencyController extends Controller
     public function show($id)
     {
         $currency = Currency::findOrFail($id);
-        return response()->json($currency);
+        return ApiResponse::success($currency, '获取成功');
     }
 }
 

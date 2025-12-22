@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -53,7 +54,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::with('roles')->findOrFail($id);
-        return response()->json($user);
+        return ApiResponse::success($user, '获取成功');
     }
 
     public function update(Request $request, $id)

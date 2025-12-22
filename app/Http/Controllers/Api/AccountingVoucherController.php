@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\AccountingVoucher;
 use App\Services\FinancialService;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class AccountingVoucherController extends Controller
     public function show($id)
     {
         $voucher = AccountingVoucher::with(['items.account', 'creator', 'poster'])->findOrFail($id);
-        return response()->json($voucher);
+        return ApiResponse::success($voucher, '获取成功');
     }
 
     public function update(Request $request, $id)

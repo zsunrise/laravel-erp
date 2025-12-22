@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,7 @@ class UnitController extends Controller
     public function show($id)
     {
         $unit = Unit::findOrFail($id);
-        return response()->json($unit);
+        return ApiResponse::success($unit, '获取成功');
     }
 }
 

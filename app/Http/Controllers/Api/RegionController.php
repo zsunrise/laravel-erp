@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Region;
 use Illuminate\Http\Request;
 
@@ -41,7 +42,7 @@ class RegionController extends Controller
     public function show($id)
     {
         $region = Region::with(['parent', 'children'])->findOrFail($id);
-        return response()->json($region);
+        return ApiResponse::success($region, '获取成功');
     }
 }
 

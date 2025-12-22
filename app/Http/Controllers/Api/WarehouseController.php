@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
@@ -57,7 +58,7 @@ class WarehouseController extends Controller
     public function show($id)
     {
         $warehouse = Warehouse::with(['region', 'locations'])->findOrFail($id);
-        return response()->json($warehouse);
+        return ApiResponse::success($warehouse, '获取成功');
     }
 
     public function update(Request $request, $id)

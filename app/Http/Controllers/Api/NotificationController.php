@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Notification;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -61,7 +62,7 @@ class NotificationController extends Controller
             $notification->markAsRead();
         }
 
-        return response()->json($notification);
+        return ApiResponse::success($notification, '获取成功');
     }
 
     public function markAsRead($id)

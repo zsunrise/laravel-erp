@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Bom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,14 @@ class BomController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('version', 'like', "%{$search}%")
-                  ->orWhereHas('product', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('sku', 'like', "%{$search}%");
-                  });
-            });
+            $query->leftJoin('products', 'boms.product_id', '=', 'products.id')
+                  ->where(function($q) use ($search) {
+                      $q->where('boms.version', 'like', "%{$search}%")
+                        ->orWhere('products.name', 'like', "%{$search}%")
+                        ->orWhere('products.sku', 'like', "%{$search}%");
+                  })
+                  ->select('boms.*')
+                  ->distinct();
         }
 
         return response()->json($query->orderBy('effective_date', 'desc')->paginate($request->get('per_page', 15)));
@@ -96,7 +98,7 @@ class BomController extends Controller
     {
         $bom = Bom::with(['product', 'items.componentProduct', 'items.unit', 'creator'])
             ->findOrFail($id);
-        return response()->json($bom);
+        return ApiResponse::success($bom, '获取成功');
     }
 
     public function update(Request $request, $id)

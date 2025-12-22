@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\NotificationTemplate;
 use Illuminate\Http\Request;
 
@@ -58,7 +59,7 @@ class NotificationTemplateController extends Controller
     public function show($id)
     {
         $template = NotificationTemplate::with(['creator'])->findOrFail($id);
-        return response()->json($template);
+        return ApiResponse::success($template, '获取成功');
     }
 
     public function update(Request $request, $id)

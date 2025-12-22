@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\AccountsPayable;
 use App\Services\FinancialService;
 use Illuminate\Http\Request;
@@ -61,7 +62,7 @@ class AccountsPayableController extends Controller
     public function show($id)
     {
         $payable = AccountsPayable::with(['supplier', 'currency'])->findOrFail($id);
-        return response()->json($payable);
+        return ApiResponse::success($payable, '获取成功');
     }
 
     public function makePayment($id, Request $request)

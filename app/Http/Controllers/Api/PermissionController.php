@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 
@@ -44,7 +45,7 @@ class PermissionController extends Controller
     public function show($id)
     {
         $permission = Permission::with(['roles'])->findOrFail($id);
-        return response()->json($permission);
+        return ApiResponse::success($permission, '获取成功');
     }
 
     public function update(Request $request, $id)

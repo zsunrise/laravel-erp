@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 
@@ -61,7 +62,7 @@ class CustomerController extends Controller
     public function show($id)
     {
         $customer = Customer::with(['region'])->findOrFail($id);
-        return response()->json($customer);
+        return ApiResponse::success($customer, '获取成功');
     }
 
     public function update(Request $request, $id)

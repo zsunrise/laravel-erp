@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\SystemConfig;
 use Illuminate\Http\Request;
 
@@ -45,7 +46,7 @@ class SystemConfigController extends Controller
     public function show($id)
     {
         $config = SystemConfig::findOrFail($id);
-        return response()->json($config);
+        return ApiResponse::success($config, '获取成功');
     }
 
     public function update(Request $request, $id)
