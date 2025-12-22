@@ -71,7 +71,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="300" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
                         <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
                         <el-button type="info" size="small" @click="handleSetDefault(row)" v-if="!row.is_default">设默认</el-button>
                         <el-button type="success" size="small" @click="handleCopy(row)">复制</el-button>
@@ -224,8 +224,10 @@
             v-model="detailVisible"
             title="BOM详情"
             width="1200px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentBom">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentBom">
                 <el-descriptions-item label="产品名称">{{ currentBom.product?.name }}</el-descriptions-item>
                 <el-descriptions-item label="SKU">{{ currentBom.product?.sku }}</el-descriptions-item>
                 <el-descriptions-item label="版本">{{ currentBom.version }}</el-descriptions-item>
@@ -246,16 +248,17 @@
                 <el-descriptions-item label="创建人">{{ currentBom.creator?.name || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="描述" :span="2">{{ currentBom.description || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-table :data="currentBom?.items || []" style="margin-top: 20px;" border>
-                <el-table-column prop="sequence" label="序号" width="80" />
-                <el-table-column prop="component_product.name" label="物料名称" />
-                <el-table-column prop="component_product.sku" label="SKU" width="120" />
-                <el-table-column prop="quantity" label="数量" width="120" />
-                <el-table-column prop="unit.name" label="单位" width="100" />
-                <el-table-column prop="loss_rate" label="损耗率(%)" width="120" />
-                <el-table-column prop="position" label="位置" width="150" />
-                <el-table-column prop="remark" label="备注" />
-            </el-table>
+                <el-table :data="currentBom?.items || []" style="margin-top: 20px;" border v-if="currentBom">
+                    <el-table-column prop="sequence" label="序号" width="80" />
+                    <el-table-column prop="component_product.name" label="物料名称" />
+                    <el-table-column prop="component_product.sku" label="SKU" width="120" />
+                    <el-table-column prop="quantity" label="数量" width="120" />
+                    <el-table-column prop="unit.name" label="单位" width="100" />
+                    <el-table-column prop="loss_rate" label="损耗率(%)" width="120" />
+                    <el-table-column prop="position" label="位置" width="150" />
+                    <el-table-column prop="remark" label="备注" />
+                </el-table>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -270,6 +273,8 @@ const loading = ref(false);
 const submitLoading = ref(false);
 const dialogVisible = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const dialogTitle = ref('新增BOM');
 const formRef = ref(null);
 const boms = ref([]);
@@ -378,12 +383,25 @@ const handleAdd = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentBom.value = null;
+    
     try {
         const response = await api.get(`/boms/${row.id}`);
         currentBom.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载BOM详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

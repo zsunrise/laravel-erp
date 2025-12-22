@@ -57,7 +57,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
                         <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'">审核</el-button>
                         <el-button type="warning" size="small" @click="handleReceive(row)" v-if="row.status == 'approved'">收款</el-button>
                     </template>
@@ -205,8 +205,10 @@
             v-model="detailVisible"
             title="结算详情"
             width="1000px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentSettlement">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentSettlement">
                 <el-descriptions-item label="结算单号">{{ currentSettlement.settlement_no }}</el-descriptions-item>
                 <el-descriptions-item label="客户">{{ currentSettlement.customer?.name }}</el-descriptions-item>
                 <el-descriptions-item label="结算日期">{{ currentSettlement.settlement_date }}</el-descriptions-item>
@@ -218,18 +220,19 @@
                 </el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ currentSettlement.remark || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-table :data="currentSettlement?.items || []" style="margin-top: 20px;">
-                <el-table-column prop="reference_type" label="关联类型" width="120">
-                    <template #default="{ row }">
-                        {{ row.reference_type == 'sales_order' ? '销售订单' : '销售退货' }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="reference_no" label="关联单据号" width="150" />
-                <el-table-column prop="amount" label="金额" width="120">
-                    <template #default="{ row }">¥{{ row.amount }}</template>
-                </el-table-column>
-                <el-table-column prop="remark" label="备注" />
-            </el-table>
+                <el-table :data="currentSettlement?.items || []" style="margin-top: 20px;" v-if="currentSettlement">
+                    <el-table-column prop="reference_type" label="关联类型" width="120">
+                        <template #default="{ row }">
+                            {{ row.reference_type == 'sales_order' ? '销售订单' : '销售退货' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="reference_no" label="关联单据号" width="150" />
+                    <el-table-column prop="amount" label="金额" width="120">
+                        <template #default="{ row }">¥{{ row.amount }}</template>
+                    </el-table-column>
+                    <el-table-column prop="remark" label="备注" />
+                </el-table>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -246,6 +249,8 @@ const receiveSubmitLoading = ref(false);
 const dialogVisible = ref(false);
 const receiveDialogVisible = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const formRef = ref(null);
 const receiveFormRef = ref(null);
 const settlements = ref([]);
@@ -409,12 +414,25 @@ const handleAdd = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentSettlement.value = null;
+    
     try {
         const response = await api.get(`/sales-settlements/${row.id}`);
         currentSettlement.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载结算详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

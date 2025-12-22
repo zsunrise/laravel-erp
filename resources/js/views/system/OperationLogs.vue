@@ -78,7 +78,7 @@
                 <el-table-column prop="created_at" label="操作时间" width="180" />
                 <el-table-column label="操作" width="100" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -102,8 +102,10 @@
             v-model="detailVisible"
             title="日志详情"
             width="900px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentLog">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentLog">
                 <el-descriptions-item label="日志ID">{{ currentLog.id }}</el-descriptions-item>
                 <el-descriptions-item label="用户">{{ currentLog.user?.name || '-' }} ({{ currentLog.user?.email || '-' }})</el-descriptions-item>
                 <el-descriptions-item label="模块">{{ currentLog.module || '-' }}</el-descriptions-item>
@@ -125,7 +127,8 @@
                 <el-descriptions-item label="响应数据" :span="2">
                     <pre style="max-height: 200px; overflow: auto; background: #f5f5f5; padding: 10px; border-radius: 4px;">{{ formatJson(currentLog.response_data) }}</pre>
                 </el-descriptions-item>
-            </el-descriptions>
+                </el-descriptions>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -137,6 +140,8 @@ import api from '../../services/api';
 
 const loading = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const logs = ref([]);
 const users = ref([]);
 const currentLog = ref(null);
@@ -241,12 +246,25 @@ const handleReset = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentLog.value = null;
+    
     try {
         const response = await api.get(`/operation-logs/${row.id}`);
         currentLog.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载日志详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

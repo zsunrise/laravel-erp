@@ -58,7 +58,7 @@
                         </el-table-column>
                         <el-table-column label="操作" width="250" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" size="small" @click="handleViewVoucher(row)">查看</el-button>
+                                <el-button type="primary" size="small" @click="handleViewVoucher(row)" :loading="voucherViewLoadingId === row.id" :disabled="voucherViewLoadingId !== null">查看</el-button>
                                 <el-button type="warning" size="small" @click="handleEditVoucher(row)" v-if="row.status == 'draft'">编辑</el-button>
                                 <el-button type="success" size="small" @click="handlePostVoucher(row)" v-if="row.status == 'draft'">过账</el-button>
                                 <el-button type="danger" size="small" @click="handleDeleteVoucher(row)" v-if="row.status == 'draft'">删除</el-button>
@@ -300,8 +300,10 @@
             v-model="voucherDetailVisible"
             title="凭证详情"
             width="1200px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentVoucher">
+            <div v-loading="voucherDetailLoading">
+                <el-descriptions :column="2" border v-if="currentVoucher">
                 <el-descriptions-item label="凭证号">{{ currentVoucher.voucher_no }}</el-descriptions-item>
                 <el-descriptions-item label="凭证日期">{{ currentVoucher.voucher_date }}</el-descriptions-item>
                 <el-descriptions-item label="凭证类型">{{ getVoucherTypeText(currentVoucher.type) }}</el-descriptions-item>
@@ -318,24 +320,25 @@
                 <el-descriptions-item label="过账时间" v-if="currentVoucher.status == 'posted'">{{ currentVoucher.posted_at || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ currentVoucher.remark || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-table :data="currentVoucher?.items || []" style="margin-top: 20px;" border>
-                <el-table-column prop="sequence" label="序号" width="80" />
-                <el-table-column prop="account.code" label="科目编码" width="120" />
-                <el-table-column prop="account.name" label="科目名称" />
-                <el-table-column prop="direction" label="方向" width="100">
-                    <template #default="{ row }">
-                        <el-tag :type="row.direction == 'debit' ? 'success' : 'primary'">
-                            {{ row.direction == 'debit' ? '借方' : '贷方' }}
-                        </el-tag>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="amount" label="金额" width="120">
-                    <template #default="{ row }">¥{{ row.amount }}</template>
-                </el-table-column>
-                <el-table-column prop="summary" label="摘要" />
-                <el-table-column prop="reference_type" label="关联类型" width="120" />
-                <el-table-column prop="reference_no" label="关联编号" width="120" />
-            </el-table>
+                <el-table :data="currentVoucher?.items || []" style="margin-top: 20px;" border v-if="currentVoucher">
+                    <el-table-column prop="sequence" label="序号" width="80" />
+                    <el-table-column prop="account.code" label="科目编码" width="120" />
+                    <el-table-column prop="account.name" label="科目名称" />
+                    <el-table-column prop="direction" label="方向" width="100">
+                        <template #default="{ row }">
+                            <el-tag :type="row.direction == 'debit' ? 'success' : 'primary'">
+                                {{ row.direction == 'debit' ? '借方' : '贷方' }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="amount" label="金额" width="120">
+                        <template #default="{ row }">¥{{ row.amount }}</template>
+                    </el-table-column>
+                    <el-table-column prop="summary" label="摘要" />
+                    <el-table-column prop="reference_type" label="关联类型" width="120" />
+                    <el-table-column prop="reference_no" label="关联编号" width="120" />
+                </el-table>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -353,6 +356,8 @@ const receivableLoading = ref(false);
 const payableLoading = ref(false);
 const voucherDialogVisible = ref(false);
 const voucherDetailVisible = ref(false);
+const voucherDetailLoading = ref(false);
+const voucherViewLoadingId = ref(null);
 const voucherSubmitLoading = ref(false);
 const voucherFormRef = ref(null);
 const vouchers = ref([]);
@@ -596,12 +601,25 @@ const handleEditVoucher = async (row) => {
 };
 
 const handleViewVoucher = async (row) => {
+    // 防止重复点击
+    if (voucherViewLoadingId.value !== null) {
+        return;
+    }
+    
+    voucherViewLoadingId.value = row.id;
+    voucherDetailLoading.value = true;
+    voucherDetailVisible.value = true;
+    currentVoucher.value = null;
+    
     try {
         const response = await api.get(`/accounting-vouchers/${row.id}`);
         currentVoucher.value = response.data.data;
-        voucherDetailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载凭证详情失败');
+        voucherDetailVisible.value = false;
+    } finally {
+        voucherDetailLoading.value = false;
+        voucherViewLoadingId.value = null;
     }
 };
 

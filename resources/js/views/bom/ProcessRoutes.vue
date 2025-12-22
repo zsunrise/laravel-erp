@@ -68,7 +68,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="300" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
                         <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
                         <el-button type="info" size="small" @click="handleSetDefault(row)" v-if="!row.is_default">设默认</el-button>
                         <el-button type="success" size="small" @click="handleCopy(row)">复制</el-button>
@@ -222,8 +222,10 @@
             v-model="detailVisible"
             title="工艺路线详情"
             width="1200px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentProcessRoute">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentProcessRoute">
                 <el-descriptions-item label="产品名称">{{ currentProcessRoute.product?.name }}</el-descriptions-item>
                 <el-descriptions-item label="SKU">{{ currentProcessRoute.product?.sku }}</el-descriptions-item>
                 <el-descriptions-item label="版本">{{ currentProcessRoute.version }}</el-descriptions-item>
@@ -244,18 +246,19 @@
                 <el-descriptions-item label="创建人">{{ currentProcessRoute.creator?.name || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="描述" :span="2">{{ currentProcessRoute.description || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-table :data="currentProcessRoute?.steps || []" style="margin-top: 20px;" border>
-                <el-table-column prop="sequence" label="序号" width="80" />
-                <el-table-column prop="step_name" label="步骤名称" />
-                <el-table-column prop="step_code" label="步骤编码" width="120" />
-                <el-table-column prop="work_center" label="工作中心" width="150" />
-                <el-table-column prop="standard_time" label="标准工时" width="120" />
-                <el-table-column prop="setup_time" label="准备时间" width="120" />
-                <el-table-column prop="queue_time" label="排队时间" width="120" />
-                <el-table-column prop="move_time" label="移动时间" width="120" />
-                <el-table-column prop="description" label="描述" />
-                <el-table-column prop="remark" label="备注" />
-            </el-table>
+                <el-table :data="currentProcessRoute?.steps || []" style="margin-top: 20px;" border v-if="currentProcessRoute">
+                    <el-table-column prop="sequence" label="序号" width="80" />
+                    <el-table-column prop="step_name" label="步骤名称" />
+                    <el-table-column prop="step_code" label="步骤编码" width="120" />
+                    <el-table-column prop="work_center" label="工作中心" width="150" />
+                    <el-table-column prop="standard_time" label="标准工时" width="120" />
+                    <el-table-column prop="setup_time" label="准备时间" width="120" />
+                    <el-table-column prop="queue_time" label="排队时间" width="120" />
+                    <el-table-column prop="move_time" label="移动时间" width="120" />
+                    <el-table-column prop="description" label="描述" />
+                    <el-table-column prop="remark" label="备注" />
+                </el-table>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -270,6 +273,9 @@ const loading = ref(false);
 const submitLoading = ref(false);
 const dialogVisible = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
+const viewLoadingId = ref(null);
 const dialogTitle = ref('新增工艺路线');
 const formRef = ref(null);
 const processRoutes = ref([]);
@@ -368,12 +374,25 @@ const handleAdd = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentProcessRoute.value = null;
+    
     try {
         const response = await api.get(`/process-routes/${row.id}`);
         currentProcessRoute.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载工艺路线详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

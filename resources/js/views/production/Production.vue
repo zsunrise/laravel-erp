@@ -46,7 +46,7 @@
                         </el-table-column>
                         <el-table-column label="操作" width="250" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" size="small" @click="handleViewPlan(row)">查看</el-button>
+                                <el-button type="primary" size="small" @click="handleViewPlan(row)" :loading="planViewLoadingId === row.id" :disabled="planViewLoadingId !== null">查看</el-button>
                                 <el-button type="warning" size="small" @click="handleEditPlan(row)" v-if="row.status == 'draft'">编辑</el-button>
                                 <el-button type="success" size="small" @click="handleApprovePlan(row)" v-if="row.status == 'draft'">审批</el-button>
                                 <el-button type="danger" size="small" @click="handleDeletePlan(row)" v-if="row.status == 'draft'">删除</el-button>
@@ -114,7 +114,7 @@
                         </el-table-column>
                         <el-table-column label="操作" width="250" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" size="small" @click="handleViewWorkOrder(row)">查看</el-button>
+                                <el-button type="primary" size="small" @click="handleViewWorkOrder(row)" :loading="workOrderViewLoadingId === row.id" :disabled="workOrderViewLoadingId !== null">查看</el-button>
                                 <el-button type="warning" size="small" @click="handleEditWorkOrder(row)" v-if="row.status == 'draft'">编辑</el-button>
                                 <el-button type="success" size="small" @click="handleApproveWorkOrder(row)" v-if="row.status == 'draft'">审批</el-button>
                                 <el-button type="danger" size="small" @click="handleDeleteWorkOrder(row)" v-if="row.status == 'draft'">删除</el-button>
@@ -388,8 +388,10 @@
             v-model="planDetailVisible"
             title="生产计划详情"
             width="1200px"
+            :close-on-click-modal="false"
         >
-            <div v-if="currentPlan" style="padding: 20px;">
+            <div v-loading="planDetailLoading" style="padding: 20px;">
+                <div v-if="currentPlan">
                 <el-descriptions :column="2" border>
                     <el-descriptions-item label="计划号">{{ currentPlan.plan_no }}</el-descriptions-item>
                     <el-descriptions-item label="计划日期">{{ currentPlan.plan_date }}</el-descriptions-item>
@@ -421,10 +423,39 @@
                     <el-table-column prop="priority" label="优先级" width="100" align="center" />
                     <el-table-column prop="remark" label="备注" min-width="200" show-overflow-tooltip />
                 </el-table>
+                </div>
             </div>
             <template #footer>
                 <el-button @click="planDetailVisible = false">关闭</el-button>
             </template>
+        </el-dialog>
+
+        <!-- 工单详情对话框 -->
+        <el-dialog
+            v-model="workOrderDetailVisible"
+            title="工单详情"
+            width="1200px"
+            :close-on-click-modal="false"
+        >
+            <div v-loading="workOrderDetailLoading">
+                <el-descriptions :column="2" border v-if="currentWorkOrder">
+                    <el-descriptions-item label="工单号">{{ currentWorkOrder.work_order_no }}</el-descriptions-item>
+                    <el-descriptions-item label="产品">{{ currentWorkOrder.product?.name }}</el-descriptions-item>
+                    <el-descriptions-item label="SKU">{{ currentWorkOrder.product?.sku }}</el-descriptions-item>
+                    <el-descriptions-item label="仓库">{{ currentWorkOrder.warehouse?.name }}</el-descriptions-item>
+                    <el-descriptions-item label="计划数量">{{ currentWorkOrder.planned_quantity }}</el-descriptions-item>
+                    <el-descriptions-item label="完成数量">{{ currentWorkOrder.completed_quantity || 0 }}</el-descriptions-item>
+                    <el-descriptions-item label="开始日期">{{ currentWorkOrder.start_date }}</el-descriptions-item>
+                    <el-descriptions-item label="结束日期">{{ currentWorkOrder.end_date || '-' }}</el-descriptions-item>
+                    <el-descriptions-item label="状态">
+                        <el-tag :type="getWorkOrderStatusType(currentWorkOrder.status)">
+                            {{ getWorkOrderStatusText(currentWorkOrder.status) }}
+                        </el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="负责人">{{ currentWorkOrder.assigned_to_user?.name || '-' }}</el-descriptions-item>
+                    <el-descriptions-item label="备注" :span="2">{{ currentWorkOrder.remark || '-' }}</el-descriptions-item>
+                </el-descriptions>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -440,7 +471,12 @@ const planLoading = ref(false);
 const workOrderLoading = ref(false);
 const planDialogVisible = ref(false);
 const planDetailVisible = ref(false);
+const planDetailLoading = ref(false);
+const planViewLoadingId = ref(null);
 const workOrderDialogVisible = ref(false);
+const workOrderDetailVisible = ref(false);
+const workOrderDetailLoading = ref(false);
+const workOrderViewLoadingId = ref(null);
 const planSubmitLoading = ref(false);
 const workOrderSubmitLoading = ref(false);
 const planFormRef = ref(null);
@@ -763,12 +799,25 @@ const handleEditPlan = async (row) => {
 };
 
 const handleViewPlan = async (row) => {
+    // 防止重复点击
+    if (planViewLoadingId.value !== null) {
+        return;
+    }
+    
+    planViewLoadingId.value = row.id;
+    planDetailLoading.value = true;
+    planDetailVisible.value = true;
+    currentPlan.value = null;
+    
     try {
         const response = await api.get(`/production-plans/${row.id}`);
         currentPlan.value = response.data.data;
-        planDetailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载生产计划详情失败');
+        planDetailVisible.value = false;
+    } finally {
+        planDetailLoading.value = false;
+        planViewLoadingId.value = null;
     }
 };
 
@@ -931,12 +980,25 @@ const handleEditWorkOrder = async (row) => {
 };
 
 const handleViewWorkOrder = async (row) => {
+    // 防止重复点击
+    if (workOrderViewLoadingId.value !== null) {
+        return;
+    }
+    
+    workOrderViewLoadingId.value = row.id;
+    workOrderDetailLoading.value = true;
+    workOrderDetailVisible.value = true;
+    currentWorkOrder.value = null;
+    
     try {
         const response = await api.get(`/work-orders/${row.id}`);
         currentWorkOrder.value = response.data.data;
-        ElMessageBox.alert(JSON.stringify(currentWorkOrder.value, null, 2), '工单详情', { type: 'info' });
     } catch (error) {
         ElMessage.error('加载工单详情失败');
+        workOrderDetailVisible.value = false;
+    } finally {
+        workOrderDetailLoading.value = false;
+        workOrderViewLoadingId.value = null;
     }
 };
 

@@ -212,8 +212,10 @@
             v-model="detailVisible"
             title="退货详情"
             width="1000px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentReturn">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentReturn">
                 <el-descriptions-item label="退货单号">{{ currentReturn.return_no }}</el-descriptions-item>
                 <el-descriptions-item label="客户">{{ currentReturn.customer?.name }}</el-descriptions-item>
                 <el-descriptions-item label="仓库">{{ currentReturn.warehouse?.name }}</el-descriptions-item>
@@ -224,20 +226,21 @@
                 </el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ currentReturn.remark || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-table :data="currentReturn?.items || []" style="margin-top: 20px;">
-                <el-table-column prop="product.name" label="商品名称" />
-                <el-table-column prop="quantity" label="数量" width="100" />
-                <el-table-column prop="unit_price" label="单价" width="120">
-                    <template #default="{ row }">¥{{ row.unit_price }}</template>
-                </el-table-column>
-                <el-table-column prop="tax_rate" label="税率(%)" width="100" />
-                <el-table-column label="小计" width="120">
-                    <template #default="{ row }">
-                        ¥{{ (row.quantity * row.unit_price * (1 + (row.tax_rate || 0) / 100)).toFixed(2) }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="remark" label="备注" />
-            </el-table>
+                <el-table :data="currentReturn?.items || []" style="margin-top: 20px;" v-if="currentReturn">
+                    <el-table-column prop="product.name" label="商品名称" />
+                    <el-table-column prop="quantity" label="数量" width="100" />
+                    <el-table-column prop="unit_price" label="单价" width="120">
+                        <template #default="{ row }">¥{{ row.unit_price }}</template>
+                    </el-table-column>
+                    <el-table-column prop="tax_rate" label="税率(%)" width="100" />
+                    <el-table-column label="小计" width="120">
+                        <template #default="{ row }">
+                            ¥{{ (row.quantity * row.unit_price * (1 + (row.tax_rate || 0) / 100)).toFixed(2) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="remark" label="备注" />
+                </el-table>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -252,6 +255,8 @@ const loading = ref(false);
 const submitLoading = ref(false);
 const dialogVisible = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const formRef = ref(null);
 const returns = ref([]);
 const customers = ref([]);
@@ -410,12 +415,25 @@ const handleAdd = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentReturn.value = null;
+    
     try {
         const response = await api.get(`/sales-returns/${row.id}`);
         currentReturn.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载退货详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

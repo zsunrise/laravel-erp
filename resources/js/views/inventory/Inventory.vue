@@ -78,7 +78,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)" class="interactive">查看</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null" class="interactive">查看</el-button>
                         <el-button type="info" size="small" @click="handleTransactions(row)" class="interactive">流水</el-button>
                     </template>
                 </el-table-column>
@@ -305,8 +305,9 @@
         </el-dialog>
 
         <!-- 详情对话框 -->
-        <el-dialog v-model="detailVisible" title="库存详情" width="800px">
-            <el-descriptions :column="2" border v-if="currentInventory">
+        <el-dialog v-model="detailVisible" title="库存详情" width="800px" :close-on-click-modal="false">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentInventory">
                 <el-descriptions-item label="商品名称">{{ currentInventory.product?.name }}</el-descriptions-item>
                 <el-descriptions-item label="SKU">{{ currentInventory.product?.sku }}</el-descriptions-item>
                 <el-descriptions-item label="仓库">{{ currentInventory.warehouse?.name }}</el-descriptions-item>
@@ -319,7 +320,8 @@
                         {{ getStockStatus(currentInventory.quantity, currentInventory.product?.min_stock || 0) }}
                     </el-tag>
                 </el-descriptions-item>
-            </el-descriptions>
+                </el-descriptions>
+            </div>
         </el-dialog>
 
         <!-- 交易流水对话框 -->
@@ -379,6 +381,8 @@ const stockOutVisible = ref(false);
 const transferVisible = ref(false);
 const stocktakeVisible = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const transactionsVisible = ref(false);
 const currentInventory = ref(null);
 
@@ -798,12 +802,25 @@ const submitStocktake = async () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentInventory.value = null;
+    
     try {
         const response = await api.get(`/inventory/${row.id}`);
         currentInventory.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

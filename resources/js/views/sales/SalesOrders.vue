@@ -66,7 +66,7 @@
                 <el-table-column prop="delivery_date" label="预计交货" width="120" />
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)" class="interactive">查看</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null" class="interactive">查看</el-button>
                         <el-button type="warning" size="small" @click="handleEdit(row)" v-if="row.status == 'pending'" class="interactive">编辑</el-button>
                         <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'" class="interactive">审核</el-button>
                         <el-button type="danger" size="small" @click="handleDelete(row)" v-if="row.status == 'pending'" class="interactive">删除</el-button>
@@ -93,8 +93,10 @@
             v-model="detailVisible"
             title="订单详情"
             width="1000px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentOrder">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentOrder">
                 <el-descriptions-item label="订单号">{{ currentOrder.order_no }}</el-descriptions-item>
                 <el-descriptions-item label="客户">{{ currentOrder.customer?.name }}</el-descriptions-item>
                 <el-descriptions-item label="订单日期">{{ currentOrder.order_date }}</el-descriptions-item>
@@ -105,16 +107,17 @@
                 </el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ currentOrder.remark || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-table :data="currentOrder?.items || []" style="margin-top: 20px;">
-                <el-table-column prop="product.name" label="商品名称" />
-                <el-table-column prop="quantity" label="数量" width="100" />
-                <el-table-column prop="unit_price" label="单价" width="120">
-                    <template #default="{ row }">¥{{ row.unit_price }}</template>
-                </el-table-column>
-                <el-table-column prop="total_price" label="小计" width="120">
-                    <template #default="{ row }">¥{{ row.total_price }}</template>
-                </el-table-column>
-            </el-table>
+                <el-table :data="currentOrder?.items || []" style="margin-top: 20px;" v-if="currentOrder">
+                    <el-table-column prop="product.name" label="商品名称" />
+                    <el-table-column prop="quantity" label="数量" width="100" />
+                    <el-table-column prop="unit_price" label="单价" width="120">
+                        <template #default="{ row }">¥{{ row.unit_price }}</template>
+                    </el-table-column>
+                    <el-table-column prop="total_price" label="小计" width="120">
+                        <template #default="{ row }">¥{{ row.total_price }}</template>
+                    </el-table-column>
+                </el-table>
+            </div>
             <template #footer v-if="currentOrder && currentOrder.status == 'approved'">
                 <el-button type="success" @click="handleShip(currentOrder)">出库</el-button>
             </template>
@@ -225,6 +228,8 @@ import api from '../../services/api';
 
 const loading = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const formVisible = ref(false);
 const submitLoading = ref(false);
 const orders = ref([]);
@@ -354,12 +359,25 @@ const handleAdd = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentOrder.value = null;
+    
     try {
         const response = await api.get(`/sales-orders/${row.id}`);
         currentOrder.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载订单详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

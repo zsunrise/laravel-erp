@@ -70,7 +70,7 @@
                 <el-table-column prop="created_at" label="创建时间" width="180" />
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
                         <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
                         <el-button type="info" size="small" @click="handlePreview(row)">预览</el-button>
                         <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
@@ -149,8 +149,10 @@
             v-model="detailVisible"
             title="模板详情"
             width="800px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentTemplate">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentTemplate">
                 <el-descriptions-item label="模板编码">{{ currentTemplate.code }}</el-descriptions-item>
                 <el-descriptions-item label="模板名称">{{ currentTemplate.name }}</el-descriptions-item>
                 <el-descriptions-item label="类型">
@@ -170,7 +172,8 @@
                 <el-descriptions-item label="内容" :span="2">
                     <div style="white-space: pre-wrap;">{{ currentTemplate.content }}</div>
                 </el-descriptions-item>
-            </el-descriptions>
+                </el-descriptions>
+            </div>
         </el-dialog>
 
         <!-- 预览对话框 -->
@@ -212,6 +215,8 @@ const submitLoading = ref(false);
 const previewLoading = ref(false);
 const dialogVisible = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const previewVisible = ref(false);
 const dialogTitle = ref('新增模板');
 const formRef = ref(null);
@@ -331,12 +336,25 @@ const handleAdd = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentTemplate.value = null;
+    
     try {
         const response = await api.get(`/notification-templates/${row.id}`);
         currentTemplate.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载模板详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 

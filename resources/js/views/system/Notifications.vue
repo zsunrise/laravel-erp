@@ -97,8 +97,10 @@
             v-model="detailVisible"
             title="消息详情"
             width="800px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentNotification">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentNotification">
                 <el-descriptions-item label="消息ID">{{ currentNotification.id }}</el-descriptions-item>
                 <el-descriptions-item label="类型">
                     <el-tag :type="getTypeTagType(currentNotification.type)">{{ getTypeText(currentNotification.type) }}</el-tag>
@@ -119,7 +121,8 @@
                 <el-descriptions-item label="内容" :span="2">
                     <div style="white-space: pre-wrap;">{{ currentNotification.content }}</div>
                 </el-descriptions-item>
-            </el-descriptions>
+                </el-descriptions>
+            </div>
         </el-dialog>
 
         <!-- 发送消息对话框 -->
@@ -198,6 +201,8 @@ const loading = ref(false);
 const markAllLoading = ref(false);
 const sendLoading = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const sendDialogVisible = ref(false);
 const sendFormRef = ref(null);
 const notifications = ref([]);
@@ -343,15 +348,25 @@ const handleReset = () => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentNotification.value = null;
+    
     try {
         const response = await api.get(`/notifications/${row.id}`);
         currentNotification.value = response.data.data;
-        detailVisible.value = true;
         if (row.status == 'unread') {
             loadNotifications();
         }
     } catch (error) {
         ElMessage.error('加载消息详情失败');
+        detailVisible.value = false;
     }
 };
 

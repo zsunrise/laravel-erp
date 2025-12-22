@@ -62,7 +62,7 @@
                         </el-table-column>
                         <el-table-column label="操作" width="250" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
+                                <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
                                 <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
                                 <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
                             </template>
@@ -156,7 +156,7 @@
                         <el-table-column prop="started_at" label="发起时间" width="180" />
                         <el-table-column label="操作" width="150" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" size="small" @click="handleViewInstance(row)">查看</el-button>
+                                <el-button type="primary" size="small" @click="handleViewInstance(row)" :loading="instanceViewLoadingId === row.id" :disabled="instanceViewLoadingId !== null">查看</el-button>
                             </template>
                         </el-table-column>
                         </el-table>
@@ -289,8 +289,10 @@
             v-model="detailVisible"
             title="流程详情"
             width="1000px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentWorkflow">
+            <div v-loading="detailLoading">
+                <el-descriptions :column="2" border v-if="currentWorkflow">
                 <el-descriptions-item label="流程名称">{{ currentWorkflow.name }}</el-descriptions-item>
                 <el-descriptions-item label="流程编码">{{ currentWorkflow.code }}</el-descriptions-item>
                 <el-descriptions-item label="流程类型">{{ getTypeText(currentWorkflow.type) }}</el-descriptions-item>
@@ -301,28 +303,29 @@
                 </el-descriptions-item>
                 <el-descriptions-item label="描述" :span="2">{{ currentWorkflow.description || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-table :data="currentWorkflow?.nodes || []" style="margin-top: 20px;" border>
-                <el-table-column prop="node_name" label="节点名称" />
-                <el-table-column prop="node_type" label="节点类型" width="120">
-                    <template #default="{ row }">
-                        {{ getNodeTypeText(row.node_type) }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="sequence" label="序号" width="80" />
-                <el-table-column prop="approval_type" label="审批类型" width="120">
-                    <template #default="{ row }">
-                        {{ row.approval_type ? getApprovalTypeText(row.approval_type) : '-' }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="timeout_hours" label="超时(小时)" width="120" />
-                <el-table-column prop="is_required" label="必填" width="80">
-                    <template #default="{ row }">
-                        <el-tag v-if="row.is_required" type="success">是</el-tag>
-                        <span v-else>-</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="remark" label="备注" />
-            </el-table>
+                <el-table :data="currentWorkflow?.nodes || []" style="margin-top: 20px;" border v-if="currentWorkflow">
+                    <el-table-column prop="node_name" label="节点名称" />
+                    <el-table-column prop="node_type" label="节点类型" width="120">
+                        <template #default="{ row }">
+                            {{ getNodeTypeText(row.node_type) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="sequence" label="序号" width="80" />
+                    <el-table-column prop="approval_type" label="审批类型" width="120">
+                        <template #default="{ row }">
+                            {{ row.approval_type ? getApprovalTypeText(row.approval_type) : '-' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="timeout_hours" label="超时(小时)" width="120" />
+                    <el-table-column prop="is_required" label="必填" width="80">
+                        <template #default="{ row }">
+                            <el-tag v-if="row.is_required" type="success">是</el-tag>
+                            <span v-else>-</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="remark" label="备注" />
+                </el-table>
+            </div>
         </el-dialog>
 
         <!-- 审批/拒绝对话框 -->
@@ -351,8 +354,10 @@
             v-model="instanceDetailVisible"
             title="流程实例详情"
             width="1000px"
+            :close-on-click-modal="false"
         >
-            <el-descriptions :column="2" border v-if="currentInstance">
+            <div v-loading="instanceDetailLoading">
+                <el-descriptions :column="2" border v-if="currentInstance">
                 <el-descriptions-item label="实例编号">{{ currentInstance.instance_no }}</el-descriptions-item>
                 <el-descriptions-item label="流程名称">{{ currentInstance.workflow?.name }}</el-descriptions-item>
                 <el-descriptions-item label="关联类型">{{ getReferenceTypeText(currentInstance.reference_type) }}</el-descriptions-item>
@@ -364,20 +369,21 @@
                 <el-descriptions-item label="发起人">{{ currentInstance.starter?.name || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="发起时间">{{ currentInstance.started_at || '-' }}</el-descriptions-item>
             </el-descriptions>
-            <el-divider>审批记录</el-divider>
-            <el-table :data="approvalHistory || []" style="margin-top: 20px;" border>
-                <el-table-column prop="node.node_name" label="节点" width="150" />
-                <el-table-column prop="approver.name" label="审批人" width="120" />
-                <el-table-column prop="status" label="状态" width="100">
-                    <template #default="{ row }">
-                        <el-tag :type="row.status == 'approved' ? 'success' : row.status == 'rejected' ? 'danger' : 'warning'">
-                            {{ row.status == 'approved' ? '已同意' : row.status == 'rejected' ? '已拒绝' : '待审批' }}
-                        </el-tag>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="comment" label="审批意见" />
-                <el-table-column prop="created_at" label="审批时间" width="180" />
-            </el-table>
+                <el-divider>审批记录</el-divider>
+                <el-table :data="approvalHistory || []" style="margin-top: 20px;" border v-if="currentInstance">
+                    <el-table-column prop="node.node_name" label="节点" width="150" />
+                    <el-table-column prop="approver.name" label="审批人" width="120" />
+                    <el-table-column prop="status" label="状态" width="100">
+                        <template #default="{ row }">
+                            <el-tag :type="row.status == 'approved' ? 'success' : row.status == 'rejected' ? 'danger' : 'warning'">
+                                {{ row.status == 'approved' ? '已同意' : row.status == 'rejected' ? '已拒绝' : '待审批' }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="comment" label="审批意见" />
+                    <el-table-column prop="created_at" label="审批时间" width="180" />
+                </el-table>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -396,8 +402,12 @@ const submitLoading = ref(false);
 const approvalSubmitLoading = ref(false);
 const dialogVisible = ref(false);
 const detailVisible = ref(false);
+const detailLoading = ref(false);
+const viewLoadingId = ref(null);
 const approvalDialogVisible = ref(false);
 const instanceDetailVisible = ref(false);
+const instanceDetailLoading = ref(false);
+const instanceViewLoadingId = ref(null);
 const formRef = ref(null);
 const approvalFormRef = ref(null);
 const workflows = ref([]);
@@ -637,12 +647,25 @@ const handleEdit = async (row) => {
 };
 
 const handleView = async (row) => {
+    // 防止重复点击
+    if (viewLoadingId.value !== null) {
+        return;
+    }
+    
+    viewLoadingId.value = row.id;
+    detailLoading.value = true;
+    detailVisible.value = true;
+    currentWorkflow.value = null;
+    
     try {
         const response = await api.get(`/workflows/${row.id}`);
         currentWorkflow.value = response.data.data;
-        detailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载流程详情失败');
+        detailVisible.value = false;
+    } finally {
+        detailLoading.value = false;
+        viewLoadingId.value = null;
     }
 };
 
@@ -768,13 +791,27 @@ const handleSubmitApproval = async () => {
 };
 
 const handleViewInstance = async (row) => {
+    // 防止重复点击
+    if (instanceViewLoadingId.value !== null) {
+        return;
+    }
+    
+    instanceViewLoadingId.value = row.id;
+    instanceDetailLoading.value = true;
+    instanceDetailVisible.value = true;
+    currentInstance.value = null;
+    approvalHistory.value = [];
+    
     try {
         const response = await api.get(`/approval-records/${row.id}/history`);
         currentInstance.value = response.data.data.instance;
         approvalHistory.value = response.data.data.records || [];
-        instanceDetailVisible.value = true;
     } catch (error) {
         ElMessage.error('加载实例详情失败');
+        instanceDetailVisible.value = false;
+    } finally {
+        instanceDetailLoading.value = false;
+        instanceViewLoadingId.value = null;
     }
 };
 
