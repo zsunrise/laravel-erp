@@ -144,6 +144,9 @@
                 </div>
             </el-header>
 
+            <!-- 标签页 -->
+            <TabsView />
+
             <el-main class="main-content">
                 <router-view />
             </el-main>
@@ -156,6 +159,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useConfirm } from '../utils/message';
+import TabsView from '../components/TabsView.vue';
 import { 
     Gauge, Settings, Package, Users, Warehouse, Boxes, 
     ShoppingCart, ShoppingBag, FileText, Cog, DollarSign, 
