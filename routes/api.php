@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PermissionController;
@@ -48,6 +49,11 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    // Dashboard routes
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
+    Route::get('/dashboard/pending-tasks', [DashboardController::class, 'getPendingTasks']);
+    Route::get('/dashboard/recent-orders', [DashboardController::class, 'getRecentOrders']);
 
     Route::middleware('permission:users.manage')->apiResource('users', UserController::class);
     Route::middleware('permission:roles.manage')->apiResource('roles', RoleController::class);
