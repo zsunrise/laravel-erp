@@ -45,9 +45,9 @@ class ApprovalRecordController extends Controller
 
         try {
             $instance = $this->approvalService->approve($instanceId, $validated['comment'] ?? null);
-            return response()->json($instance);
+            return ApiResponse::success($instance, '审批成功');
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            return ApiResponse::error($e->getMessage(), 400);
         }
     }
 
@@ -59,9 +59,9 @@ class ApprovalRecordController extends Controller
 
         try {
             $instance = $this->approvalService->reject($instanceId, $validated['comment'] ?? null);
-            return response()->json($instance);
+            return ApiResponse::success($instance, '拒绝成功');
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            return ApiResponse::error($e->getMessage(), 400);
         }
     }
 

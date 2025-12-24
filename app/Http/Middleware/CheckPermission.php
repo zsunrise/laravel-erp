@@ -25,6 +25,11 @@ class CheckPermission
         }
 
         $user = auth()->user();
+        
+        // 预加载 roles 和 permissions 关系，避免 N+1 查询
+        if (!$user->relationLoaded('roles')) {
+            $user->load('roles.permissions');
+        }
 
         if ($permission && !$user->hasPermission($permission)) {
             return response()->json([

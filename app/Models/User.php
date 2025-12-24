@@ -64,7 +64,20 @@ class User extends Authenticatable
 
     public function hasPermission($permission)
     {
+        // 如果 roles 关系未加载，使用查询方式避免 N+1 问题
+        if (!$this->relationLoaded('roles')) {
+            return $this->roles()
+                ->whereHas('permissions', function ($query) use ($permission) {
+                    $query->where('slug', $permission);
+                })
+                ->exists();
+        }
+
+        // 如果已加载，使用集合方式
         foreach ($this->roles as $role) {
+            if (!$role->relationLoaded('permissions')) {
+                $role->load('permissions');
+            }
             if ($role->permissions->contains('slug', $permission)) {
                 return true;
             }

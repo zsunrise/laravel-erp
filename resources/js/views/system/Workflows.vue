@@ -1,6 +1,6 @@
 <template>
     <div class="workflows-page">
-        <el-tabs v-model="activeTab">
+        <el-tabs v-model="activeTab" @tab-change="handleTabChange">
             <el-tab-pane label="流程设计" name="design">
                 <div class="page-card">
                     <div class="page-header">
@@ -88,10 +88,13 @@
                 <div class="page-card">
                     <div class="page-header">
                         <h2 class="page-title text-primary">待审批事项</h2>
+                        <div class="page-actions">
+                            <el-button @click="loadPendingApprovals" :loading="pendingLoading">刷新</el-button>
+                        </div>
                     </div>
 
                     <div class="modern-table" style="margin: 0 24px;">
-                        <el-table :data="pendingApprovals" v-loading="pendingLoading" style="width: 100%">
+                        <el-table :data="pendingApprovals" v-loading="pendingLoading" style="width: 100%" empty-text="暂无待审批事项">
                         <el-table-column prop="instance_no" label="实例编号" width="180" />
                         <el-table-column prop="workflow.name" label="流程名称" />
                         <el-table-column prop="reference_type" label="关联类型" width="150">
@@ -99,13 +102,31 @@
                                 {{ getReferenceTypeText(row.reference_type) }}
                             </template>
                         </el-table-column>
-                        <el-table-column prop="reference_no" label="关联单据号" width="150" />
-                        <el-table-column prop="current_node.node_name" label="当前节点" width="150" />
-                        <el-table-column prop="started_at" label="发起时间" width="180" />
+                        <el-table-column prop="reference_no" label="关联单据号" width="150">
+                            <template #default="{ row }">
+                                {{ row.reference_no || '-' }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="current_node.node_name" label="当前节点" width="150">
+                            <template #default="{ row }">
+                                {{ row.current_node?.node_name || '-' }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="starter.name" label="发起人" width="120">
+                            <template #default="{ row }">
+                                {{ row.starter?.name || '-' }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="started_at" label="发起时间" width="180">
+                            <template #default="{ row }">
+                                {{ row.started_at || '-' }}
+                            </template>
+                        </el-table-column>
                         <el-table-column label="操作" width="200" fixed="right">
                             <template #default="{ row }">
                                 <el-button type="success" size="small" @click="handleApprove(row)">同意</el-button>
                                 <el-button type="danger" size="small" @click="handleReject(row)">拒绝</el-button>
+                                <el-button type="primary" size="small" @click="handleViewInstance(row)">详情</el-button>
                             </template>
                         </el-table-column>
                         </el-table>
@@ -233,7 +254,7 @@
                         </el-table-column>
                         <el-table-column prop="node_type" label="节点类型" width="150">
                             <template #default="{ row, $index }">
-                                <el-select v-model="row.node_type" style="width: 100%">
+                                <el-select v-model="row.node_type" style="width: 100%" @change="handleNodeTypeChange(row)">
                                     <el-option label="开始" value="start" />
                                     <el-option label="审批" value="approval" />
                                     <el-option label="条件" value="condition" />
@@ -253,6 +274,27 @@
                                     <el-option label="全部通过" value="all" />
                                     <el-option label="任一通过" value="any" />
                                 </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="approvers" label="审批人" width="200" v-if="form.nodes.some(n => n.node_type == 'approval')">
+                            <template #default="{ row, $index }">
+                                <el-select 
+                                    v-if="row.node_type == 'approval'"
+                                    v-model="row.approver_user_ids" 
+                                    multiple 
+                                    filterable
+                                    placeholder="请选择审批人" 
+                                    style="width: 100%"
+                                    @change="handleApproverChange(row)"
+                                >
+                                    <el-option
+                                        v-for="user in users"
+                                        :key="user.id"
+                                        :label="`${user.name} (${user.email})`"
+                                        :value="user.id"
+                                    />
+                                </el-select>
+                                <span v-else>-</span>
                             </template>
                         </el-table-column>
                         <el-table-column prop="timeout_hours" label="超时(小时)" width="120">
@@ -316,6 +358,21 @@
                             {{ row.approval_type ? getApprovalTypeText(row.approval_type) : '-' }}
                         </template>
                     </el-table-column>
+                    <el-table-column prop="approvers" label="审批人" width="200" v-if="currentWorkflow.nodes.some(n => n.node_type == 'approval')">
+                        <template #default="{ row }">
+                            <template v-if="row.node_type == 'approval' && row.approver_config?.user_ids">
+                                <el-tag 
+                                    v-for="userId in row.approver_config.user_ids" 
+                                    :key="userId" 
+                                    style="margin-right: 5px; margin-bottom: 5px;"
+                                >
+                                    {{ getUserName(userId) }}
+                                </el-tag>
+                                <span v-if="!row.approver_config.user_ids || row.approver_config.user_ids.length === 0" style="color: #999;">未配置</span>
+                            </template>
+                            <span v-else>-</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="timeout_hours" label="超时(小时)" width="120" />
                     <el-table-column prop="is_required" label="必填" width="80">
                         <template #default="{ row }">
@@ -370,9 +427,22 @@
                 <el-descriptions-item label="发起时间">{{ currentInstance.started_at || '-' }}</el-descriptions-item>
             </el-descriptions>
                 <el-divider>审批记录</el-divider>
-                <el-table :data="approvalHistory || []" style="margin-top: 20px;" border v-if="currentInstance">
-                    <el-table-column prop="node.node_name" label="节点" width="150" />
-                    <el-table-column prop="approver.name" label="审批人" width="120" />
+                <el-table :data="approvalHistory || []" style="margin-top: 20px;" border v-if="currentInstance" empty-text="暂无审批记录">
+                    <el-table-column prop="node.node_name" label="节点" width="150">
+                        <template #default="{ row }">
+                            {{ row.node?.node_name || '-' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="approver.name" label="审批人" width="120">
+                        <template #default="{ row }">
+                            {{ row.approver?.name || '-' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="action" label="操作" width="100">
+                        <template #default="{ row }">
+                            {{ row.action == 'approve' ? '通过' : row.action == 'reject' ? '拒绝' : row.action || '-' }}
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="status" label="状态" width="100">
                         <template #default="{ row }">
                             <el-tag :type="row.status == 'approved' ? 'success' : row.status == 'rejected' ? 'danger' : 'warning'">
@@ -380,8 +450,16 @@
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="comment" label="审批意见" />
-                    <el-table-column prop="created_at" label="审批时间" width="180" />
+                    <el-table-column prop="comment" label="审批意见" min-width="200">
+                        <template #default="{ row }">
+                            {{ row.comment || '-' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="approved_at" label="审批时间" width="180">
+                        <template #default="{ row }">
+                            {{ row.approved_at || row.created_at || '-' }}
+                        </template>
+                    </el-table-column>
                 </el-table>
             </div>
         </el-dialog>
@@ -419,6 +497,7 @@ const currentInstance = ref(null);
 const currentApprovalInstance = ref(null);
 const approvalAction = ref('approve');
 const approvalDialogTitle = ref('审批');
+const users = ref([]); // 用户列表，用于选择审批人
 
 const searchForm = reactive({
     name: '',
@@ -510,6 +589,12 @@ const getReferenceTypeText = (type) => {
     return typeMap[type] || type;
 };
 
+// 根据用户ID获取用户名称
+const getUserName = (userId) => {
+    const user = users.value.find(u => u.id === userId);
+    return user ? user.name : `用户${userId}`;
+};
+
 const getInstanceStatusType = (status) => {
     const statusMap = {
         'pending': 'warning',
@@ -561,9 +646,18 @@ const loadPendingApprovals = async () => {
     pendingLoading.value = true;
     try {
         const response = await api.get('/approval-records/pending');
-        pendingApprovals.value = response.data.data || [];
+        // 处理返回数据格式：可能是数组或分页对象
+        if (Array.isArray(response.data)) {
+            pendingApprovals.value = response.data;
+        } else if (response.data.data) {
+            pendingApprovals.value = response.data.data;
+        } else {
+            pendingApprovals.value = [];
+        }
     } catch (error) {
-        ElMessage.error('加载待审批列表失败');
+        console.error('加载待审批列表失败:', error);
+        ElMessage.error(error.response?.data?.message || '加载待审批列表失败');
+        pendingApprovals.value = [];
     } finally {
         pendingLoading.value = false;
     }
@@ -630,6 +724,22 @@ const handleAdd = () => {
     dialogVisible.value = true;
 };
 
+// 加载用户列表
+const loadUsers = async () => {
+    try {
+        const response = await api.get('/users', { 
+            params: { 
+                per_page: 1000, // 获取所有用户
+                is_active: 1 // 只获取启用用户
+            } 
+        });
+        users.value = response.data.data || [];
+    } catch (error) {
+        console.error('加载用户列表失败:', error);
+        ElMessage.warning('加载用户列表失败，无法选择审批人');
+    }
+};
+
 const handleEdit = async (row) => {
     try {
         const response = await api.get(`/workflows/${row.id}`);
@@ -642,18 +752,25 @@ const handleEdit = async (row) => {
             type: workflow.type,
             description: workflow.description || '',
             is_active: workflow.is_active,
-            nodes: workflow.nodes.map(node => ({
-                node_name: node.node_name,
-                node_type: node.node_type,
-                sequence: node.sequence,
-                approval_type: node.approval_type || null,
-                approver_config: node.approver_config || null,
-                condition_config: node.condition_config || null,
-                next_nodes: node.next_nodes || null,
-                timeout_hours: node.timeout_hours || 0,
-                is_required: node.is_required || false,
-                remark: node.remark || ''
-            }))
+            nodes: workflow.nodes.map(node => {
+                // 从 approver_config 中提取 user_ids 用于前端显示
+                const approverUserIds = node.node_type === 'approval' 
+                    ? (node.approver_config?.user_ids || [])
+                    : [];
+                return {
+                    node_name: node.node_name,
+                    node_type: node.node_type,
+                    sequence: node.sequence,
+                    approval_type: node.approval_type || null,
+                    approver_user_ids: approverUserIds, // 用于前端显示
+                    approver_config: node.approver_config || null, // 保留原始配置
+                    condition_config: node.condition_config || null,
+                    next_nodes: node.next_nodes || null,
+                    timeout_hours: node.timeout_hours || 0,
+                    is_required: node.is_required || false,
+                    remark: node.remark || ''
+                };
+            })
         });
         dialogVisible.value = true;
     } catch (error) {
@@ -707,13 +824,45 @@ const handleAddNode = () => {
         node_type: 'approval',
         sequence: form.nodes.length + 1,
         approval_type: 'single',
-        approver_config: null,
+        approver_user_ids: [], // 用于前端显示和选择
+        approver_config: null, // 用于后端保存
         condition_config: null,
         next_nodes: null,
         timeout_hours: 0,
         is_required: false,
         remark: ''
     });
+};
+
+// 处理节点类型变化
+const handleNodeTypeChange = (row) => {
+    // 如果节点类型不是审批类型，清理审批相关配置
+    if (row.node_type !== 'approval') {
+        row.approval_type = null;
+        row.approver_user_ids = [];
+        row.approver_config = null;
+        row.is_required = false;
+    } else {
+        // 如果是审批节点，初始化默认值
+        if (!row.approval_type) {
+            row.approval_type = 'single';
+        }
+        if (!row.approver_user_ids) {
+            row.approver_user_ids = [];
+        }
+    }
+};
+
+// 处理审批人选择变化
+const handleApproverChange = (row) => {
+    // 将选择的用户ID数组保存到 approver_config
+    if (row.approver_user_ids && row.approver_user_ids.length > 0) {
+        row.approver_config = {
+            user_ids: row.approver_user_ids
+        };
+    } else {
+        row.approver_config = null;
+    }
 };
 
 const handleRemoveNode = (index) => {
@@ -734,6 +883,25 @@ const handleSubmit = async () => {
             }
             submitLoading.value = true;
             try {
+                // 验证审批节点是否配置了审批人
+                for (const node of form.nodes) {
+                    if (node.node_type === 'approval') {
+                        // 确保审批人配置已更新
+                        if (node.approver_user_ids && node.approver_user_ids.length > 0) {
+                            node.approver_config = {
+                                user_ids: node.approver_user_ids
+                            };
+                        }
+                        
+                        // 检查是否配置了审批人
+                        if (!node.approver_config || !node.approver_config.user_ids || node.approver_config.user_ids.length === 0) {
+                            ElMessage.warning(`节点"${node.node_name || '未命名'}"需要配置审批人`);
+                            submitLoading.value = false;
+                            return;
+                        }
+                    }
+                }
+                
                 const data = {
                     ...form,
                     nodes: form.nodes.map(node => ({
@@ -772,34 +940,56 @@ const handleDialogClose = () => {
 };
 
 const handleApprove = (row) => {
+    if (!row || !row.id) {
+        ElMessage.error('无效的审批实例');
+        return;
+    }
     currentApprovalInstance.value = row;
     approvalAction.value = 'approve';
-    approvalDialogTitle.value = '审批';
+    approvalDialogTitle.value = '审批通过';
     approvalForm.comment = '';
     approvalDialogVisible.value = true;
 };
 
 const handleReject = (row) => {
+    if (!row || !row.id) {
+        ElMessage.error('无效的审批实例');
+        return;
+    }
     currentApprovalInstance.value = row;
     approvalAction.value = 'reject';
-    approvalDialogTitle.value = '拒绝';
+    approvalDialogTitle.value = '审批拒绝';
     approvalForm.comment = '';
     approvalDialogVisible.value = true;
 };
 
 const handleSubmitApproval = async () => {
+    if (!currentApprovalInstance.value) {
+        ElMessage.error('审批实例不存在');
+        return;
+    }
+
     approvalSubmitLoading.value = true;
     try {
         const endpoint = approvalAction.value == 'approve' ? 'approve' : 'reject';
-        await api.post(`/approval-records/${currentApprovalInstance.value.id}/${endpoint}`, {
-            comment: approvalForm.comment
+        const response = await api.post(`/approval-records/${currentApprovalInstance.value.id}/${endpoint}`, {
+            comment: approvalForm.comment || null
         });
+        
         ElMessage.success(approvalAction.value == 'approve' ? '审批成功' : '拒绝成功');
         approvalDialogVisible.value = false;
-        loadPendingApprovals();
-        loadInstances();
+        approvalForm.comment = '';
+        currentApprovalInstance.value = null;
+        
+        // 刷新相关列表
+        await Promise.all([
+            loadPendingApprovals(),
+            loadInstances()
+        ]);
     } catch (error) {
-        ElMessage.error(error.response?.data?.message || '操作失败');
+        console.error('审批操作失败:', error);
+        const errorMessage = error.response?.data?.message || error.message || '操作失败';
+        ElMessage.error(errorMessage);
     } finally {
         approvalSubmitLoading.value = false;
     }
@@ -853,10 +1043,22 @@ const handleInstancePageChange = () => {
     loadInstances();
 };
 
+// 监听标签页切换，切换时刷新对应数据
+const handleTabChange = (tabName) => {
+    if (tabName === 'pending') {
+        loadPendingApprovals();
+    } else if (tabName === 'instances') {
+        loadInstances();
+    } else if (tabName === 'design') {
+        loadWorkflows();
+    }
+};
+
 onMounted(() => {
     loadWorkflows();
     loadPendingApprovals();
     loadInstances();
+    loadUsers(); // 加载用户列表用于选择审批人
 });
 </script>
 

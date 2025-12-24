@@ -26,6 +26,7 @@
                                         start-placeholder="开始日期"
                                         end-placeholder="结束日期"
                                         value-format="YYYY-MM-DD"
+                                        style="width: 300px"
                                     />
                                 </el-form-item>
                                 <el-form-item>
@@ -75,6 +76,7 @@
                                         start-placeholder="开始日期"
                                         end-placeholder="结束日期"
                                         value-format="YYYY-MM-DD"
+                                        style="width: 300px"
                                     />
                                 </el-form-item>
                                 <el-form-item>
@@ -117,7 +119,7 @@
                         <el-tab-pane label="库存报表" name="inventory">
                             <el-form :inline="true" :model="inventoryReportForm" class="search-form-modern">
                                 <el-form-item label="仓库">
-                                    <el-select v-model="inventoryReportForm.warehouse_id" placeholder="全部" clearable>
+                                    <el-select v-model="inventoryReportForm.warehouse_id" placeholder="全部" clearable style="width: 200px">
                                         <el-option label="全部仓库" :value="''" />
                                         <el-option
                                             v-for="warehouse in warehouses"
@@ -154,6 +156,7 @@
                                         start-placeholder="开始日期"
                                         end-placeholder="结束日期"
                                         value-format="YYYY-MM-DD"
+                                        style="width: 300px"
                                     />
                                 </el-form-item>
                                 <el-form-item>
@@ -273,11 +276,7 @@ const loadSalesReport = async () => {
             Object.assign(salesStats, { total_amount: 0, order_count: 0, avg_amount: 0, customer_count: 0 });
         }
         
-        // 更新图表
-        await nextTick();
-        if (salesChartRef.value) {
-            updateSalesChart();
-        }
+        // 图表会在标签页切换时自动更新，无需在这里手动调用
     } catch (error) {
         console.error('加载销售报表失败:', error);
         ElMessage.error(error.response?.data?.message || '加载销售报表失败');
@@ -288,14 +287,17 @@ const loadSalesReport = async () => {
     }
 };
 
-const updateSalesChart = () => {
+const updateSalesChart = async () => {
     if (!salesReportData.value || salesReportData.value.length == 0) return;
-    
+
+    // 检查是否在销售标签页
+    if (activeTab.value !== 'sales' || !salesChartRef.value) return;
+
     const dates = salesReportData.value.map(item => item.date);
     const amounts = salesReportData.value.map(item => parseFloat(item.total_amount) || 0);
     const orderCounts = salesReportData.value.map(item => parseInt(item.order_count) || 0);
-    
-    salesChart.setOption({
+
+    const chartOptions = {
         title: {
             text: '销售趋势分析',
             left: 'center'
@@ -366,7 +368,19 @@ const updateSalesChart = () => {
                 itemStyle: { color: '#67C23A' }
             }
         ]
-    });
+    };
+
+    // 如果图表还没有初始化，先初始化
+    if (!salesChart.isInitialized()) {
+        const success = await salesChart.initChart(chartOptions);
+        if (success) {
+            // 添加窗口大小改变监听
+            window.addEventListener('resize', salesChart.resize);
+        }
+    } else {
+        // 图表已初始化，直接设置选项
+        salesChart.setOption(chartOptions);
+    }
 };
 
 const loadPurchaseReport = async () => {
@@ -392,11 +406,13 @@ const loadPurchaseReport = async () => {
             Object.assign(purchaseStats, { total_amount: 0, order_count: 0, avg_amount: 0, supplier_count: 0 });
         }
         
-        // 更新图表
+        // 更新图表 - 只有当采购标签页是活跃的时才更新
         await nextTick();
-        if (purchaseChartRef.value) {
-            updatePurchaseChart();
-        }
+        setTimeout(() => {
+            if (activeTab.value == 'purchase' && purchaseChartRef.value) {
+                updatePurchaseChart();
+            }
+        }, 200);
     } catch (error) {
         console.error('加载采购报表失败:', error);
         ElMessage.error(error.response?.data?.message || '加载采购报表失败');
@@ -407,14 +423,17 @@ const loadPurchaseReport = async () => {
     }
 };
 
-const updatePurchaseChart = () => {
+const updatePurchaseChart = async () => {
     if (!purchaseReportData.value || purchaseReportData.value.length == 0) return;
-    
+
+    // 检查是否在采购标签页
+    if (activeTab.value !== 'purchase' || !purchaseChartRef.value) return;
+
     const dates = purchaseReportData.value.map(item => item.date);
     const amounts = purchaseReportData.value.map(item => parseFloat(item.total_amount) || 0);
     const orderCounts = purchaseReportData.value.map(item => parseInt(item.order_count) || 0);
-    
-    purchaseChart.setOption({
+
+    const chartOptions = {
         title: {
             text: '采购趋势分析',
             left: 'center'
@@ -485,7 +504,19 @@ const updatePurchaseChart = () => {
                 itemStyle: { color: '#F56C6C' }
             }
         ]
-    });
+    };
+
+    // 如果图表还没有初始化，先初始化
+    if (!purchaseChart.isInitialized()) {
+        const success = await purchaseChart.initChart(chartOptions);
+        if (success) {
+            // 添加窗口大小改变监听
+            window.addEventListener('resize', purchaseChart.resize);
+        }
+    } else {
+        // 图表已初始化，直接设置选项
+        purchaseChart.setOption(chartOptions);
+    }
 };
 
 const loadInventoryReport = async () => {
@@ -702,22 +733,32 @@ const handleExportPDF = async () => {
         }
         
         exportToPDF(data, columns, filename, title, stats);
-        ElMessage.success('导出成功');
+        ElMessage.success('PDF导出成功');
     } catch (error) {
-        ElMessage.error('导出失败');
+        console.error('PDF导出失败:', error);
+        ElMessage.error(error.message || 'PDF导出失败，请稍后重试');
     }
 };
 
-watch(activeTab, () => {
-    nextTick(() => {
-        if (activeTab.value == 'sales' && salesChartRef.value) {
+watch(activeTab, async () => {
+    await nextTick();
+
+    // 等待DOM完全渲染
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (activeTab.value == 'sales' && salesReportData.value && salesReportData.value.length > 0 && salesChartRef.value) {
+        const success = await salesChart.initChart();
+        if (success) {
             salesChart.resize();
             updateSalesChart();
-        } else if (activeTab.value == 'purchase' && purchaseChartRef.value) {
+        }
+    } else if (activeTab.value == 'purchase' && purchaseReportData.value && purchaseReportData.value.length > 0 && purchaseChartRef.value) {
+        const success = await purchaseChart.initChart();
+        if (success) {
             purchaseChart.resize();
             updatePurchaseChart();
         }
-    });
+    }
 });
 
 onMounted(() => {
