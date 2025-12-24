@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class BomController extends Controller
 {
+    /**
+     * 获取BOM列表
+     *
+     * @param Request $request 请求对象，支持 product_id（产品ID）、is_active（是否激活）、is_default（是否默认）和 search（搜索关键词）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的BOM列表，包含产品和创建人信息
+     */
     public function index(Request $request)
     {
         $query = Bom::with(['product', 'creator']);
@@ -41,6 +47,12 @@ class BomController extends Controller
         return response()->json($query->orderBy('effective_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建BOM
+     *
+     * @param Request $request 请求对象，包含BOM信息和明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的BOM信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -94,6 +106,12 @@ class BomController extends Controller
         });
     }
 
+    /**
+     * 获取指定BOM详情
+     *
+     * @param int $id BOM ID
+     * @return \Illuminate\Http\JsonResponse 返回BOM详细信息，包含产品、明细项和创建人信息
+     */
     public function show($id)
     {
         $bom = Bom::with(['product', 'items.componentProduct', 'items.unit', 'creator'])
@@ -101,6 +119,13 @@ class BomController extends Controller
         return ApiResponse::success($bom, '获取成功');
     }
 
+    /**
+     * 更新BOM信息
+     *
+     * @param Request $request 请求对象，包含要更新的BOM字段和明细项
+     * @param int $id BOM ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的BOM信息
+     */
     public function update(Request $request, $id)
     {
         $bom = Bom::findOrFail($id);
@@ -158,6 +183,12 @@ class BomController extends Controller
         });
     }
 
+    /**
+     * 删除BOM
+     *
+     * @param int $id BOM ID
+     * @return \Illuminate\Http\JsonResponse 返回删除成功消息
+     */
     public function destroy($id)
     {
         $bom = Bom::findOrFail($id);
@@ -166,6 +197,12 @@ class BomController extends Controller
         return response()->json(['message' => 'BOM删除成功']);
     }
 
+    /**
+     * 设置BOM为默认版本
+     *
+     * @param int $id BOM ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的BOM信息
+     */
     public function setDefault($id)
     {
         $bom = Bom::findOrFail($id);
@@ -180,6 +217,12 @@ class BomController extends Controller
         return response()->json($bom->load(['product', 'items.componentProduct']));
     }
 
+    /**
+     * 复制BOM
+     *
+     * @param int $id BOM ID
+     * @return \Illuminate\Http\JsonResponse 返回复制的BOM信息，状态码 201
+     */
     public function copy($id)
     {
         $sourceBom = Bom::with('items')->findOrFail($id);

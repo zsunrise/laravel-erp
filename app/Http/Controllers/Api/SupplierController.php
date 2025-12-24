@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
+    /**
+     * 获取供应商列表
+     *
+     * @param Request $request 请求对象，支持 search（搜索关键词）、is_active（是否激活）和 rating（评级）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的供应商列表，包含区域信息
+     */
     public function index(Request $request)
     {
         $query = Supplier::with(['region']);
@@ -34,6 +40,12 @@ class SupplierController extends Controller
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建新供应商
+     *
+     * @param Request $request 请求对象，包含供应商信息（编码、名称、联系方式等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的供应商信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -59,12 +71,25 @@ class SupplierController extends Controller
         return response()->json($supplier->load('region'), 201);
     }
 
+    /**
+     * 获取指定供应商详情
+     *
+     * @param int $id 供应商ID
+     * @return \Illuminate\Http\JsonResponse 返回供应商详细信息，包含区域信息
+     */
     public function show($id)
     {
         $supplier = Supplier::with(['region'])->findOrFail($id);
         return ApiResponse::success($supplier, '获取成功');
     }
 
+    /**
+     * 更新供应商信息
+     *
+     * @param Request $request 请求对象，包含要更新的供应商字段
+     * @param int $id 供应商ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的供应商信息
+     */
     public function update(Request $request, $id)
     {
         $supplier = Supplier::findOrFail($id);
@@ -92,6 +117,12 @@ class SupplierController extends Controller
         return response()->json($supplier->load('region'));
     }
 
+    /**
+     * 删除供应商
+     *
+     * @param int $id 供应商ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，如果供应商下有采购订单则返回错误消息
+     */
     public function destroy($id)
     {
         $supplier = Supplier::findOrFail($id);

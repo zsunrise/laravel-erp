@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class OperationLogController extends Controller
 {
+    /**
+     * 获取操作日志列表
+     *
+     * @param Request $request 请求对象，支持 user_id（用户ID）、module（模块）、action（操作）、method（请求方法）、status_code（状态码）、search（搜索关键词）和 date_from/date_to（日期范围）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的操作日志列表，包含用户信息
+     */
     public function index(Request $request)
     {
         $query = OperationLog::with(['user']);
@@ -58,6 +64,12 @@ class OperationLogController extends Controller
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 获取指定操作日志详情
+     *
+     * @param int $id 日志ID
+     * @return \Illuminate\Http\JsonResponse 返回日志详细信息，包含用户信息
+     */
     public function show($id)
     {
         $log = OperationLog::with(['user'])->findOrFail($id);

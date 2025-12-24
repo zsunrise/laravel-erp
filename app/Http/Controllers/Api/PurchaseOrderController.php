@@ -19,6 +19,12 @@ class PurchaseOrderController extends Controller
         $this->purchaseService = $purchaseService;
     }
 
+    /**
+     * 获取采购订单列表
+     *
+     * @param Request $request 请求对象，支持 supplier_id（供应商ID）、warehouse_id（仓库ID）、status（状态）、start_date/end_date（日期范围）和 search（搜索关键词）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的采购订单列表，包含供应商、仓库、货币和创建人信息
+     */
     public function index(Request $request)
     {
         $query = PurchaseOrder::with(['supplier', 'warehouse', 'currency', 'creator']);
@@ -57,6 +63,12 @@ class PurchaseOrderController extends Controller
         return response()->json($query->orderBy('order_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建采购订单
+     *
+     * @param Request $request 请求对象，包含订单信息和明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的订单信息，状态码 201，失败时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -84,6 +96,12 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 获取指定采购订单详情
+     *
+     * @param int $id 采购订单ID
+     * @return \Illuminate\Http\JsonResponse 返回订单详细信息，包含供应商、仓库、货币、创建人、审批人和明细项信息
+     */
     public function show($id)
     {
         $order = PurchaseOrder::with(['supplier', 'warehouse', 'currency', 'creator', 'approver', 'items.product'])
@@ -91,6 +109,13 @@ class PurchaseOrderController extends Controller
         return ApiResponse::success($order, '获取成功');
     }
 
+    /**
+     * 更新采购订单
+     *
+     * @param Request $request 请求对象，包含要更新的订单字段和明细项
+     * @param int $id 采购订单ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的订单信息，失败时返回错误消息
+     */
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -118,6 +143,12 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 删除采购订单
+     *
+     * @param int $id 采购订单ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，只能删除草稿状态的订单
+     */
     public function destroy($id)
     {
         $order = PurchaseOrder::findOrFail($id);
@@ -131,6 +162,12 @@ class PurchaseOrderController extends Controller
         return response()->json(['message' => '订单删除成功']);
     }
 
+    /**
+     * 审批采购订单
+     *
+     * @param int $id 采购订单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的订单信息，失败时返回错误消息
+     */
     public function approve($id)
     {
         try {
@@ -141,6 +178,13 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 采购订单收货
+     *
+     * @param int $id 采购订单ID
+     * @param Request $request 请求对象，包含收货明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回收货后的订单信息，失败时返回错误消息
+     */
     public function receive($id, Request $request)
     {
         $validated = $request->validate([
@@ -157,6 +201,12 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 取消采购订单
+     *
+     * @param int $id 采购订单ID
+     * @return \Illuminate\Http\JsonResponse 返回取消后的订单信息，失败时返回错误消息
+     */
     public function cancel($id)
     {
         try {
@@ -167,6 +217,12 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 获取采购退货单列表
+     *
+     * @param Request $request 请求对象，支持 supplier_id（供应商ID）和 status（状态）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的采购退货单列表，包含供应商、仓库、货币和创建人信息
+     */
     public function returns(Request $request)
     {
         $query = PurchaseReturn::with(['supplier', 'warehouse', 'currency', 'creator']);
@@ -182,6 +238,12 @@ class PurchaseOrderController extends Controller
         return response()->json($query->orderBy('return_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建采购退货单
+     *
+     * @param Request $request 请求对象，包含退货单信息和明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的退货单信息，状态码 201，失败时返回错误消息
+     */
     public function createReturn(Request $request)
     {
         $validated = $request->validate([
@@ -207,6 +269,12 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 获取指定采购退货单详情
+     *
+     * @param int $id 采购退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回退货单详细信息，包含供应商、仓库、货币、创建人、审批人和明细项信息
+     */
     public function showReturn($id)
     {
         $return = PurchaseReturn::with(['supplier', 'warehouse', 'currency', 'creator', 'approver', 'items.product'])
@@ -214,6 +282,12 @@ class PurchaseOrderController extends Controller
         return ApiResponse::success($return, '获取成功');
     }
 
+    /**
+     * 审批采购退货单
+     *
+     * @param int $id 采购退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的退货单信息，失败时返回错误消息
+     */
     public function approveReturn($id)
     {
         try {
@@ -224,6 +298,12 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 获取采购结算单列表
+     *
+     * @param Request $request 请求对象，支持 supplier_id（供应商ID）和 status（状态）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的采购结算单列表，包含供应商、货币和创建人信息
+     */
     public function settlements(Request $request)
     {
         $query = PurchaseSettlement::with(['supplier', 'currency', 'creator']);
@@ -239,6 +319,12 @@ class PurchaseOrderController extends Controller
         return response()->json($query->orderBy('settlement_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建采购结算单
+     *
+     * @param Request $request 请求对象，包含结算单信息和关联订单/退货单明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的结算单信息，状态码 201，失败时返回错误消息
+     */
     public function createSettlement(Request $request)
     {
         $validated = $request->validate([
@@ -260,6 +346,12 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 获取指定采购结算单详情
+     *
+     * @param int $id 采购结算单ID
+     * @return \Illuminate\Http\JsonResponse 返回结算单详细信息，包含供应商、货币、创建人、审批人和明细项信息
+     */
     public function showSettlement($id)
     {
         $settlement = PurchaseSettlement::with(['supplier', 'currency', 'creator', 'approver', 'items'])
@@ -267,6 +359,12 @@ class PurchaseOrderController extends Controller
         return ApiResponse::success($settlement, '获取成功');
     }
 
+    /**
+     * 审批采购结算单
+     *
+     * @param int $id 采购结算单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的结算单信息，失败时返回错误消息
+     */
     public function approveSettlement($id)
     {
         try {
@@ -277,6 +375,13 @@ class PurchaseOrderController extends Controller
         }
     }
 
+    /**
+     * 支付采购结算单
+     *
+     * @param int $id 采购结算单ID
+     * @param Request $request 请求对象，包含 paid_amount（支付金额）
+     * @return \Illuminate\Http\JsonResponse 返回支付后的结算单信息，失败时返回错误消息
+     */
     public function paySettlement($id, Request $request)
     {
         $validated = $request->validate([

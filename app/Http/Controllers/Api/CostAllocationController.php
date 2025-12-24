@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class CostAllocationController extends Controller
 {
+    /**
+     * 获取成本分配单列表
+     *
+     * @param Request $request 请求对象，支持 allocation_no（分配单号）、cost_type（成本类型）、status（状态）、reference_type/reference_id（关联信息）、product_id（产品ID）和 start_date/end_date（日期范围）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的成本分配单列表，包含产品、创建人和审批人信息
+     */
     public function index(Request $request)
     {
         $query = CostAllocation::with(['product', 'creator', 'approver']);
@@ -53,6 +59,12 @@ class CostAllocationController extends Controller
         );
     }
 
+    /**
+     * 创建成本分配单
+     *
+     * @param Request $request 请求对象，包含成本分配单信息（分配日期、成本类型、总金额、分配方法等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的成本分配单信息，状态码 201，失败时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -101,6 +113,12 @@ class CostAllocationController extends Controller
         }
     }
 
+    /**
+     * 获取指定成本分配单详情
+     *
+     * @param int $id 成本分配单ID
+     * @return \Illuminate\Http\JsonResponse 返回成本分配单详细信息，包含产品、创建人和审批人信息
+     */
     public function show($id)
     {
         $costAllocation = CostAllocation::with(['product', 'creator', 'approver'])
@@ -109,6 +127,13 @@ class CostAllocationController extends Controller
         return ApiResponse::success($costAllocation);
     }
 
+    /**
+     * 更新成本分配单
+     *
+     * @param Request $request 请求对象，包含要更新的成本分配单字段
+     * @param int $id 成本分配单ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的成本分配单信息，只能修改草稿状态的分配单，失败时返回错误消息
+     */
     public function update(Request $request, $id)
     {
         $costAllocation = CostAllocation::findOrFail($id);
@@ -143,6 +168,12 @@ class CostAllocationController extends Controller
         }
     }
 
+    /**
+     * 删除成本分配单
+     *
+     * @param int $id 成本分配单ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，只能删除草稿状态的分配单，失败时返回错误消息
+     */
     public function destroy($id)
     {
         $costAllocation = CostAllocation::findOrFail($id);
@@ -159,6 +190,12 @@ class CostAllocationController extends Controller
         }
     }
 
+    /**
+     * 审批成本分配单
+     *
+     * @param int $id 成本分配单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的成本分配单信息，只能审批草稿状态的分配单，失败时返回错误消息
+     */
     public function approve($id)
     {
         $costAllocation = CostAllocation::findOrFail($id);
@@ -185,6 +222,12 @@ class CostAllocationController extends Controller
         }
     }
 
+    /**
+     * 完成成本分配单
+     *
+     * @param int $id 成本分配单ID
+     * @return \Illuminate\Http\JsonResponse 返回完成后的成本分配单信息，只能完成已审核状态的分配单，失败时返回错误消息
+     */
     public function complete($id)
     {
         $costAllocation = CostAllocation::findOrFail($id);

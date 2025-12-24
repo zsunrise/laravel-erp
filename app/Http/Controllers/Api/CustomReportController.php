@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class CustomReportController extends Controller
 {
+    /**
+     * 获取自定义报表定义列表
+     *
+     * @param Request $request 请求对象，支持 category（分类）和 is_active（是否激活）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的自定义报表定义列表，包含创建人信息，按创建时间降序排列
+     */
     public function index(Request $request)
     {
         $query = ReportDefinition::with(['creator']);
@@ -25,6 +31,12 @@ class CustomReportController extends Controller
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建自定义报表定义
+     *
+     * @param Request $request 请求对象，包含报表定义信息（名称、编码、分类、查询配置、显示配置等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的报表定义信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -51,12 +63,25 @@ class CustomReportController extends Controller
         return response()->json($report->load('creator'), 201);
     }
 
+    /**
+     * 获取指定报表定义详情
+     *
+     * @param int $id 报表定义ID
+     * @return \Illuminate\Http\JsonResponse 返回报表定义详细信息，包含创建人和计划任务信息
+     */
     public function show($id)
     {
         $report = ReportDefinition::with(['creator', 'schedules'])->findOrFail($id);
         return ApiResponse::success($report, '获取成功');
     }
 
+    /**
+     * 更新自定义报表定义
+     *
+     * @param Request $request 请求对象，包含要更新的报表定义字段
+     * @param int $id 报表定义ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的报表定义信息
+     */
     public function update(Request $request, $id)
     {
         $report = ReportDefinition::findOrFail($id);
@@ -76,6 +101,12 @@ class CustomReportController extends Controller
         return response()->json($report->load('creator'));
     }
 
+    /**
+     * 删除自定义报表定义
+     *
+     * @param int $id 报表定义ID
+     * @return \Illuminate\Http\JsonResponse 返回删除成功消息
+     */
     public function destroy($id)
     {
         $report = ReportDefinition::findOrFail($id);
@@ -84,6 +115,13 @@ class CustomReportController extends Controller
         return response()->json(['message' => '报表删除成功']);
     }
 
+    /**
+     * 执行自定义报表
+     *
+     * @param int $id 报表定义ID
+     * @param Request $request 请求对象，包含报表查询参数
+     * @return \Illuminate\Http\JsonResponse 返回报表数据和报表定义信息，报表未启用或配置错误时返回错误消息
+     */
     public function execute($id, Request $request)
     {
         $report = ReportDefinition::findOrFail($id);

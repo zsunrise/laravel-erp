@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class RegionController extends Controller
 {
+    /**
+     * 获取区域列表
+     *
+     * @param Request $request 请求对象，支持 parent_id（父区域ID）、level（级别）、is_active（是否激活）和 tree（树形结构）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的区域列表或树形结构
+     */
     public function index(Request $request)
     {
         $query = Region::query();
@@ -39,6 +45,12 @@ class RegionController extends Controller
         return response()->json($query->where('is_active', true)->orderBy('sort')->paginate($request->get('per_page', 1000)));
     }
 
+    /**
+     * 获取指定区域详情
+     *
+     * @param int $id 区域ID
+     * @return \Illuminate\Http\JsonResponse 返回区域详细信息，包含父区域和子区域信息
+     */
     public function show($id)
     {
         $region = Region::with(['parent', 'children'])->findOrFail($id);

@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryReportController extends Controller
 {
+    /**
+     * 库存周转率报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回产品的库存周转率和周转天数统计，按周转率降序排列
+     */
     public function turnover(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
@@ -43,6 +49,12 @@ class InventoryReportController extends Controller
         return response()->json($report);
     }
 
+    /**
+     * 呆滞库存报表
+     *
+     * @param Request $request 请求对象，支持 days（天数阈值，默认90天）
+     * @return \Illuminate\Http\JsonResponse 返回超过指定天数未发生交易的产品库存信息，按未交易天数降序排列
+     */
     public function slowMoving(Request $request)
     {
         $days = $request->days ?? 90;
@@ -73,6 +85,12 @@ class InventoryReportController extends Controller
         return response()->json($report);
     }
 
+    /**
+     * 库存估值报表
+     *
+     * @param Request $request 请求对象，支持 warehouse_id（仓库ID）
+     * @return \Illuminate\Http\JsonResponse 返回按产品和仓库分组的库存估值数据（数量和总价值）
+     */
     public function valuation(Request $request)
     {
         $warehouseId = $request->warehouse_id;
@@ -105,6 +123,12 @@ class InventoryReportController extends Controller
         return ApiResponse::success($report, '获取成功');
     }
 
+    /**
+     * 库存变动报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回按产品分组的库存变动统计（入库数量/金额、出库数量/金额），按入库数量降序排列
+     */
     public function movement(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();

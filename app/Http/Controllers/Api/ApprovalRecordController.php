@@ -18,6 +18,12 @@ class ApprovalRecordController extends Controller
         $this->approvalService = $approvalService;
     }
 
+    /**
+     * 获取审批记录列表
+     *
+     * @param Request $request 请求对象，支持 instance_id（流程实例ID）、approver_id（审批人ID）和 status（状态）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的审批记录列表，包含流程实例、节点和审批人信息
+     */
     public function index(Request $request)
     {
         $query = ApprovalRecord::with(['instance', 'node', 'approver']);
@@ -37,6 +43,13 @@ class ApprovalRecordController extends Controller
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 审批通过
+     *
+     * @param int $instanceId 流程实例ID
+     * @param Request $request 请求对象，包含 comment（审批意见）
+     * @return \Illuminate\Http\JsonResponse 返回审批后的流程实例信息，失败时返回错误消息
+     */
     public function approve($instanceId, Request $request)
     {
         $validated = $request->validate([
@@ -51,6 +64,13 @@ class ApprovalRecordController extends Controller
         }
     }
 
+    /**
+     * 审批拒绝
+     *
+     * @param int $instanceId 流程实例ID
+     * @param Request $request 请求对象，包含 comment（拒绝原因）
+     * @return \Illuminate\Http\JsonResponse 返回拒绝后的流程实例信息，失败时返回错误消息
+     */
     public function reject($instanceId, Request $request)
     {
         $validated = $request->validate([
@@ -65,12 +85,23 @@ class ApprovalRecordController extends Controller
         }
     }
 
+    /**
+     * 获取待审批列表
+     *
+     * @return \Illuminate\Http\JsonResponse 返回当前登录用户的待审批流程实例列表
+     */
     public function pendingApprovals()
     {
         $instances = $this->approvalService->getPendingApprovals(auth()->id());
         return response()->json($instances);
     }
 
+    /**
+     * 获取审批历史记录
+     *
+     * @param int $instanceId 流程实例ID
+     * @return \Illuminate\Http\JsonResponse 返回流程实例的完整审批历史记录，包含所有审批记录
+     */
     public function history($instanceId)
     {
         $instance = WorkflowInstance::with([

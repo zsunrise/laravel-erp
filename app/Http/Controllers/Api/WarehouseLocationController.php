@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class WarehouseLocationController extends Controller
 {
+    /**
+     * 获取库位列表
+     *
+     * @param Request $request 请求对象，支持 warehouse_id（仓库ID）和 is_active（是否激活）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的库位列表，按排序字段排序
+     */
     public function index(Request $request)
     {
         $query = WarehouseLocation::query();
@@ -24,6 +30,12 @@ class WarehouseLocationController extends Controller
         return response()->json($query->orderBy('sort')->paginate($request->get('per_page', 1000)));
     }
 
+    /**
+     * 创建库位
+     *
+     * @param Request $request 请求对象，包含库位信息（仓库ID、名称、编码等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的库位信息，状态码 201，编码重复时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,12 +61,25 @@ class WarehouseLocationController extends Controller
         return response()->json($location, 201);
     }
 
+    /**
+     * 获取指定库位详情
+     *
+     * @param int $id 库位ID
+     * @return \Illuminate\Http\JsonResponse 返回库位详细信息
+     */
     public function show($id)
     {
         $location = WarehouseLocation::findOrFail($id);
         return ApiResponse::success($location, '获取成功');
     }
 
+    /**
+     * 更新库位信息
+     *
+     * @param Request $request 请求对象，包含要更新的库位字段
+     * @param int $id 库位ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的库位信息，编码重复时返回错误消息
+     */
     public function update(Request $request, $id)
     {
         $location = WarehouseLocation::findOrFail($id);
@@ -82,6 +107,12 @@ class WarehouseLocationController extends Controller
         return response()->json($location);
     }
 
+    /**
+     * 删除库位
+     *
+     * @param int $id 库位ID
+     * @return \Illuminate\Http\JsonResponse 返回删除成功消息
+     */
     public function destroy($id)
     {
         $location = WarehouseLocation::findOrFail($id);

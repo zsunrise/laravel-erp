@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class WorkflowController extends Controller
 {
+    /**
+     * 获取工作流列表
+     *
+     * @param Request $request 请求对象，支持 type（类型）和 is_active（是否激活）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的工作流列表，包含创建人信息
+     */
     public function index(Request $request)
     {
         $query = Workflow::with(['creator']);
@@ -25,6 +31,12 @@ class WorkflowController extends Controller
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建工作流
+     *
+     * @param Request $request 请求对象，包含工作流信息和节点数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的工作流信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -64,12 +76,25 @@ class WorkflowController extends Controller
         });
     }
 
+    /**
+     * 获取指定工作流详情
+     *
+     * @param int $id 工作流ID
+     * @return \Illuminate\Http\JsonResponse 返回工作流详细信息，包含节点和创建人信息
+     */
     public function show($id)
     {
         $workflow = Workflow::with(['nodes', 'creator'])->findOrFail($id);
         return ApiResponse::success($workflow, '获取成功');
     }
 
+    /**
+     * 更新工作流信息
+     *
+     * @param Request $request 请求对象，包含要更新的工作流字段
+     * @param int $id 工作流ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的工作流信息
+     */
     public function update(Request $request, $id)
     {
         $workflow = Workflow::findOrFail($id);
@@ -87,6 +112,12 @@ class WorkflowController extends Controller
         return response()->json($workflow->load(['nodes', 'creator']));
     }
 
+    /**
+     * 删除工作流
+     *
+     * @param int $id 工作流ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，如果工作流已有实例则返回错误消息
+     */
     public function destroy($id)
     {
         $workflow = Workflow::findOrFail($id);

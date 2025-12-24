@@ -529,10 +529,10 @@
             </template>
         </el-dialog>
 
-        <!-- 生产领料对话框 -->
+        <!-- 生产领料/退料对话框 -->
         <el-dialog
             v-model="materialIssueDialogVisible"
-            title="生产领料"
+            :title="materialIssueType === 'return' ? '生产退料' : '生产领料'"
             width="800px"
         >
             <el-form ref="materialIssueFormRef" :model="materialIssueForm" label-width="120px">
@@ -653,6 +653,7 @@ const productionReports = ref([]);
 const materialIssueDialogVisible = ref(false);
 const materialIssueFormRef = ref(null);
 const materialIssueSubmitLoading = ref(false);
+const materialIssueType = ref('issue'); // 'issue' 或 'return'
 const materialIssueForm = reactive({
     items: []
 });
@@ -1280,11 +1281,13 @@ const handleWorkOrderDialogClose = () => {
 };
 
 const handleIssueMaterial = () => {
+    materialIssueType.value = 'issue';
     materialIssueForm.items = [];
     materialIssueDialogVisible.value = true;
 };
 
 const handleReturnMaterial = () => {
+    materialIssueType.value = 'return';
     materialIssueForm.items = [];
     materialIssueDialogVisible.value = true;
 };
@@ -1313,15 +1316,22 @@ const handleSubmitMaterialIssue = async () => {
     
     materialIssueSubmitLoading.value = true;
     try {
-        await api.post(`/work-orders/${currentWorkOrder.value.id}/issue-material`, {
+        const endpoint = materialIssueType.value === 'return' 
+            ? `/work-orders/${currentWorkOrder.value.id}/return-material`
+            : `/work-orders/${currentWorkOrder.value.id}/issue-material`;
+        
+        await api.post(endpoint, {
             items: materialIssueForm.items
         });
-        ElMessage.success('领料成功');
+        
+        const successMessage = materialIssueType.value === 'return' ? '退料成功' : '领料成功';
+        ElMessage.success(successMessage);
         materialIssueDialogVisible.value = false;
         handleViewMaterialIssues();
         loadWorkOrders();
     } catch (error) {
-        ElMessage.error(error.response?.data?.message || '领料失败');
+        const errorMessage = materialIssueType.value === 'return' ? '退料失败' : '领料失败';
+        ElMessage.error(error.response?.data?.message || errorMessage);
     } finally {
         materialIssueSubmitLoading.value = false;
     }

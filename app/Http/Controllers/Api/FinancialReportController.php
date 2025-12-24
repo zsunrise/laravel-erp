@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 
 class FinancialReportController extends Controller
 {
+    /**
+     * 资产负债表
+     *
+     * @param Request $request 请求对象，支持 date（报表日期，默认为当前日期）
+     * @return \Illuminate\Http\JsonResponse 返回资产负债表数据，包含资产、负债、所有者权益及其合计
+     */
     public function balanceSheet(Request $request)
     {
         $date = $request->date ?? now()->toDateString();
@@ -67,6 +73,12 @@ class FinancialReportController extends Controller
         ]);
     }
 
+    /**
+     * 利润表（损益表）
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回利润表数据，包含收入、费用、利润和利润率统计
+     */
     public function incomeStatement(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();

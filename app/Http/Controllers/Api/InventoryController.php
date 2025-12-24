@@ -19,6 +19,12 @@ class InventoryController extends Controller
         $this->inventoryService = $inventoryService;
     }
 
+    /**
+     * 获取库存列表
+     *
+     * @param Request $request 请求对象，支持 product_id（产品ID）、warehouse_id（仓库ID）、location_id（库位ID）和 low_stock（低库存）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的库存列表，包含产品、仓库和库位信息
+     */
     public function index(Request $request)
     {
         $query = Inventory::with(['product', 'warehouse', 'location']);
@@ -42,12 +48,24 @@ class InventoryController extends Controller
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 获取指定库存详情
+     *
+     * @param int $id 库存ID
+     * @return \Illuminate\Http\JsonResponse 返回库存详细信息，包含产品、仓库和库位信息
+     */
     public function show($id)
     {
         $inventory = Inventory::with(['product', 'warehouse', 'location'])->findOrFail($id);
         return ApiResponse::success($inventory, '获取成功');
     }
 
+    /**
+     * 入库操作
+     *
+     * @param Request $request 请求对象，包含产品ID、仓库ID、数量、单位成本等入库信息
+     * @return \Illuminate\Http\JsonResponse 返回入库结果，状态码 201，失败时返回错误消息
+     */
     public function stockIn(Request $request)
     {
         $validated = $request->validate([
@@ -83,6 +101,12 @@ class InventoryController extends Controller
         }
     }
 
+    /**
+     * 出库操作
+     *
+     * @param Request $request 请求对象，包含产品ID、仓库ID、数量、单位成本等出库信息
+     * @return \Illuminate\Http\JsonResponse 返回出库结果，状态码 201，失败时返回错误消息
+     */
     public function stockOut(Request $request)
     {
         $validated = $request->validate([
@@ -118,6 +142,12 @@ class InventoryController extends Controller
         }
     }
 
+    /**
+     * 库存调拨
+     *
+     * @param Request $request 请求对象，包含产品ID、源仓库、目标仓库、数量等调拨信息
+     * @return \Illuminate\Http\JsonResponse 返回调拨结果，状态码 201，失败时返回错误消息
+     */
     public function transfer(Request $request)
     {
         $validated = $request->validate([
@@ -151,6 +181,12 @@ class InventoryController extends Controller
         }
     }
 
+    /**
+     * 库存调整
+     *
+     * @param Request $request 请求对象，包含产品ID、仓库ID、调整后数量、单位成本等调整信息
+     * @return \Illuminate\Http\JsonResponse 返回调整结果，状态码 201，失败时返回错误消息
+     */
     public function adjust(Request $request)
     {
         $validated = $request->validate([
@@ -182,6 +218,12 @@ class InventoryController extends Controller
         }
     }
 
+    /**
+     * 获取库存交易记录列表
+     *
+     * @param Request $request 请求对象，支持 product_id（产品ID）、warehouse_id（仓库ID）、type（交易类型）和 start_date/end_date（日期范围）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的库存交易记录列表，包含产品、仓库、库位和操作用户信息
+     */
     public function transactions(Request $request)
     {
         $query = InventoryTransaction::with(['product', 'warehouse', 'location', 'user']);
@@ -209,6 +251,12 @@ class InventoryController extends Controller
         return response()->json($query->orderBy('transaction_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 获取盘点单列表
+     *
+     * @param Request $request 请求对象，支持 warehouse_id（仓库ID）和 status（状态）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的盘点单列表，包含仓库、创建人和完成人信息
+     */
     public function stocktakes(Request $request)
     {
         $query = InventoryStocktake::with(['warehouse', 'creator', 'completer']);
@@ -224,6 +272,12 @@ class InventoryController extends Controller
         return response()->json($query->orderBy('stocktake_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建盘点单
+     *
+     * @param Request $request 请求对象，包含仓库ID、盘点日期等盘点单信息
+     * @return \Illuminate\Http\JsonResponse 返回创建的盘点单信息，状态码 201
+     */
     public function createStocktake(Request $request)
     {
         $validated = $request->validate([
@@ -244,6 +298,12 @@ class InventoryController extends Controller
         return response()->json($stocktake->load(['warehouse', 'creator']), 201);
     }
 
+    /**
+     * 获取指定盘点单详情
+     *
+     * @param int $id 盘点单ID
+     * @return \Illuminate\Http\JsonResponse 返回盘点单详细信息，包含仓库、创建人、完成人和明细项信息
+     */
     public function showStocktake($id)
     {
         $stocktake = InventoryStocktake::with(['warehouse', 'creator', 'completer', 'items.product', 'items.location'])
@@ -251,6 +311,13 @@ class InventoryController extends Controller
         return ApiResponse::success($stocktake, '获取成功');
     }
 
+    /**
+     * 添加盘点单明细项
+     *
+     * @param Request $request 请求对象，包含产品ID、库位ID、实际数量等明细信息
+     * @param int $id 盘点单ID
+     * @return \Illuminate\Http\JsonResponse 返回创建的明细项信息，状态码 201，状态不允许时返回错误消息
+     */
     public function addStocktakeItem(Request $request, $id)
     {
         $stocktake = InventoryStocktake::findOrFail($id);
@@ -290,6 +357,13 @@ class InventoryController extends Controller
         return response()->json($item->load(['product', 'location']), 201);
     }
 
+    /**
+     * 完成盘点单
+     *
+     * @param Request $request 请求对象
+     * @param int $id 盘点单ID
+     * @return \Illuminate\Http\JsonResponse 返回完成后的盘点单信息，失败时返回错误消息
+     */
     public function completeStocktake(Request $request, $id)
     {
         $stocktake = InventoryStocktake::with('items')->findOrFail($id);

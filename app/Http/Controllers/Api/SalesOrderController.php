@@ -19,6 +19,12 @@ class SalesOrderController extends Controller
         $this->salesService = $salesService;
     }
 
+    /**
+     * 获取销售订单列表
+     *
+     * @param Request $request 请求对象，支持 customer_id（客户ID）、warehouse_id（仓库ID）、status（状态）、start_date/end_date（日期范围）和 search（搜索关键词）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的销售订单列表，包含客户、仓库、货币和创建人信息
+     */
     public function index(Request $request)
     {
         $query = SalesOrder::with(['customer', 'warehouse', 'currency', 'creator']);
@@ -57,6 +63,12 @@ class SalesOrderController extends Controller
         return response()->json($query->orderBy('order_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建销售订单
+     *
+     * @param Request $request 请求对象，包含订单信息和明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的订单信息，状态码 201，失败时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -84,6 +96,12 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 获取指定销售订单详情
+     *
+     * @param int $id 销售订单ID
+     * @return \Illuminate\Http\JsonResponse 返回订单详细信息，包含客户、仓库、货币、创建人、审批人和明细项信息
+     */
     public function show($id)
     {
         $order = SalesOrder::with(['customer', 'warehouse', 'currency', 'creator', 'approver', 'items.product'])
@@ -91,6 +109,13 @@ class SalesOrderController extends Controller
         return ApiResponse::success($order, '获取成功');
     }
 
+    /**
+     * 更新销售订单
+     *
+     * @param Request $request 请求对象，包含要更新的订单字段和明细项
+     * @param int $id 销售订单ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的订单信息，失败时返回错误消息
+     */
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -118,6 +143,12 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 删除销售订单
+     *
+     * @param int $id 销售订单ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，只能删除草稿状态的订单
+     */
     public function destroy($id)
     {
         $order = SalesOrder::findOrFail($id);
@@ -131,6 +162,12 @@ class SalesOrderController extends Controller
         return response()->json(['message' => '订单删除成功']);
     }
 
+    /**
+     * 审批销售订单
+     *
+     * @param int $id 销售订单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的订单信息，失败时返回错误消息
+     */
     public function approve($id)
     {
         try {
@@ -141,6 +178,13 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 销售订单发货
+     *
+     * @param int $id 销售订单ID
+     * @param Request $request 请求对象，包含发货明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回发货后的订单信息，失败时返回错误消息
+     */
     public function ship($id, Request $request)
     {
         $validated = $request->validate([
@@ -157,6 +201,12 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 取消销售订单
+     *
+     * @param int $id 销售订单ID
+     * @return \Illuminate\Http\JsonResponse 返回取消后的订单信息，失败时返回错误消息
+     */
     public function cancel($id)
     {
         try {
@@ -167,6 +217,12 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 获取销售退货单列表
+     *
+     * @param Request $request 请求对象，支持 customer_id（客户ID）和 status（状态）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的销售退货单列表，包含客户、仓库、货币和创建人信息
+     */
     public function returns(Request $request)
     {
         $query = SalesReturn::with(['customer', 'warehouse', 'currency', 'creator']);
@@ -182,6 +238,12 @@ class SalesOrderController extends Controller
         return response()->json($query->orderBy('return_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建销售退货单
+     *
+     * @param Request $request 请求对象，包含退货单信息和明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的退货单信息，状态码 201，失败时返回错误消息
+     */
     public function createReturn(Request $request)
     {
         $validated = $request->validate([
@@ -207,6 +269,12 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 获取指定销售退货单详情
+     *
+     * @param int $id 销售退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回退货单详细信息，包含客户、仓库、货币、创建人、审批人和明细项信息
+     */
     public function showReturn($id)
     {
         $return = SalesReturn::with(['customer', 'warehouse', 'currency', 'creator', 'approver', 'items.product'])
@@ -214,6 +282,12 @@ class SalesOrderController extends Controller
         return ApiResponse::success($return, '获取成功');
     }
 
+    /**
+     * 审批销售退货单
+     *
+     * @param int $id 销售退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的退货单信息，失败时返回错误消息
+     */
     public function approveReturn($id)
     {
         try {
@@ -224,6 +298,12 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 获取销售结算单列表
+     *
+     * @param Request $request 请求对象，支持 customer_id（客户ID）和 status（状态）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的销售结算单列表，包含客户、货币和创建人信息
+     */
     public function settlements(Request $request)
     {
         $query = SalesSettlement::with(['customer', 'currency', 'creator']);
@@ -239,6 +319,12 @@ class SalesOrderController extends Controller
         return response()->json($query->orderBy('settlement_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建销售结算单
+     *
+     * @param Request $request 请求对象，包含结算单信息和关联订单/退货单明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的结算单信息，状态码 201，失败时返回错误消息
+     */
     public function createSettlement(Request $request)
     {
         $validated = $request->validate([
@@ -260,6 +346,12 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 获取指定销售结算单详情
+     *
+     * @param int $id 销售结算单ID
+     * @return \Illuminate\Http\JsonResponse 返回结算单详细信息，包含客户、货币、创建人、审批人和明细项信息
+     */
     public function showSettlement($id)
     {
         $settlement = SalesSettlement::with(['customer', 'currency', 'creator', 'approver', 'items'])
@@ -267,6 +359,12 @@ class SalesOrderController extends Controller
         return ApiResponse::success($settlement, '获取成功');
     }
 
+    /**
+     * 审批销售结算单
+     *
+     * @param int $id 销售结算单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的结算单信息，失败时返回错误消息
+     */
     public function approveSettlement($id)
     {
         try {
@@ -277,6 +375,13 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * 收款（销售结算单）
+     *
+     * @param int $id 销售结算单ID
+     * @param Request $request 请求对象，包含 received_amount（收款金额）
+     * @return \Illuminate\Http\JsonResponse 返回收款后的结算单信息，失败时返回错误消息
+     */
     public function receivePayment($id, Request $request)
     {
         $validated = $request->validate([

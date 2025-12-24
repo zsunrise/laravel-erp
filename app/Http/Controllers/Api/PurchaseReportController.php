@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 
 class PurchaseReportController extends Controller
 {
+    /**
+     * 采购汇总报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回按日期分组的采购数据统计和汇总信息（总金额、订单数、平均金额、供应商数）
+     */
     public function summary(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
@@ -48,6 +54,12 @@ class PurchaseReportController extends Controller
         ], '获取成功');
     }
 
+    /**
+     * 按供应商统计采购报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回按供应商分组的采购统计（订单数、总金额、平均金额），按总金额降序排列
+     */
     public function bySupplier(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
@@ -67,6 +79,12 @@ class PurchaseReportController extends Controller
         return response()->json($report);
     }
 
+    /**
+     * 按产品统计采购报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回按产品分组的采购统计（总数量、总金额、平均价格），按总金额降序排列
+     */
     public function byProduct(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
@@ -87,6 +105,12 @@ class PurchaseReportController extends Controller
         return response()->json($report);
     }
 
+    /**
+     * 采购趋势报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）、end_date（结束日期）和 group_by（分组方式：day/week/month）
+     * @return \Illuminate\Http\JsonResponse 返回按时间段分组的采购趋势数据（订单数和总金额）
+     */
     public function trend(Request $request)
     {
         $startDate = $request->start_date ?? now()->subMonths(6)->startOfMonth()->toDateString();

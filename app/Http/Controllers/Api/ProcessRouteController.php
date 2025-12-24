@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProcessRouteController extends Controller
 {
+    /**
+     * 获取工艺路线列表
+     *
+     * @param Request $request 请求对象，支持 product_id（产品ID）、is_active（是否激活）、is_default（是否默认）和 search（搜索关键词）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的工艺路线列表，包含产品和创建人信息
+     */
     public function index(Request $request)
     {
         $query = ProcessRoute::with(['product', 'creator']);
@@ -41,6 +47,12 @@ class ProcessRouteController extends Controller
         return response()->json($query->orderBy('effective_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建工艺路线
+     *
+     * @param Request $request 请求对象，包含工艺路线信息和步骤数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的工艺路线信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -100,6 +112,12 @@ class ProcessRouteController extends Controller
         });
     }
 
+    /**
+     * 获取指定工艺路线详情
+     *
+     * @param int $id 工艺路线ID
+     * @return \Illuminate\Http\JsonResponse 返回工艺路线详细信息，包含产品、步骤和创建人信息
+     */
     public function show($id)
     {
         $processRoute = ProcessRoute::with(['product', 'steps', 'creator'])
@@ -107,6 +125,13 @@ class ProcessRouteController extends Controller
         return ApiResponse::success($processRoute, '获取成功');
     }
 
+    /**
+     * 更新工艺路线信息
+     *
+     * @param Request $request 请求对象，包含要更新的工艺路线字段和步骤
+     * @param int $id 工艺路线ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的工艺路线信息
+     */
     public function update(Request $request, $id)
     {
         $processRoute = ProcessRoute::findOrFail($id);
@@ -170,6 +195,12 @@ class ProcessRouteController extends Controller
         });
     }
 
+    /**
+     * 删除工艺路线
+     *
+     * @param int $id 工艺路线ID
+     * @return \Illuminate\Http\JsonResponse 返回删除成功消息
+     */
     public function destroy($id)
     {
         $processRoute = ProcessRoute::findOrFail($id);
@@ -178,6 +209,12 @@ class ProcessRouteController extends Controller
         return response()->json(['message' => '工艺路线删除成功']);
     }
 
+    /**
+     * 设置工艺路线为默认版本
+     *
+     * @param int $id 工艺路线ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的工艺路线信息
+     */
     public function setDefault($id)
     {
         $processRoute = ProcessRoute::findOrFail($id);
@@ -192,6 +229,12 @@ class ProcessRouteController extends Controller
         return response()->json($processRoute->load(['product', 'steps']));
     }
 
+    /**
+     * 复制工艺路线
+     *
+     * @param int $id 工艺路线ID
+     * @return \Illuminate\Http\JsonResponse 返回复制的工艺路线信息，状态码 201
+     */
     public function copy($id)
     {
         $sourceRoute = ProcessRoute::with('steps')->findOrFail($id);

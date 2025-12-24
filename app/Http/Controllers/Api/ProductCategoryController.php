@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class ProductCategoryController extends Controller
 {
+    /**
+     * 获取产品分类列表
+     *
+     * @param Request $request 请求对象，支持 parent_id（父分类ID）、is_active（是否激活）和 tree（树形结构）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的分类列表或树形结构，包含父分类信息
+     */
     public function index(Request $request)
     {
         $query = ProductCategory::with(['parent']);
@@ -32,6 +38,12 @@ class ProductCategoryController extends Controller
         return response()->json($query->orderBy('sort')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建新产品分类
+     *
+     * @param Request $request 请求对象，包含分类信息（名称、编码、父分类ID等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的分类信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,12 +61,25 @@ class ProductCategoryController extends Controller
         return response()->json($category->load('parent'), 201);
     }
 
+    /**
+     * 获取指定分类详情
+     *
+     * @param int $id 分类ID
+     * @return \Illuminate\Http\JsonResponse 返回分类详细信息，包含父分类和子分类信息
+     */
     public function show($id)
     {
         $category = ProductCategory::with(['parent', 'children'])->findOrFail($id);
         return ApiResponse::success($category, '获取成功');
     }
 
+    /**
+     * 更新分类信息
+     *
+     * @param Request $request 请求对象，包含要更新的分类字段
+     * @param int $id 分类ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的分类信息
+     */
     public function update(Request $request, $id)
     {
         $category = ProductCategory::findOrFail($id);
@@ -74,6 +99,12 @@ class ProductCategoryController extends Controller
         return response()->json($category->load('parent'));
     }
 
+    /**
+     * 删除分类
+     *
+     * @param int $id 分类ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，如果分类下有子分类或商品则返回错误消息
+     */
     public function destroy($id)
     {
         $category = ProductCategory::findOrFail($id);

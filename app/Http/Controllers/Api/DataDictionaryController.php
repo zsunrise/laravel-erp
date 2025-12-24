@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class DataDictionaryController extends Controller
 {
+    /**
+     * 获取数据字典列表
+     *
+     * @param Request $request 请求对象，支持 type（类型）、code（编码）、label（标签）、is_active（是否激活）和 group_by_type（按类型分组）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的字典列表或按类型分组的字典数据
+     */
     public function index(Request $request)
     {
         $query = DataDictionary::query();
@@ -44,6 +50,12 @@ class DataDictionaryController extends Controller
         );
     }
 
+    /**
+     * 创建数据字典项
+     *
+     * @param Request $request 请求对象，包含字典项信息（类型、编码、标签、值等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的字典项信息，状态码 201，失败时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -82,12 +94,25 @@ class DataDictionaryController extends Controller
         }
     }
 
+    /**
+     * 获取指定字典项详情
+     *
+     * @param int $id 字典项ID
+     * @return \Illuminate\Http\JsonResponse 返回字典项详细信息
+     */
     public function show($id)
     {
         $dictionary = DataDictionary::findOrFail($id);
         return ApiResponse::success($dictionary);
     }
 
+    /**
+     * 更新字典项信息
+     *
+     * @param Request $request 请求对象，包含要更新的字典项字段
+     * @param int $id 字典项ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的字典项信息，失败时返回错误消息
+     */
     public function update(Request $request, $id)
     {
         $dictionary = DataDictionary::findOrFail($id);
@@ -125,6 +150,12 @@ class DataDictionaryController extends Controller
         }
     }
 
+    /**
+     * 删除字典项
+     *
+     * @param int $id 字典项ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，失败时返回错误消息
+     */
     public function destroy($id)
     {
         $dictionary = DataDictionary::findOrFail($id);
@@ -139,6 +170,9 @@ class DataDictionaryController extends Controller
 
     /**
      * 根据类型获取字典列表
+     *
+     * @param string $type 字典类型
+     * @return \Illuminate\Http\JsonResponse 返回指定类型下所有激活的字典项列表
      */
     public function getByType($type)
     {
@@ -153,6 +187,8 @@ class DataDictionaryController extends Controller
 
     /**
      * 获取所有类型列表
+     *
+     * @return \Illuminate\Http\JsonResponse 返回所有不重复的字典类型列表
      */
     public function getTypes()
     {

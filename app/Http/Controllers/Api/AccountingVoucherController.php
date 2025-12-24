@@ -17,6 +17,12 @@ class AccountingVoucherController extends Controller
         $this->financialService = $financialService;
     }
 
+    /**
+     * 获取会计凭证列表
+     *
+     * @param Request $request 请求对象，支持 status（状态）、type（类型）和 start_date/end_date（日期范围）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的凭证列表，包含创建人和过账人信息，按凭证日期降序排列
+     */
     public function index(Request $request)
     {
         $query = AccountingVoucher::with(['creator', 'poster']);
@@ -40,6 +46,12 @@ class AccountingVoucherController extends Controller
         return response()->json($query->orderBy('voucher_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建会计凭证
+     *
+     * @param Request $request 请求对象，包含凭证信息和明细项数组（至少2条，借贷必须平衡）
+     * @return \Illuminate\Http\JsonResponse 返回创建的凭证信息，状态码 201，失败时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -66,12 +78,25 @@ class AccountingVoucherController extends Controller
         }
     }
 
+    /**
+     * 获取指定凭证详情
+     *
+     * @param int $id 凭证ID
+     * @return \Illuminate\Http\JsonResponse 返回凭证详细信息，包含明细项、科目、创建人和过账人信息
+     */
     public function show($id)
     {
         $voucher = AccountingVoucher::with(['items.account', 'creator', 'poster'])->findOrFail($id);
         return ApiResponse::success($voucher, '获取成功');
     }
 
+    /**
+     * 更新会计凭证
+     *
+     * @param Request $request 请求对象，包含要更新的凭证字段和明细项
+     * @param int $id 凭证ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的凭证信息，只能修改草稿状态的凭证，失败时返回错误消息
+     */
     public function update(Request $request, $id)
     {
         $voucher = AccountingVoucher::findOrFail($id);
@@ -124,6 +149,12 @@ class AccountingVoucherController extends Controller
         }
     }
 
+    /**
+     * 删除会计凭证
+     *
+     * @param int $id 凭证ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，只能删除草稿状态的凭证
+     */
     public function destroy($id)
     {
         $voucher = AccountingVoucher::findOrFail($id);
@@ -137,6 +168,12 @@ class AccountingVoucherController extends Controller
         return response()->json(['message' => '凭证删除成功']);
     }
 
+    /**
+     * 过账（会计凭证）
+     *
+     * @param int $id 凭证ID
+     * @return \Illuminate\Http\JsonResponse 返回过账后的凭证信息，失败时返回错误消息
+     */
     public function post($id)
     {
         try {

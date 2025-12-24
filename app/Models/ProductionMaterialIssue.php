@@ -53,7 +53,7 @@ class ProductionMaterialIssue extends Model
 
     public function items()
     {
-        return $this->hasMany(ProductionMaterialIssueItem::class);
+        return $this->hasMany(ProductionMaterialIssueItem::class, 'material_issue_id');
     }
 
     public function creator()

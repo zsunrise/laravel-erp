@@ -20,6 +20,9 @@ class DashboardController extends Controller
 {
     /**
      * 获取仪表盘统计数据
+     *
+     * @param Request $request 请求对象
+     * @return \Illuminate\Http\JsonResponse 返回仪表盘统计数据，包括销售订单、采购订单、库存、营收、待审批、工单、应收应付账款和销售趋势等
      */
     public function getStats(Request $request)
     {
@@ -154,6 +157,9 @@ class DashboardController extends Controller
 
     /**
      * 获取待处理事项
+     *
+     * @param Request $request 请求对象
+     * @return \Illuminate\Http\JsonResponse 返回待处理事项列表，包括待审批工作流、低库存预警和逾期应收账款等
      */
     public function getPendingTasks(Request $request)
     {
@@ -243,6 +249,9 @@ class DashboardController extends Controller
 
     /**
      * 获取最近订单
+     *
+     * @param Request $request 请求对象
+     * @return \Illuminate\Http\JsonResponse 返回最近的销售订单和采购订单列表
      */
     public function getRecentOrders(Request $request)
     {

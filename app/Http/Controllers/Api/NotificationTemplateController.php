@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class NotificationTemplateController extends Controller
 {
+    /**
+     * 获取通知模板列表
+     *
+     * @param Request $request 请求对象，支持 type（类型）、channel（渠道）和 is_active（是否激活）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的通知模板列表，包含创建人信息
+     */
     public function index(Request $request)
     {
         $query = NotificationTemplate::with(['creator']);
@@ -28,6 +34,12 @@ class NotificationTemplateController extends Controller
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建通知模板
+     *
+     * @param Request $request 请求对象，包含模板信息（编码、名称、类型、渠道、内容等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的模板信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -56,12 +68,25 @@ class NotificationTemplateController extends Controller
         return response()->json($template->load('creator'), 201);
     }
 
+    /**
+     * 获取指定模板详情
+     *
+     * @param int $id 模板ID
+     * @return \Illuminate\Http\JsonResponse 返回模板详细信息，包含创建人信息
+     */
     public function show($id)
     {
         $template = NotificationTemplate::with(['creator'])->findOrFail($id);
         return ApiResponse::success($template, '获取成功');
     }
 
+    /**
+     * 更新通知模板
+     *
+     * @param Request $request 请求对象，包含要更新的模板字段
+     * @param int $id 模板ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的模板信息
+     */
     public function update(Request $request, $id)
     {
         $template = NotificationTemplate::findOrFail($id);
@@ -82,6 +107,12 @@ class NotificationTemplateController extends Controller
         return response()->json($template->load('creator'));
     }
 
+    /**
+     * 删除通知模板
+     *
+     * @param int $id 模板ID
+     * @return \Illuminate\Http\JsonResponse 返回删除成功消息
+     */
     public function destroy($id)
     {
         $template = NotificationTemplate::findOrFail($id);
@@ -90,6 +121,13 @@ class NotificationTemplateController extends Controller
         return response()->json(['message' => '模板删除成功']);
     }
 
+    /**
+     * 预览通知模板
+     *
+     * @param int $id 模板ID
+     * @param Request $request 请求对象，包含模板数据
+     * @return \Illuminate\Http\JsonResponse 返回渲染后的模板内容
+     */
     public function preview($id, Request $request)
     {
         $template = NotificationTemplate::findOrFail($id);

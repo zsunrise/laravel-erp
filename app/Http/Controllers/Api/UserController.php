@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * 获取用户列表
+     *
+     * @param Request $request 请求对象，支持 search（搜索关键词）和 is_active（是否激活）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的用户列表，包含角色信息
+     */
     public function index(Request $request)
     {
         $query = User::with('roles');
@@ -30,6 +36,12 @@ class UserController extends Controller
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建新用户
+     *
+     * @param Request $request 请求对象，包含用户信息和角色ID数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的用户信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -51,12 +63,25 @@ class UserController extends Controller
         return response()->json($user->load('roles'), 201);
     }
 
+    /**
+     * 获取指定用户详情
+     *
+     * @param int $id 用户ID
+     * @return \Illuminate\Http\JsonResponse 返回用户详细信息，包含角色信息
+     */
     public function show($id)
     {
         $user = User::with('roles')->findOrFail($id);
         return ApiResponse::success($user, '获取成功');
     }
 
+    /**
+     * 更新用户信息
+     *
+     * @param Request $request 请求对象，包含要更新的用户字段
+     * @param int $id 用户ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的用户信息
+     */
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -86,6 +111,12 @@ class UserController extends Controller
         return response()->json($user->load('roles'));
     }
 
+    /**
+     * 删除用户
+     *
+     * @param int $id 用户ID
+     * @return \Illuminate\Http\JsonResponse 返回删除成功消息
+     */
     public function destroy($id)
     {
         $user = User::findOrFail($id);

@@ -19,6 +19,12 @@ class WorkOrderController extends Controller
         $this->productionService = $productionService;
     }
 
+    /**
+     * 获取工单列表
+     *
+     * @param Request $request 请求对象，支持 product_id（产品ID）、warehouse_id（仓库ID）、status（状态）、assigned_to（分配人ID）和 start_date/end_date（日期范围）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的工单列表，包含产品、仓库、分配人和创建人信息
+     */
     public function index(Request $request)
     {
         $query = WorkOrder::with(['product', 'warehouse', 'assignedTo', 'creator']);
@@ -50,6 +56,12 @@ class WorkOrderController extends Controller
         return response()->json($query->orderBy('start_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建工单
+     *
+     * @param Request $request 请求对象，包含工单信息（产品ID、BOM、工艺路线、数量等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的工单信息，状态码 201，失败时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -74,6 +86,12 @@ class WorkOrderController extends Controller
         }
     }
 
+    /**
+     * 获取指定工单详情
+     *
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回工单详细信息，包含产品、BOM、工艺路线、仓库、明细项、领料单和报工单信息
+     */
     public function show($id)
     {
         $workOrder = WorkOrder::with([
@@ -84,6 +102,13 @@ class WorkOrderController extends Controller
         return ApiResponse::success($workOrder, '获取成功');
     }
 
+    /**
+     * 更新工单信息
+     *
+     * @param Request $request 请求对象，包含要更新的工单字段
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的工单信息，只能修改草稿状态的工单
+     */
     public function update(Request $request, $id)
     {
         $workOrder = WorkOrder::findOrFail($id);
@@ -109,6 +134,12 @@ class WorkOrderController extends Controller
         return response()->json($workOrder->load(['product', 'warehouse', 'items']));
     }
 
+    /**
+     * 删除工单
+     *
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，只能删除草稿状态的工单
+     */
     public function destroy($id)
     {
         $workOrder = WorkOrder::findOrFail($id);
@@ -122,6 +153,12 @@ class WorkOrderController extends Controller
         return response()->json(['message' => '工单删除成功']);
     }
 
+    /**
+     * 审批工单
+     *
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回审批后的工单信息，失败时返回错误消息
+     */
     public function approve($id)
     {
         try {
@@ -132,6 +169,13 @@ class WorkOrderController extends Controller
         }
     }
 
+    /**
+     * 工单领料
+     *
+     * @param int $id 工单ID
+     * @param Request $request 请求对象，包含领料明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的领料单信息，状态码 201，失败时返回错误消息
+     */
     public function issueMaterial($id, Request $request)
     {
         $validated = $request->validate([
@@ -149,6 +193,13 @@ class WorkOrderController extends Controller
         }
     }
 
+    /**
+     * 工单退料
+     *
+     * @param int $id 工单ID
+     * @param Request $request 请求对象，包含退料明细项数组
+     * @return \Illuminate\Http\JsonResponse 返回创建的退料单信息，状态码 201，失败时返回错误消息
+     */
     public function returnMaterial($id, Request $request)
     {
         $validated = $request->validate([
@@ -166,6 +217,12 @@ class WorkOrderController extends Controller
         }
     }
 
+    /**
+     * 完成工单
+     *
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回完成后的工单信息，失败时返回错误消息
+     */
     public function complete($id)
     {
         try {
@@ -176,17 +233,29 @@ class WorkOrderController extends Controller
         }
     }
 
+    /**
+     * 获取工单的领料单列表
+     *
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回该工单的所有领料单列表
+     */
     public function materialIssues($id)
     {
         $workOrder = WorkOrder::findOrFail($id);
-        $materialIssues = ProductionMaterialIssue::with(['items.product', 'items.location', 'creator', 'approver'])
+        $materialIssues = ProductionMaterialIssue::with(['items.product.unit', 'items.location', 'creator', 'approver'])
             ->where('work_order_id', $id)
             ->orderBy('issue_date', 'desc')
             ->get();
 
-        return response()->json($materialIssues);
+        return response()->json(['data' => $materialIssues]);
     }
 
+    /**
+     * 获取工单的报工单列表
+     *
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回该工单的所有报工单列表
+     */
     public function reports($id)
     {
         $workOrder = WorkOrder::findOrFail($id);
@@ -195,6 +264,6 @@ class WorkOrderController extends Controller
             ->orderBy('report_date', 'desc')
             ->get();
 
-        return response()->json($reports);
+        return response()->json(['data' => $reports]);
     }
 }

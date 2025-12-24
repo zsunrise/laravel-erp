@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class SalesReportController extends Controller
 {
+    /**
+     * 销售汇总报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回按日期分组的销售数据统计和汇总信息（总金额、订单数、平均金额、客户数）
+     */
     public function summary(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
@@ -49,6 +55,12 @@ class SalesReportController extends Controller
         ], '获取成功');
     }
 
+    /**
+     * 按客户统计销售报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回按客户分组的销售统计（订单数、总金额、平均金额），按总金额降序排列
+     */
     public function byCustomer(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
@@ -68,6 +80,12 @@ class SalesReportController extends Controller
         return response()->json($report);
     }
 
+    /**
+     * 按产品统计销售报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
+     * @return \Illuminate\Http\JsonResponse 返回按产品分组的销售统计（总数量、总金额、平均价格），按总金额降序排列
+     */
     public function byProduct(Request $request)
     {
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
@@ -88,6 +106,12 @@ class SalesReportController extends Controller
         return response()->json($report);
     }
 
+    /**
+     * 销售趋势报表
+     *
+     * @param Request $request 请求对象，支持 start_date（开始日期）、end_date（结束日期）和 group_by（分组方式：day/week/month）
+     * @return \Illuminate\Http\JsonResponse 返回按时间段分组的销售趋势数据（订单数和总金额）
+     */
     public function trend(Request $request)
     {
         $startDate = $request->start_date ?? now()->subMonths(6)->startOfMonth()->toDateString();

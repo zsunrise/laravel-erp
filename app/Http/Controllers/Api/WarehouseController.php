@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class WarehouseController extends Controller
 {
+    /**
+     * 获取仓库列表
+     *
+     * @param Request $request 请求对象，支持 is_active（是否激活）、is_default（是否默认）和 search（搜索关键词）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的仓库列表，包含区域信息
+     */
     public function index(Request $request)
     {
         $query = Warehouse::with(['region']);
@@ -32,6 +38,12 @@ class WarehouseController extends Controller
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 创建新仓库
+     *
+     * @param Request $request 请求对象，包含仓库信息（名称、编码、区域等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的仓库信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -55,12 +67,25 @@ class WarehouseController extends Controller
         return response()->json($warehouse->load('region'), 201);
     }
 
+    /**
+     * 获取指定仓库详情
+     *
+     * @param int $id 仓库ID
+     * @return \Illuminate\Http\JsonResponse 返回仓库详细信息，包含区域和库位信息
+     */
     public function show($id)
     {
         $warehouse = Warehouse::with(['region', 'locations'])->findOrFail($id);
         return ApiResponse::success($warehouse, '获取成功');
     }
 
+    /**
+     * 更新仓库信息
+     *
+     * @param Request $request 请求对象，包含要更新的仓库字段
+     * @param int $id 仓库ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的仓库信息
+     */
     public function update(Request $request, $id)
     {
         $warehouse = Warehouse::findOrFail($id);
@@ -86,6 +111,12 @@ class WarehouseController extends Controller
         return response()->json($warehouse->load('region'));
     }
 
+    /**
+     * 删除仓库
+     *
+     * @param int $id 仓库ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，如果仓库下有库存则返回错误消息
+     */
     public function destroy($id)
     {
         $warehouse = Warehouse::findOrFail($id);

@@ -36,7 +36,7 @@ class ProductionMaterialIssueItem extends Model
 
     public function materialIssue()
     {
-        return $this->belongsTo(ProductionMaterialIssue::class);
+        return $this->belongsTo(ProductionMaterialIssue::class, 'material_issue_id');
     }
 
     public function product()

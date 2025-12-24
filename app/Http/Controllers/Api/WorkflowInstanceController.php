@@ -17,6 +17,12 @@ class WorkflowInstanceController extends Controller
         $this->approvalService = $approvalService;
     }
 
+    /**
+     * 获取工作流实例列表
+     *
+     * @param Request $request 请求对象，支持 workflow_id（工作流ID）、status（状态）和 reference_type/reference_id（关联信息）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的工作流实例列表，包含工作流、当前节点和发起人信息，按创建时间降序排列
+     */
     public function index(Request $request)
     {
         $query = WorkflowInstance::with(['workflow', 'currentNode', 'starter']);
@@ -40,6 +46,12 @@ class WorkflowInstanceController extends Controller
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
+    /**
+     * 启动工作流实例
+     *
+     * @param Request $request 请求对象，包含工作流ID和关联业务信息
+     * @return \Illuminate\Http\JsonResponse 返回创建的工作流实例信息，状态码 201，失败时返回错误消息
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -62,6 +74,12 @@ class WorkflowInstanceController extends Controller
         }
     }
 
+    /**
+     * 获取指定工作流实例详情
+     *
+     * @param int $id 工作流实例ID
+     * @return \Illuminate\Http\JsonResponse 返回工作流实例详细信息，包含工作流、当前节点、发起人和审批记录信息
+     */
     public function show($id)
     {
         $instance = WorkflowInstance::with([

@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
+    /**
+     * 获取权限列表
+     *
+     * @param Request $request 请求对象，支持 group（权限组）和 search（搜索关键词）筛选
+     * @return \Illuminate\Http\JsonResponse 返回分页的权限列表，包含角色信息
+     */
     public function index(Request $request)
     {
         $query = Permission::with(['roles']);
@@ -29,6 +35,12 @@ class PermissionController extends Controller
         return ApiResponse::paginated($permissions, '获取成功');
     }
 
+    /**
+     * 创建新权限
+     *
+     * @param Request $request 请求对象，包含权限信息（名称、标识、分组等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的权限信息，状态码 201
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -43,12 +55,25 @@ class PermissionController extends Controller
         return ApiResponse::success($permission, '创建成功', 201);
     }
 
+    /**
+     * 获取指定权限详情
+     *
+     * @param int $id 权限ID
+     * @return \Illuminate\Http\JsonResponse 返回权限详细信息，包含角色信息
+     */
     public function show($id)
     {
         $permission = Permission::with(['roles'])->findOrFail($id);
         return ApiResponse::success($permission, '获取成功');
     }
 
+    /**
+     * 更新权限信息
+     *
+     * @param Request $request 请求对象，包含要更新的权限字段
+     * @param int $id 权限ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的权限信息
+     */
     public function update(Request $request, $id)
     {
         $permission = Permission::findOrFail($id);
@@ -65,6 +90,12 @@ class PermissionController extends Controller
         return ApiResponse::success($permission, '更新成功');
     }
 
+    /**
+     * 删除权限
+     *
+     * @param int $id 权限ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，如果权限已被角色使用则返回错误消息
+     */
     public function destroy($id)
     {
         $permission = Permission::findOrFail($id);
