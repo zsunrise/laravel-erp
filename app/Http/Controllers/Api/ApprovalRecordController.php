@@ -15,6 +15,7 @@ class ApprovalRecordController extends Controller
 
     public function __construct(ApprovalService $approvalService)
     {
+        // 注入审批服务
         $this->approvalService = $approvalService;
     }
 
@@ -26,20 +27,25 @@ class ApprovalRecordController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载流程实例、节点和审批人信息
         $query = ApprovalRecord::with(['instance', 'node', 'approver']);
 
+        // 按流程实例ID筛选
         if ($request->has('instance_id')) {
             $query->where('instance_id', $request->instance_id);
         }
 
+        // 按审批人id筛选
         if ($request->has('approver_id')) {
             $query->where('approver_id', $request->approver_id);
         }
 
+        // 按审批状态筛选（pending/approved/rejected）
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
+        // 按创建时间倒序排列，返回分页结果
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -52,14 +58,18 @@ class ApprovalRecordController extends Controller
      */
     public function approve($instanceId, Request $request)
     {
+        // 验证审批参数
         $validated = $request->validate([
-            'comment' => 'nullable|string',
+            'comment' => 'nullable|string',  // 审批意见（可选）
         ]);
 
         try {
+            // 调用审批服务执行审批通过
             $instance = $this->approvalService->approve($instanceId, $validated['comment'] ?? null);
+            // 返回审批成功响应
             return ApiResponse::success($instance, '审批成功');
         } catch (\Exception $e) {
+            // 审批失败返回错误消息
             return ApiResponse::error($e->getMessage(), 400);
         }
     }
@@ -73,14 +83,18 @@ class ApprovalRecordController extends Controller
      */
     public function reject($instanceId, Request $request)
     {
+        // 验证拒绝参数
         $validated = $request->validate([
-            'comment' => 'nullable|string',
+            'comment' => 'nullable|string',  // 拒绝原因（可选）
         ]);
 
         try {
+            // 调用审批服务执行审批拒绝
             $instance = $this->approvalService->reject($instanceId, $validated['comment'] ?? null);
+            // 返回拒绝成功响应
             return ApiResponse::success($instance, '拒绝成功');
         } catch (\Exception $e) {
+            // 拒绝失败返回错误消息
             return ApiResponse::error($e->getMessage(), 400);
         }
     }
@@ -92,7 +106,9 @@ class ApprovalRecordController extends Controller
      */
     public function pendingApprovals()
     {
+        // 调用审批服务获取当前用户的待审批流程实例
         $instances = $this->approvalService->getPendingApprovals(auth()->id());
+        // 返回待审批列表
         return response()->json($instances);
     }
 
@@ -104,19 +120,22 @@ class ApprovalRecordController extends Controller
      */
     public function history($instanceId)
     {
+        // 根据ID查询流程实例，预加载全部关联信息
         $instance = WorkflowInstance::with([
-            'workflow',
-            'currentNode',
-            'starter',
-            'approvalRecords.approver',
-            'approvalRecords.node'
+            'workflow',                     // 工作流定义
+            'currentNode',                  // 当前节点
+            'starter',                      // 发起人
+            'approvalRecords.approver',     // 审批记录及审批人
+            'approvalRecords.node'          // 审批记录对应的节点
         ])->findOrFail($instanceId);
         
+        // 查询该实例的所有审批记录，按时间正序排列
         $records = ApprovalRecord::with(['node', 'approver', 'transferredTo'])
             ->where('instance_id', $instanceId)
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // 返回完整的审批历史记录
         return ApiResponse::success([
             'instance' => $instance,
             'records' => $records,

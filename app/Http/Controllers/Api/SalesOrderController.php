@@ -306,16 +306,20 @@ class SalesOrderController extends Controller
      */
     public function settlements(Request $request)
     {
+        // 构建查询，预加载关联的客户、货币和创建人信息
         $query = SalesSettlement::with(['customer', 'currency', 'creator']);
 
+        // 按客户ID筛选
         if ($request->has('customer_id')) {
             $query->where('customer_id', $request->customer_id);
         }
 
+        // 按状态筛选（pending-待审核、approved-已审核、paid-已收款）
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
+        // 按结算日期倒序排列，返回分页结果
         return response()->json($query->orderBy('settlement_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -327,21 +331,25 @@ class SalesOrderController extends Controller
      */
     public function createSettlement(Request $request)
     {
+        // 验证请求参数
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'settlement_date' => 'required|date',
-            'currency_id' => 'nullable|exists:currencies,id',
-            'remark' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.reference_type' => 'required|in:sales_order,sales_return',
-            'items.*.reference_id' => 'required|integer',
-            'items.*.remark' => 'nullable|string',
+            'customer_id' => 'required|exists:customers,id',           // 客户ID（必填）
+            'settlement_date' => 'required|date',                      // 结算日期（必填）
+            'currency_id' => 'nullable|exists:currencies,id',          // 币种ID（可选）
+            'remark' => 'nullable|string',                             // 备注（可选）
+            'items' => 'required|array|min:1',                         // 结算明细（至少一条）
+            'items.*.reference_type' => 'required|in:sales_order,sales_return', // 关联类型：销售订单或销售退货
+            'items.*.reference_id' => 'required|integer',              // 关联单据ID
+            'items.*.remark' => 'nullable|string',                     // 明细备注（可选）
         ]);
 
         try {
+            // 调用服务层创建结算单，自动计算金额并生成结算单号
             $settlement = $this->salesService->createSettlement($validated);
+            // 创建成功返回 201 状态码
             return response()->json($settlement, 201);
         } catch (\Exception $e) {
+            // 创建失败返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
@@ -354,8 +362,10 @@ class SalesOrderController extends Controller
      */
     public function showSettlement($id)
     {
+        // 查询结算单，预加载关联信息（客户、货币、创建人、审批人、明细项）
         $settlement = SalesSettlement::with(['customer', 'currency', 'creator', 'approver', 'items'])
-            ->findOrFail($id);
+            ->findOrFail($id); // 找不到则抛出 404 异常
+        // 返回标准化成功响应
         return ApiResponse::success($settlement, '获取成功');
     }
 
@@ -368,9 +378,12 @@ class SalesOrderController extends Controller
     public function approveSettlement($id)
     {
         try {
+            // 调用服务层审批结算单，将状态从 pending 更新为 approved
             $settlement = $this->salesService->approveSettlement($id);
+            // 审批成功返回结算单信息
             return response()->json($settlement);
         } catch (\Exception $e) {
+            // 审批失败（如状态不正确）返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
@@ -384,14 +397,18 @@ class SalesOrderController extends Controller
      */
     public function receivePayment($id, Request $request)
     {
+        // 验证收款金额参数
         $validated = $request->validate([
-            'received_amount' => 'required|numeric|min:0',
+            'received_amount' => 'required|numeric|min:0', // 收款金额（必填，非负数）
         ]);
 
         try {
+            // 调用服务层处理收款，累加已收金额，全额收款后状态更新为 paid
             $settlement = $this->salesService->receivePayment($id, $validated['received_amount']);
+            // 收款成功返回结算单信息
             return response()->json($settlement);
         } catch (\Exception $e) {
+            // 收款失败（如金额超出余额）返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }

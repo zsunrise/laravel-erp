@@ -18,20 +18,25 @@ class ProcessRouteController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载产品和创建人信息
         $query = ProcessRoute::with(['product', 'creator']);
 
+        // 按产品ID筛选
         if ($request->has('product_id')) {
             $query->where('product_id', $request->product_id);
         }
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 按默认版本筛选
         if ($request->has('is_default')) {
             $query->where('is_default', $request->is_default);
         }
 
+        // 关键词搜索：按版本号、产品名称或SKU模糊匹配
         if ($request->has('search')) {
             $search = $request->search;
             $query->leftJoin('products', 'process_routes.product_id', '=', 'products.id')
@@ -44,6 +49,7 @@ class ProcessRouteController extends Controller
                   ->distinct();
         }
 
+        // 按生效日期倒序排列，返回分页结果
         return response()->json($query->orderBy('effective_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -55,33 +61,37 @@ class ProcessRouteController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证工艺路线参数
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'version' => 'required|string|max:50',
-            'effective_date' => 'required|date',
-            'expiry_date' => 'nullable|date|after:effective_date',
-            'is_default' => 'sometimes|boolean',
-            'is_active' => 'sometimes|boolean',
-            'description' => 'nullable|string',
-            'steps' => 'required|array|min:1',
-            'steps.*.step_name' => 'required|string|max:255',
-            'steps.*.step_code' => 'nullable|string|max:100',
-            'steps.*.sequence' => 'required|integer|min:1',
-            'steps.*.work_center' => 'nullable|string|max:100',
-            'steps.*.standard_time' => 'nullable|numeric|min:0',
-            'steps.*.setup_time' => 'nullable|numeric|min:0',
-            'steps.*.queue_time' => 'nullable|numeric|min:0',
-            'steps.*.move_time' => 'nullable|numeric|min:0',
-            'steps.*.description' => 'nullable|string',
-            'steps.*.remark' => 'nullable|string',
+            'product_id' => 'required|exists:products,id',        // 产品ID（必填）
+            'version' => 'required|string|max:50',                // 版本号（必填）
+            'effective_date' => 'required|date',                  // 生效日期（必填）
+            'expiry_date' => 'nullable|date|after:effective_date', // 失效日期
+            'is_default' => 'sometimes|boolean',                  // 是否默认版本
+            'is_active' => 'sometimes|boolean',                   // 是否激活
+            'description' => 'nullable|string',                   // 描述
+            'steps' => 'required|array|min:1',                    // 工序步骤（至少一个）
+            'steps.*.step_name' => 'required|string|max:255',     // 工序名称
+            'steps.*.step_code' => 'nullable|string|max:100',     // 工序编码
+            'steps.*.sequence' => 'required|integer|min:1',       // 工序顺序
+            'steps.*.work_center' => 'nullable|string|max:100',   // 工作中心
+            'steps.*.standard_time' => 'nullable|numeric|min:0',  // 标准工时
+            'steps.*.setup_time' => 'nullable|numeric|min:0',     // 准备时间
+            'steps.*.queue_time' => 'nullable|numeric|min:0',     // 排队时间
+            'steps.*.move_time' => 'nullable|numeric|min:0',      // 转移时间
+            'steps.*.description' => 'nullable|string',           // 工序描述
+            'steps.*.remark' => 'nullable|string',                // 备注
         ]);
 
+        // 使用事务确保数据一致性
         return DB::transaction(function () use ($validated) {
+            // 如果设置为默认版本，先清除该产品其他工艺路线的默认标记
             if ($validated['is_default'] ?? false) {
                 ProcessRoute::where('product_id', $validated['product_id'])
                     ->update(['is_default' => false]);
             }
 
+            // 创建工艺路线主记录
             $processRoute = ProcessRoute::create([
                 'product_id' => $validated['product_id'],
                 'version' => $validated['version'],
@@ -90,9 +100,10 @@ class ProcessRouteController extends Controller
                 'is_default' => $validated['is_default'] ?? false,
                 'is_active' => $validated['is_active'] ?? true,
                 'description' => $validated['description'] ?? null,
-                'created_by' => auth()->id(),
+                'created_by' => auth()->id(), // 记录创建人
             ]);
 
+            // 创建工序步骤
             foreach ($validated['steps'] as $stepData) {
                 $processRoute->steps()->create([
                     'step_name' => $stepData['step_name'],
@@ -108,6 +119,7 @@ class ProcessRouteController extends Controller
                 ]);
             }
 
+            // 返回新建工艺路线信息（包含关联）
             return response()->json($processRoute->load(['product', 'steps', 'creator']), 201);
         });
     }
@@ -120,8 +132,10 @@ class ProcessRouteController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询工艺路线，预加载产品、工序步骤和创建人信息
         $processRoute = ProcessRoute::with(['product', 'steps', 'creator'])
-            ->findOrFail($id);
+            ->findOrFail($id); // 找不到则抛出404异常
+        // 返回标准化成功响应
         return ApiResponse::success($processRoute, '获取成功');
     }
 
@@ -134,8 +148,10 @@ class ProcessRouteController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 根据ID查询工艺路线
         $processRoute = ProcessRoute::findOrFail($id);
 
+        // 验证更新参数
         $validated = $request->validate([
             'version' => 'sometimes|required|string|max:50',
             'effective_date' => 'sometimes|required|date',
@@ -156,13 +172,16 @@ class ProcessRouteController extends Controller
             'steps.*.remark' => 'nullable|string',
         ]);
 
+        // 使用事务确保数据一致性
         return DB::transaction(function () use ($processRoute, $validated) {
+            // 如果设置为默认版本，清除该产品其他工艺路线的默认标记
             if (isset($validated['is_default']) && $validated['is_default']) {
                 ProcessRoute::where('product_id', $processRoute->product_id)
                     ->where('id', '!=', $processRoute->id)
                     ->update(['is_default' => false]);
             }
 
+            // 更新工艺路线主记录
             $processRoute->update([
                 'version' => $validated['version'] ?? $processRoute->version,
                 'effective_date' => $validated['effective_date'] ?? $processRoute->effective_date,
@@ -172,9 +191,12 @@ class ProcessRouteController extends Controller
                 'description' => $validated['description'] ?? $processRoute->description,
             ]);
 
+            // 如果提供了工序步骤，则重新创建
             if (isset($validated['steps'])) {
+                // 删除旧的工序步骤
                 $processRoute->steps()->delete();
 
+                // 创建新的工序步骤
                 foreach ($validated['steps'] as $stepData) {
                     $processRoute->steps()->create([
                         'step_name' => $stepData['step_name'],
@@ -191,6 +213,7 @@ class ProcessRouteController extends Controller
                 }
             }
 
+            // 返回更新后的工艺路线信息
             return response()->json($processRoute->load(['product', 'steps', 'creator']));
         });
     }
@@ -203,9 +226,12 @@ class ProcessRouteController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询工艺路线
         $processRoute = ProcessRoute::findOrFail($id);
+        // 删除工艺路线记录（级联删除工序步骤）
         $processRoute->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => '工艺路线删除成功']);
     }
 
@@ -217,15 +243,20 @@ class ProcessRouteController extends Controller
      */
     public function setDefault($id)
     {
+        // 根据ID查询工艺路线
         $processRoute = ProcessRoute::findOrFail($id);
 
+        // 使用事务确保数据一致性
         DB::transaction(function () use ($processRoute) {
+            // 先清除该产品所有工艺路线的默认标记
             ProcessRoute::where('product_id', $processRoute->product_id)
                 ->update(['is_default' => false]);
 
+            // 将当前工艺路线设置为默认
             $processRoute->update(['is_default' => true]);
         });
 
+        // 返回更新后的工艺路线信息
         return response()->json($processRoute->load(['product', 'steps']));
     }
 
@@ -237,21 +268,26 @@ class ProcessRouteController extends Controller
      */
     public function copy($id)
     {
+        // 根据ID查询源工艺路线，预加载工序步骤
         $sourceRoute = ProcessRoute::with('steps')->findOrFail($id);
 
+        // 使用事务确保数据一致性
         return DB::transaction(function () use ($sourceRoute) {
+            // 复制工艺路线主记录
             $newRoute = $sourceRoute->replicate();
-            $newRoute->version = $sourceRoute->version . '_copy';
-            $newRoute->is_default = false;
-            $newRoute->created_by = auth()->id();
+            $newRoute->version = $sourceRoute->version . '_copy'; // 版本号加后缀
+            $newRoute->is_default = false;                         // 新副本不是默认版本
+            $newRoute->created_by = auth()->id();                 // 记录新的创建人
             $newRoute->save();
 
+            // 复制工序步骤
             foreach ($sourceRoute->steps as $step) {
                 $newStep = $step->replicate();
-                $newStep->process_route_id = $newRoute->id;
+                $newStep->process_route_id = $newRoute->id; // 关联到新工艺路线
                 $newStep->save();
             }
 
+            // 返回复制后的工艺路线信息
             return response()->json($newRoute->load(['product', 'steps', 'creator']), 201);
         });
     }

@@ -14,6 +14,7 @@ class ProductionPlanController extends Controller
 
     public function __construct(ProductionService $productionService)
     {
+        // 注入生产服务
         $this->productionService = $productionService;
     }
 
@@ -25,24 +26,30 @@ class ProductionPlanController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载仓库、销售订单和创建人信息
         $query = ProductionPlan::with(['warehouse', 'salesOrder', 'creator']);
 
+        // 按仓库筛选
         if ($request->has('warehouse_id')) {
             $query->where('warehouse_id', $request->warehouse_id);
         }
 
+        // 按状态筛选
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
+        // 按日期范围筛选：开始日期
         if ($request->has('start_date')) {
             $query->whereDate('plan_date', '>=', $request->start_date);
         }
 
+        // 按日期范围筛选：结束日期
         if ($request->has('end_date')) {
             $query->whereDate('plan_date', '<=', $request->end_date);
         }
 
+        // 按计划日期倒序排列，返回分页结果
         return response()->json($query->orderBy('plan_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -54,28 +61,32 @@ class ProductionPlanController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证生产计划参数
         $validated = $request->validate([
-            'sales_order_id' => 'nullable|exists:sales_orders,id',
-            'plan_date' => 'required|date',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'remark' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.bom_id' => 'nullable|exists:boms,id',
-            'items.*.process_route_id' => 'nullable|exists:process_routes,id',
-            'items.*.planned_quantity' => 'required|integer|min:1',
-            'items.*.planned_start_date' => 'required|date',
-            'items.*.planned_end_date' => 'required|date|after:items.*.planned_start_date',
-            'items.*.priority' => 'nullable|integer|min:0',
-            'items.*.remark' => 'nullable|string',
+            'sales_order_id' => 'nullable|exists:sales_orders,id',          // 关联销售订单
+            'plan_date' => 'required|date',                                  // 计划日期（必填）
+            'start_date' => 'required|date',                                 // 开始日期（必填）
+            'end_date' => 'required|date|after:start_date',                  // 结束日期（必填）
+            'warehouse_id' => 'required|exists:warehouses,id',               // 仓库（必填）
+            'remark' => 'nullable|string',                                   // 备注
+            'items' => 'required|array|min:1',                               // 明细项（必填）
+            'items.*.product_id' => 'required|exists:products,id',           // 产品ID
+            'items.*.bom_id' => 'nullable|exists:boms,id',                   // BOM ID
+            'items.*.process_route_id' => 'nullable|exists:process_routes,id', // 工艺路线ID
+            'items.*.planned_quantity' => 'required|integer|min:1',          // 计划数量
+            'items.*.planned_start_date' => 'required|date',                 // 计划开始日期
+            'items.*.planned_end_date' => 'required|date|after:items.*.planned_start_date', // 计划结束日期
+            'items.*.priority' => 'nullable|integer|min:0',                  // 优先级
+            'items.*.remark' => 'nullable|string',                           // 明细备注
         ]);
 
         try {
+            // 调用生产服务创建计划
             $plan = $this->productionService->createPlan($validated);
+            // 返回创建成功响应
             return response()->json($plan, 201);
         } catch (\Exception $e) {
+            // 创建失败返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
@@ -88,8 +99,10 @@ class ProductionPlanController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询生产计划，预加载关联数据
         $plan = ProductionPlan::with(['warehouse', 'salesOrder', 'creator', 'approver', 'items.product', 'items.bom', 'items.processRoute'])
             ->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($plan, '获取成功');
     }
 
@@ -102,12 +115,15 @@ class ProductionPlanController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 根据ID查询生产计划
         $plan = ProductionPlan::findOrFail($id);
 
+        // 检查状态：只能修改草稿状态的计划
         if ($plan->status != 'draft') {
             return response()->json(['message' => '只能修改草稿状态的计划'], 400);
         }
 
+        // 验证更新参数
         $validated = $request->validate([
             'sales_order_id' => 'nullable|exists:sales_orders,id',
             'plan_date' => 'sometimes|required|date',
@@ -117,8 +133,10 @@ class ProductionPlanController extends Controller
             'remark' => 'nullable|string',
         ]);
 
+        // 更新计划信息
         $plan->update($validated);
 
+        // 返回更新后的计划信息
         return response()->json($plan->load(['warehouse', 'salesOrder', 'items.product']));
     }
 
@@ -130,14 +148,18 @@ class ProductionPlanController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询生产计划
         $plan = ProductionPlan::findOrFail($id);
 
+        // 检查状态：只能删除草稿状态的计划
         if ($plan->status != 'draft') {
             return response()->json(['message' => '只能删除草稿状态的计划'], 400);
         }
 
+        // 删除计划记录
         $plan->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => '生产计划删除成功']);
     }
 
@@ -150,9 +172,12 @@ class ProductionPlanController extends Controller
     public function approve($id)
     {
         try {
+            // 调用生产服务审批计划
             $plan = $this->productionService->approvePlan($id);
+            // 返回审批后的计划信息
             return response()->json($plan);
         } catch (\Exception $e) {
+            // 审批失败返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }

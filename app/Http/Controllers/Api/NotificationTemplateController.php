@@ -17,20 +17,25 @@ class NotificationTemplateController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载创建人信息
         $query = NotificationTemplate::with(['creator']);
 
+        // 按模板类型筛选
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
 
+        // 按发送渠道筛选
         if ($request->has('channel')) {
             $query->where('channel', $request->channel);
         }
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 按创建时间倒序排列，返回分页结果
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -42,17 +47,19 @@ class NotificationTemplateController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证模板参数
         $validated = $request->validate([
-            'code' => 'required|string|unique:notification_templates,code',
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:system,approval,order,inventory,financial',
-            'channel' => 'required|in:system,email,sms,push',
-            'subject' => 'nullable|string|max:255',
-            'content' => 'required|string',
-            'variables' => 'nullable|array',
-            'is_active' => 'sometimes|boolean',
+            'code' => 'required|string|unique:notification_templates,code', // 模板编码（唯一）
+            'name' => 'required|string|max:255',                            // 模板名称（必填）
+            'type' => 'required|in:system,approval,order,inventory,financial', // 类型
+            'channel' => 'required|in:system,email,sms,push',               // 发送渠道
+            'subject' => 'nullable|string|max:255',                         // 邮件主题
+            'content' => 'required|string',                                 // 模板内容（必填）
+            'variables' => 'nullable|array',                                // 模板变量定义
+            'is_active' => 'sometimes|boolean',                             // 是否激活
         ]);
 
+        // 创建模板记录
         $template = NotificationTemplate::create([
             'code' => $validated['code'],
             'name' => $validated['name'],
@@ -62,9 +69,10 @@ class NotificationTemplateController extends Controller
             'content' => $validated['content'],
             'variables' => $validated['variables'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
-            'created_by' => auth()->id(),
+            'created_by' => auth()->id(), // 记录创建人
         ]);
 
+        // 返回新建模板信息
         return response()->json($template->load('creator'), 201);
     }
 
@@ -76,7 +84,9 @@ class NotificationTemplateController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询模板，预加载创建人信息，找不到则抛出404
         $template = NotificationTemplate::with(['creator'])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($template, '获取成功');
     }
 
@@ -89,8 +99,10 @@ class NotificationTemplateController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 根据ID查询模板
         $template = NotificationTemplate::findOrFail($id);
 
+        // 验证更新参数
         $validated = $request->validate([
             'code' => 'sometimes|required|string|unique:notification_templates,code,' . $id,
             'name' => 'sometimes|required|string|max:255',
@@ -102,8 +114,10 @@ class NotificationTemplateController extends Controller
             'is_active' => 'sometimes|boolean',
         ]);
 
+        // 更新模板信息
         $template->update($validated);
 
+        // 返回更新后的模板信息
         return response()->json($template->load('creator'));
     }
 
@@ -115,9 +129,12 @@ class NotificationTemplateController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询模板
         $template = NotificationTemplate::findOrFail($id);
+        // 删除模板记录
         $template->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => '模板删除成功']);
     }
 
@@ -130,10 +147,14 @@ class NotificationTemplateController extends Controller
      */
     public function preview($id, Request $request)
     {
+        // 根据ID查询模板
         $template = NotificationTemplate::findOrFail($id);
+        // 获取预览数据
         $data = $request->get('data', []);
+        // 渲染模板内容
         $rendered = $template->render($data);
 
+        // 返回渲染结果
         return response()->json($rendered);
     }
 }

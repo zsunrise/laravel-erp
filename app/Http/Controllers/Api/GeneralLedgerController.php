@@ -13,6 +13,7 @@ class GeneralLedgerController extends Controller
 
     public function __construct(FinancialService $financialService)
     {
+        // 注入财务服务
         $this->financialService = $financialService;
     }
 
@@ -24,20 +25,25 @@ class GeneralLedgerController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载科目和凭证信息
         $query = GeneralLedger::with(['account', 'voucher']);
 
+        // 按科目ID筛选
         if ($request->has('account_id')) {
             $query->where('account_id', $request->account_id);
         }
 
+        // 按日期范围筛选：开始日期
         if ($request->has('start_date')) {
             $query->whereDate('entry_date', '>=', $request->start_date);
         }
 
+        // 按日期范围筛选：结束日期
         if ($request->has('end_date')) {
             $query->whereDate('entry_date', '<=', $request->end_date);
         }
 
+        // 按分录日期和ID倒序排列，返回分页结果
         return response()->json($query->orderBy('entry_date', 'desc')->orderBy('id', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -50,12 +56,14 @@ class GeneralLedgerController extends Controller
      */
     public function accountBalance($accountId, Request $request)
     {
+        // 调用财务服务获取科目余额
         $balance = $this->financialService->getAccountBalance(
             $accountId,
-            $request->start_date,
-            $request->end_date
+            $request->start_date,  // 开始日期
+            $request->end_date     // 结束日期
         );
 
+        // 返回科目余额信息（包含期初、本期借贷发生额、期末余额）
         return response()->json($balance);
     }
 }

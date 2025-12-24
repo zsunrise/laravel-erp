@@ -14,6 +14,7 @@ class NotificationController extends Controller
 
     public function __construct(NotificationService $notificationService)
     {
+        // 注入通知服务
         $this->notificationService = $notificationService;
     }
 
@@ -25,20 +26,25 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询：只查询当前用户的通知
         $query = Notification::where('user_id', auth()->id());
 
+        // 按通知状态筛选（unread/read/deleted）
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
+        // 按通知类型筛选
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
 
+        // 按优先级筛选
         if ($request->has('priority')) {
             $query->where('priority', $request->priority);
         }
 
+        // 按创建时间倒序排列，返回分页结果
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -49,11 +55,13 @@ class NotificationController extends Controller
      */
     public function unread()
     {
+        // 获取当前用户的所有未读通知
         $notifications = Notification::where('user_id', auth()->id())
             ->where('status', 'unread')
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // 返回未读通知列表
         return response()->json($notifications);
     }
 
@@ -64,7 +72,9 @@ class NotificationController extends Controller
      */
     public function unreadCount()
     {
+        // 调用通知服务获取未读数量
         $count = $this->notificationService->getUnreadCount(auth()->id());
+        // 返回未读数量
         return response()->json(['count' => $count]);
     }
 
@@ -76,14 +86,17 @@ class NotificationController extends Controller
      */
     public function show($id)
     {
+        // 查询当前用户的指定通知，预加载用户和日志信息
         $notification = Notification::where('user_id', auth()->id())
             ->with(['user', 'logs'])
             ->findOrFail($id);
 
+        // 如果未读则自动标记为已读
         if ($notification->status == 'unread') {
             $notification->markAsRead();
         }
 
+        // 返回通知详情
         return ApiResponse::success($notification, '获取成功');
     }
 
@@ -95,8 +108,11 @@ class NotificationController extends Controller
      */
     public function markAsRead($id)
     {
+        // 查询当前用户的指定通知
         $notification = Notification::where('user_id', auth()->id())->findOrFail($id);
+        // 调用通知服务标记为已读
         $notification = $this->notificationService->markAsRead($notification->id);
+        // 返回更新后的通知
         return response()->json($notification);
     }
 
@@ -107,7 +123,9 @@ class NotificationController extends Controller
      */
     public function markAllAsRead()
     {
+        // 调用通知服务标记当前用户所有通知为已读
         $count = $this->notificationService->markAllAsRead(auth()->id());
+        // 返回标记结果
         return response()->json(['message' => "已标记 {$count} 条消息为已读"]);
     }
 
@@ -119,8 +137,11 @@ class NotificationController extends Controller
      */
     public function destroy($id)
     {
+        // 查询当前用户的指定通知
         $notification = Notification::where('user_id', auth()->id())->findOrFail($id);
+        // 标记为已删除（软删除）
         $notification->update(['status' => 'deleted']);
+        // 返回删除成功消息
         return response()->json(['message' => '消息删除成功']);
     }
 
@@ -132,20 +153,22 @@ class NotificationController extends Controller
      */
     public function send(Request $request)
     {
+        // 验证发送通知参数
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'type' => 'required|in:system,approval,order,inventory,financial',
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'channel' => 'sometimes|in:system,email,sms,push',
-            'priority' => 'sometimes|in:low,normal,high,urgent',
-            'reference_type' => 'nullable|string',
-            'reference_id' => 'nullable|integer',
-            'reference_no' => 'nullable|string',
-            'data' => 'nullable|array',
+            'user_id' => 'required|exists:users,id',                      // 目标用户ID（必填）
+            'type' => 'required|in:system,approval,order,inventory,financial', // 通知类型
+            'title' => 'required|string|max:255',                         // 标题（必填）
+            'content' => 'required|string',                               // 内容（必填）
+            'channel' => 'sometimes|in:system,email,sms,push',            // 发送渠道
+            'priority' => 'sometimes|in:low,normal,high,urgent',          // 优先级
+            'reference_type' => 'nullable|string',                        // 关联业务类型
+            'reference_id' => 'nullable|integer',                         // 关联业务ID
+            'reference_no' => 'nullable|string',                          // 关联业务编号
+            'data' => 'nullable|array',                                   // 额外数据
         ]);
 
         try {
+            // 调用通知服务发送通知
             $notification = $this->notificationService->send(
                 $validated['user_id'],
                 $validated['type'],
@@ -160,8 +183,10 @@ class NotificationController extends Controller
                     'data' => $validated['data'] ?? null,
                 ]
             );
+            // 发送成功返回 201 状态码
             return response()->json($notification, 201);
         } catch (\Exception $e) {
+            // 发送失败返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
@@ -174,16 +199,18 @@ class NotificationController extends Controller
      */
     public function sendByTemplate(Request $request)
     {
+        // 验证模板发送参数
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'template_code' => 'required|exists:notification_templates,code',
-            'data' => 'required|array',
-            'reference_type' => 'nullable|string',
-            'reference_id' => 'nullable|integer',
-            'reference_no' => 'nullable|string',
+            'user_id' => 'required|exists:users,id',                       // 目标用户ID（必填）
+            'template_code' => 'required|exists:notification_templates,code', // 模板编码（必填）
+            'data' => 'required|array',                                    // 模板变量数据（必填）
+            'reference_type' => 'nullable|string',                         // 关联业务类型
+            'reference_id' => 'nullable|integer',                          // 关联业务ID
+            'reference_no' => 'nullable|string',                           // 关联业务编号
         ]);
 
         try {
+            // 调用通知服务使用模板发送通知
             $notification = $this->notificationService->sendByTemplate(
                 $validated['user_id'],
                 $validated['template_code'],
@@ -194,8 +221,10 @@ class NotificationController extends Controller
                     'reference_no' => $validated['reference_no'] ?? null,
                 ]
             );
+            // 发送成功返回 201 状态码
             return response()->json($notification, 201);
         } catch (\Exception $e) {
+            // 发送失败返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }

@@ -17,32 +17,39 @@ class ChartOfAccountController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载父科目信息
         $query = ChartOfAccount::with('parent');
 
+        // 按科目类型筛选
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
 
+        // 按科目分类筛选
         if ($request->has('category')) {
             $query->where('category', $request->category);
         }
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 按父科目筛选
         if ($request->has('parent_id')) {
             $query->where('parent_id', $request->parent_id);
         }
 
+        // 如果请求树形结构，返回层级数据
         if ($request->has('tree')) {
             $accounts = ChartOfAccount::whereNull('parent_id')
-                ->with('children')
+                ->with('children')  // 递归加载子科目
                 ->orderBy('order')
                 ->get();
             return response()->json($accounts);
         }
 
+        // 按排序字段排列，返回分页结果
         return response()->json($query->orderBy('order')->paginate($request->get('per_page', 15)));
     }
 
@@ -67,15 +74,20 @@ class ChartOfAccountController extends Controller
             'remark' => 'nullable|string',
         ]);
 
+        // 自动计算科目层级
         if ($validated['parent_id']) {
+            // 有父科目，层级为父科目层级+1
             $parent = ChartOfAccount::find($validated['parent_id']);
             $validated['level'] = $parent->level + 1;
         } else {
+            // 无父科目，为一级科目
             $validated['level'] = 1;
         }
 
+        // 创建科目记录
         $account = ChartOfAccount::create($validated);
 
+        // 返回新建科目信息
         return response()->json($account->load('parent'), 201);
     }
 
@@ -87,7 +99,9 @@ class ChartOfAccountController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询科目，预加载父科目和子科目信息
         $account = ChartOfAccount::with(['parent', 'children'])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($account, '获取成功');
     }
 
@@ -114,8 +128,10 @@ class ChartOfAccountController extends Controller
             'remark' => 'nullable|string',
         ]);
 
+        // 更新科目信息
         $account->update($validated);
 
+        // 返回更新后的科目信息
         return response()->json($account->load('parent'));
     }
 
@@ -127,18 +143,23 @@ class ChartOfAccountController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询科目
         $account = ChartOfAccount::findOrFail($id);
 
+        // 检查是否有子科目
         if ($account->children()->count() > 0) {
             return response()->json(['message' => '该科目下有子科目，无法删除'], 400);
         }
 
+        // 检查是否有总账分录记录
         if ($account->ledgerEntries()->count() > 0) {
             return response()->json(['message' => '该科目已有账务记录，无法删除'], 400);
         }
 
+        // 删除科目记录
         $account->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => '会计科目删除成功']);
     }
 }

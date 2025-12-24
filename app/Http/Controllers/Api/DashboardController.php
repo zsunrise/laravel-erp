@@ -27,32 +27,40 @@ class DashboardController extends Controller
     public function getStats(Request $request)
     {
         try {
+            // 获取当前时间和上月开始时间
             $now = Carbon::now();
             $currentMonth = $now->startOfMonth();
             $lastMonth = $now->copy()->subMonth()->startOfMonth();
 
-            // 销售订单统计
+            // ========== 销售订单统计 ==========
+            // 本月销售订单数量
             $salesOrders = SalesOrder::where('order_date', '>=', $currentMonth)->count();
+            // 上月销售订单数量（用于计算环比）
             $salesOrdersLastMonth = SalesOrder::where('order_date', '>=', $lastMonth)
                 ->where('order_date', '<', $currentMonth)
                 ->count();
+            // 计算环比增长率
             $salesOrdersTrend = $salesOrdersLastMonth > 0 
                 ? round((($salesOrders - $salesOrdersLastMonth) / $salesOrdersLastMonth) * 100, 1)
                 : 0;
 
-            // 采购订单统计
+            // ========== 采购订单统计 ==========
+            // 本月采购订单数量
             $purchaseOrders = PurchaseOrder::where('order_date', '>=', $currentMonth)->count();
+            // 上月采购订单数量
             $purchaseOrdersLastMonth = PurchaseOrder::where('order_date', '>=', $lastMonth)
                 ->where('order_date', '<', $currentMonth)
                 ->count();
+            // 计算环比增长率
             $purchaseOrdersTrend = $purchaseOrdersLastMonth > 0 
                 ? round((($purchaseOrders - $purchaseOrdersLastMonth) / $purchaseOrdersLastMonth) * 100, 1)
                 : 0;
 
-            // 库存商品统计（有库存的商品种类）
+            // ========== 库存统计 ==========
+            // 有库存的商品种类数量
             $inventoryCount = Inventory::where('quantity', '>', 0)->count();
             
-            // 库存预警（低于最小库存的商品）
+            // 低库存预警：统计库存低于最小库存的商品数量
             $lowStockCount = 0;
             $productsWithMinStock = Product::where('min_stock', '>', 0)
                 ->with('inventory')
@@ -64,36 +72,41 @@ class DashboardController extends Controller
                 }
             }
 
-            // 本月营收
+            // ========== 本月营收统计 ==========
+            // 本月营收（排除已取消订单）
             $revenue = SalesOrder::where('order_date', '>=', $currentMonth)
                 ->where('status', '!=', 'cancelled')
                 ->sum('total_amount');
+            // 上月营收
             $revenueLastMonth = SalesOrder::where('order_date', '>=', $lastMonth)
                 ->where('order_date', '<', $currentMonth)
                 ->where('status', '!=', 'cancelled')
                 ->sum('total_amount');
+            // 计算环比增长率
             $revenueTrend = $revenueLastMonth > 0 
                 ? round((($revenue - $revenueLastMonth) / $revenueLastMonth) * 100, 1)
                 : 0;
 
-            // 待审批数量
+            // ========== 其他统计 ==========
+            // 待审批工作流数量
             $pendingApprovals = WorkflowInstance::where('status', 'pending')->count();
 
-            // 生产工单统计
+            // 进行中的生产工单数量
             $workOrders = WorkOrder::whereIn('status', ['pending', 'in_progress'])->count();
 
-            // 应收账款（未结清的）
+            // 未结清应收账款总额
             $receivables = AccountsReceivable::whereIn('status', ['outstanding', 'partial', 'overdue'])
                 ->sum('remaining_amount');
 
-            // 应付账款（未结清的）
+            // 未结清应付账款总额
             $payables = AccountsPayable::whereIn('status', ['outstanding', 'partial', 'overdue'])
                 ->sum('remaining_amount');
 
-            // 近7天销售趋势
+            // ========== 近7天销售趋势 ==========
             $salesTrend = [];
             for ($i = 6; $i >= 0; $i--) {
                 $date = Carbon::now()->subDays($i)->toDateString();
+                // 统计每天的销售额
                 $amount = SalesOrder::whereDate('order_date', $date)
                     ->where('status', '!=', 'cancelled')
                     ->sum('total_amount');
@@ -103,6 +116,7 @@ class DashboardController extends Controller
                 ];
             }
 
+            // 返回统计数据
             return response()->json([
                 'stats' => [
                     'salesOrders' => [
@@ -148,6 +162,7 @@ class DashboardController extends Controller
                 'salesTrend' => $salesTrend
             ]);
         } catch (\Exception $e) {
+            // 异常处理：返回错误信息
             return response()->json([
                 'message' => '获取统计数据失败',
                 'error' => $e->getMessage()
@@ -166,13 +181,15 @@ class DashboardController extends Controller
         try {
             $tasks = [];
 
-            // 待审批工作流
+            // ========== 待审批工作流 ==========
+            // 获取最近10条待审批工作流
             $pendingWorkflows = WorkflowInstance::with(['workflow', 'initiator'])
                 ->where('status', 'pending')
                 ->orderBy('created_at', 'desc')
                 ->limit(10)
                 ->get();
 
+            // 转换为任务格式
             foreach ($pendingWorkflows as $workflow) {
                 $tasks[] = [
                     'id' => $workflow->id,
@@ -184,7 +201,8 @@ class DashboardController extends Controller
                 ];
             }
 
-            // 低库存预警
+            // ========== 低库存预警 ==========
+            // 筛选库存低于最小库存的产品
             $lowStockProducts = Product::where('min_stock', '>', 0)
                 ->with('inventory')
                 ->get()
@@ -194,6 +212,7 @@ class DashboardController extends Controller
                 })
                 ->take(5);
 
+            // 转换为任务格式
             foreach ($lowStockProducts as $product) {
                 $totalQuantity = $product->inventory->sum('quantity');
                 $tasks[] = [
@@ -206,7 +225,8 @@ class DashboardController extends Controller
                 ];
             }
 
-            // 逾期应收账款
+            // ========== 逾期应收账款 ==========
+            // 获取逾期未结清的应收账款
             $overdueReceivables = AccountsReceivable::with('customer')
                 ->where('status', 'overdue')
                 ->where('remaining_amount', '>', 0)
@@ -214,6 +234,7 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
+            // 转换为任务格式
             foreach ($overdueReceivables as $receivable) {
                 $daysOverdue = Carbon::now()->diffInDays($receivable->due_date);
                 $tasks[] = [
@@ -226,7 +247,8 @@ class DashboardController extends Controller
                 ];
             }
 
-            // 按优先级和日期排序
+            // ========== 任务排序 ==========
+            // 按优先级和日期排序（高优先级在前）
             usort($tasks, function($a, $b) {
                 $priorityWeight = ['high' => 3, 'normal' => 2, 'low' => 1];
                 $priorityDiff = ($priorityWeight[$b['priority']] ?? 0) - ($priorityWeight[$a['priority']] ?? 0);
@@ -236,10 +258,12 @@ class DashboardController extends Controller
                 return strcmp($b['date'], $a['date']);
             });
 
+            // 返回前10条任务
             return response()->json([
                 'tasks' => array_slice($tasks, 0, 10)
             ]);
         } catch (\Exception $e) {
+            // 异常处理
             return response()->json([
                 'message' => '获取待处理事项失败',
                 'error' => $e->getMessage()
@@ -258,12 +282,14 @@ class DashboardController extends Controller
         try {
             $orders = [];
 
-            // 最近销售订单
+            // ========== 最近销售订单 ==========
+            // 获取最近5条销售订单
             $salesOrders = SalesOrder::with('customer')
                 ->orderBy('order_date', 'desc')
                 ->limit(5)
                 ->get();
 
+            // 转换为统一格式
             foreach ($salesOrders as $order) {
                 $orders[] = [
                     'id' => $order->id,
@@ -277,12 +303,14 @@ class DashboardController extends Controller
                 ];
             }
 
-            // 最近采购订单
+            // ========== 最近采购订单 ==========
+            // 获取最近5条采购订单
             $purchaseOrders = PurchaseOrder::with('supplier')
                 ->orderBy('order_date', 'desc')
                 ->limit(5)
                 ->get();
 
+            // 转换为统一格式
             foreach ($purchaseOrders as $order) {
                 $orders[] = [
                     'id' => $order->id,
@@ -296,15 +324,18 @@ class DashboardController extends Controller
                 ];
             }
 
-            // 按日期排序
+            // ========== 排序 ==========
+            // 按日期倒序排列
             usort($orders, function($a, $b) {
                 return strcmp($b['date'], $a['date']);
             });
 
+            // 返回前10条订单
             return response()->json([
                 'orders' => array_slice($orders, 0, 10)
             ]);
         } catch (\Exception $e) {
+            // 异常处理
             return response()->json([
                 'message' => '获取最近订单失败',
                 'error' => $e->getMessage()
@@ -317,6 +348,7 @@ class DashboardController extends Controller
      */
     private function translateStatus($status)
     {
+        // 状态中英文映射
         $statusMap = [
             'draft' => '草稿',
             'pending' => '待审核',
@@ -327,6 +359,7 @@ class DashboardController extends Controller
             'rejected' => '已拒绝'
         ];
 
+        // 返回中文状态，未匹配则返回原值
         return $statusMap[$status] ?? $status;
     }
 }

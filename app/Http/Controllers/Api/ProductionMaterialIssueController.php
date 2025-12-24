@@ -17,24 +17,30 @@ class ProductionMaterialIssueController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载工单、仓库和创建人信息
         $query = ProductionMaterialIssue::with(['workOrder', 'warehouse', 'creator']);
 
+        // 按工单ID筛选
         if ($request->has('work_order_id')) {
             $query->where('work_order_id', $request->work_order_id);
         }
 
+        // 按仓库筛选
         if ($request->has('warehouse_id')) {
             $query->where('warehouse_id', $request->warehouse_id);
         }
 
+        // 按类型筛选（领料/退料）
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
 
+        // 按状态筛选
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
+        // 按领料日期倒序排列，返回分页结果
         return response()->json($query->orderBy('issue_date', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -46,10 +52,12 @@ class ProductionMaterialIssueController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询领料单，预加载关联数据
         $materialIssue = ProductionMaterialIssue::with([
             'workOrder', 'warehouse', 'creator', 'approver',
             'items.product', 'items.location'
         ])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($materialIssue, '获取成功');
     }
 }

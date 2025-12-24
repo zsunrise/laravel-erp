@@ -17,16 +17,20 @@ class SupplierController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载区域信息
         $query = Supplier::with(['region']);
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 按供应商评级筛选（A/B/C/D）
         if ($request->has('rating')) {
             $query->where('rating', $request->rating);
         }
 
+        // 关键词搜索：按名称、编码、联系人、电话模糊匹配
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -37,6 +41,7 @@ class SupplierController extends Controller
             });
         }
 
+        // 返回分页结果
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
@@ -48,26 +53,29 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证供应商信息参数
         $validated = $request->validate([
-            'code' => 'required|string|max:255|unique:suppliers,code',
-            'name' => 'required|string|max:255',
-            'contact_person' => 'nullable|string|max:255',
-            'contact_phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'region_id' => 'nullable|exists:regions,id',
-            'address' => 'nullable|string|max:500',
-            'tax_number' => 'nullable|string|max:255',
-            'bank_name' => 'nullable|string|max:255',
-            'bank_account' => 'nullable|string|max:255',
-            'rating' => 'sometimes|in:A,B,C,D',
-            'credit_limit' => 'nullable|numeric|min:0',
-            'payment_days' => 'nullable|integer|min:0',
-            'is_active' => 'sometimes|boolean',
-            'remark' => 'nullable|string',
+            'code' => 'required|string|max:255|unique:suppliers,code',    // 供应商编码（唯一）
+            'name' => 'required|string|max:255',                          // 供应商名称
+            'contact_person' => 'nullable|string|max:255',                // 联系人
+            'contact_phone' => 'nullable|string|max:20',                  // 联系电话
+            'email' => 'nullable|email|max:255',                          // 邮箱
+            'region_id' => 'nullable|exists:regions,id',                  // 所属区域
+            'address' => 'nullable|string|max:500',                       // 地址
+            'tax_number' => 'nullable|string|max:255',                    // 税号
+            'bank_name' => 'nullable|string|max:255',                     // 开户行
+            'bank_account' => 'nullable|string|max:255',                  // 银行账号
+            'rating' => 'sometimes|in:A,B,C,D',                           // 供应商评级
+            'credit_limit' => 'nullable|numeric|min:0',                   // 信用额度
+            'payment_days' => 'nullable|integer|min:0',                   // 账期天数
+            'is_active' => 'sometimes|boolean',                           // 是否激活
+            'remark' => 'nullable|string',                                // 备注
         ]);
 
+        // 创建供应商记录
         $supplier = Supplier::create($validated);
 
+        // 返回新建供应商信息（包含区域）
         return response()->json($supplier->load('region'), 201);
     }
 
@@ -79,7 +87,9 @@ class SupplierController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询供应商，预加载区域信息，找不到则抛出404
         $supplier = Supplier::with(['region'])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($supplier, '获取成功');
     }
 
@@ -92,8 +102,10 @@ class SupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 根据ID查询供应商，找不到则抛出404
         $supplier = Supplier::findOrFail($id);
 
+        // 验证更新参数（编码唯一性排除当前记录）
         $validated = $request->validate([
             'code' => 'sometimes|required|string|max:255|unique:suppliers,code,' . $id,
             'name' => 'sometimes|required|string|max:255',
@@ -112,8 +124,10 @@ class SupplierController extends Controller
             'remark' => 'nullable|string',
         ]);
 
+        // 更新供应商信息
         $supplier->update($validated);
 
+        // 返回更新后的供应商信息
         return response()->json($supplier->load('region'));
     }
 
@@ -125,14 +139,18 @@ class SupplierController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询供应商
         $supplier = Supplier::findOrFail($id);
 
+        // 检查是否有关联的采购订单，有则不允许删除
         if ($supplier->purchaseOrders()->count() > 0) {
             return response()->json(['message' => '该供应商下有采购订单，无法删除'], 400);
         }
 
+        // 删除供应商记录
         $supplier->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => '供应商删除成功']);
     }
 }

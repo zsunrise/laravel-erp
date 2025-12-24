@@ -17,16 +17,20 @@ class WarehouseController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载区域信息
         $query = Warehouse::with(['region']);
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 按默认仓库筛选
         if ($request->has('is_default')) {
             $query->where('is_default', $request->is_default);
         }
 
+        // 关键词搜索：按名称或编码模糊匹配
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -35,6 +39,7 @@ class WarehouseController extends Controller
             });
         }
 
+        // 返回分页结果
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
@@ -46,24 +51,28 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证仓库信息参数
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:warehouses,code',
-            'region_id' => 'nullable|exists:regions,id',
-            'address' => 'nullable|string|max:500',
-            'contact_person' => 'nullable|string|max:255',
-            'contact_phone' => 'nullable|string|max:20',
-            'is_default' => 'sometimes|boolean',
-            'is_active' => 'sometimes|boolean',
-            'description' => 'nullable|string',
+            'name' => 'required|string|max:255',                          // 仓库名称（必填）
+            'code' => 'required|string|max:255|unique:warehouses,code',   // 仓库编码（唯一）
+            'region_id' => 'nullable|exists:regions,id',                  // 所属区域
+            'address' => 'nullable|string|max:500',                       // 地址
+            'contact_person' => 'nullable|string|max:255',                // 联系人
+            'contact_phone' => 'nullable|string|max:20',                  // 联系电话
+            'is_default' => 'sometimes|boolean',                          // 是否默认仓库
+            'is_active' => 'sometimes|boolean',                           // 是否激活
+            'description' => 'nullable|string',                           // 描述
         ]);
 
+        // 如果设置为默认仓库，先清除其他仓库的默认标记
         if ($validated['is_default'] ?? false) {
             Warehouse::where('is_default', true)->update(['is_default' => false]);
         }
 
+        // 创建仓库记录
         $warehouse = Warehouse::create($validated);
 
+        // 返回新建仓库信息（包含区域）
         return response()->json($warehouse->load('region'), 201);
     }
 
@@ -75,7 +84,9 @@ class WarehouseController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询仓库，预加载区域和库位信息，找不到则抛出404
         $warehouse = Warehouse::with(['region', 'locations'])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($warehouse, '获取成功');
     }
 
@@ -88,8 +99,10 @@ class WarehouseController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 根据ID查询仓库，找不到则抛出404
         $warehouse = Warehouse::findOrFail($id);
 
+        // 验证更新参数
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'code' => 'sometimes|required|string|max:255|unique:warehouses,code,' . $id,
@@ -102,12 +115,15 @@ class WarehouseController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        // 如果设置为默认仓库且当前不是默认，清除其他仓库的默认标记
         if (($validated['is_default'] ?? false) && !$warehouse->is_default) {
             Warehouse::where('is_default', true)->update(['is_default' => false]);
         }
 
+        // 更新仓库信息
         $warehouse->update($validated);
 
+        // 返回更新后的仓库信息
         return response()->json($warehouse->load('region'));
     }
 
@@ -119,14 +135,18 @@ class WarehouseController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询仓库
         $warehouse = Warehouse::findOrFail($id);
 
+        // 检查是否有库存记录，有则不允许删除
         if ($warehouse->inventory()->count() > 0) {
             return response()->json(['message' => '该仓库下有库存，无法删除'], 400);
         }
 
+        // 删除仓库记录
         $warehouse->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => '仓库删除成功']);
     }
 }

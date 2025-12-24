@@ -17,8 +17,10 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载分类和单位信息
         $query = Product::with(['category', 'unit']);
 
+        // 关键词搜索：按名称、SKU、条码模糊匹配
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -28,14 +30,17 @@ class ProductController extends Controller
             });
         }
 
+        // 按产品分类筛选
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 返回分页结果
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
@@ -47,24 +52,27 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证产品信息参数
         $validated = $request->validate([
-            'category_id' => 'nullable|exists:product_categories,id',
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:255|unique:products',
-            'barcode' => 'nullable|string|max:255|unique:products',
-            'description' => 'nullable|string',
-            'image' => 'nullable|string',
-            'unit_id' => 'nullable|exists:units,id',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
-            'cost_price' => 'nullable|numeric|min:0',
-            'min_stock' => 'nullable|integer|min:0',
-            'max_stock' => 'nullable|integer|min:0',
-            'is_active' => 'sometimes|boolean',
+            'category_id' => 'nullable|exists:product_categories,id', // 产品分类
+            'name' => 'required|string|max:255',                      // 产品名称（必填）
+            'sku' => 'required|string|max:255|unique:products',       // SKU编码（唯一）
+            'barcode' => 'nullable|string|max:255|unique:products',   // 条形码（唯一）
+            'description' => 'nullable|string',                       // 产品描述
+            'image' => 'nullable|string',                             // 产品图片
+            'unit_id' => 'nullable|exists:units,id',                  // 计量单位
+            'purchase_price' => 'nullable|numeric|min:0',             // 采购价
+            'sale_price' => 'nullable|numeric|min:0',                 // 销售价
+            'cost_price' => 'nullable|numeric|min:0',                 // 成本价
+            'min_stock' => 'nullable|integer|min:0',                  // 最低库存
+            'max_stock' => 'nullable|integer|min:0',                  // 最高库存
+            'is_active' => 'sometimes|boolean',                       // 是否激活
         ]);
 
+        // 创建产品记录
         $product = Product::create($validated);
 
+        // 返回新建产品信息（包含分类和单位）
         return response()->json($product->load(['category', 'unit']), 201);
     }
 
@@ -76,7 +84,9 @@ class ProductController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询产品，预加载分类和单位，找不到则抛出404
         $product = Product::with(['category', 'unit'])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($product, '获取成功');
     }
 
@@ -89,8 +99,10 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 根据ID查询产品，找不到则抛出404
         $product = Product::findOrFail($id);
 
+        // 验证更新参数（SKU和条码唯一性排除当前记录）
         $validated = $request->validate([
             'category_id' => 'nullable|exists:product_categories,id',
             'name' => 'sometimes|required|string|max:255',
@@ -107,8 +119,10 @@ class ProductController extends Controller
             'is_active' => 'sometimes|boolean',
         ]);
 
+        // 更新产品信息
         $product->update($validated);
 
+        // 返回更新后的产品信息
         return response()->json($product->load(['category', 'unit']));
     }
 
@@ -120,9 +134,12 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询产品，找不到则抛出404
         $product = Product::findOrFail($id);
+        // 删除产品记录
         $product->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => 'Product deleted successfully']);
     }
 }

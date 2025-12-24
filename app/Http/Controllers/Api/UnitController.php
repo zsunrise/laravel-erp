@@ -17,12 +17,15 @@ class UnitController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询
         $query = Unit::query();
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 返回激活状态的单位列表，按排序字段排序
         return response()->json($query->where('is_active', true)->orderBy('sort')->paginate($request->get('per_page', 1000)));
     }
 
@@ -34,7 +37,9 @@ class UnitController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询单位，找不到则抛出404
         $unit = Unit::findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($unit, '获取成功');
     }
 }

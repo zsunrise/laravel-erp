@@ -18,8 +18,10 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载用户的角色信息
         $query = User::with('roles');
 
+        // 关键词搜索：按用户名、邮箱、电话模糊匹配
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -29,10 +31,12 @@ class UserController extends Controller
             });
         }
 
+        // 按激活状态筛选
         if ($request->has('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
+        // 返回分页结果
         return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
@@ -44,22 +48,27 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证用户信息参数
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'phone' => 'nullable|string|max:20',
-            'roles' => 'nullable|array',
-            'roles.*' => 'exists:roles,id',
+            'name' => 'required|string|max:255',                      // 用户名（必填）
+            'email' => 'required|string|email|max:255|unique:users',  // 邮箱（唯一）
+            'password' => 'required|string|min:8',                    // 密码（必填，至少8位）
+            'phone' => 'nullable|string|max:20',                      // 电话
+            'roles' => 'nullable|array',                              // 角色ID数组
+            'roles.*' => 'exists:roles,id',                           // 角色必须存在
         ]);
 
+        // 对密码进行哈希加密
         $validated['password'] = Hash::make($validated['password']);
+        // 创建用户记录
         $user = User::create($validated);
 
+        // 如果提供了角色，同步用户角色关系
         if ($request->has('roles')) {
             $user->roles()->sync($request->roles);
         }
 
+        // 返回新建用户信息（包含角色）
         return response()->json($user->load('roles'), 201);
     }
 
@@ -71,7 +80,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询用户，预加载角色信息，找不到则抛出404
         $user = User::with('roles')->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($user, '获取成功');
     }
 
@@ -84,8 +95,10 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 根据ID查询用户
         $user = User::findOrFail($id);
 
+        // 验证更新参数
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
@@ -96,18 +109,23 @@ class UserController extends Controller
             'roles.*' => 'exists:roles,id',
         ]);
 
+        // 如果提供了新密码，进行哈希加密
         if (isset($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
+            // 没有提供密码则不更新密码字段
             unset($validated['password']);
         }
 
+        // 更新用户信息
         $user->update($validated);
 
+        // 如果提供了角色，同步用户角色关系
         if ($request->has('roles')) {
             $user->roles()->sync($request->roles);
         }
 
+        // 返回更新后的用户信息
         return response()->json($user->load('roles'));
     }
 
@@ -119,9 +137,12 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        // 根据ID查询用户
         $user = User::findOrFail($id);
+        // 删除用户记录
         $user->delete();
 
+        // 返回删除成功消息
         return response()->json(['message' => 'User deleted successfully']);
     }
 }

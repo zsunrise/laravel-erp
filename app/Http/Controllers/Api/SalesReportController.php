@@ -20,21 +20,22 @@ class SalesReportController extends Controller
      */
     public function summary(Request $request)
     {
+        // 获取日期范围，默认为本月
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
         $endDate = $request->end_date ?? now()->toDateString();
 
-        // 按日期分组的数据
+        // 按日期分组统计销售数据
         $data = SalesOrder::selectRaw("DATE_FORMAT(order_date, '%Y-%m-%d') as date")
-            ->selectRaw('COUNT(*) as order_count')
-            ->selectRaw('SUM(total_amount) as total_amount')
-            ->selectRaw('COUNT(DISTINCT customer_id) as customer_count')
+            ->selectRaw('COUNT(*) as order_count')       // 订单数
+            ->selectRaw('SUM(total_amount) as total_amount') // 总金额
+            ->selectRaw('COUNT(DISTINCT customer_id) as customer_count') // 客户数
             ->whereBetween('order_date', [$startDate, $endDate])
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', 'cancelled')  // 排除已取消订单
             ->groupBy('date')
             ->orderBy('date')
             ->get();
 
-        // 统计信息
+        // 汇总统计信息
         $query = SalesOrder::whereBetween('order_date', [$startDate, $endDate])
             ->where('status', '!=', 'cancelled');
 
@@ -42,13 +43,15 @@ class SalesReportController extends Controller
         $orderCount = $query->count();
         $customerCount = $query->distinct('customer_id')->count('customer_id');
 
+        // 构建统计数据
         $stats = [
-            'total_amount' => $totalAmount ?? 0,
-            'order_count' => $orderCount,
-            'avg_amount' => $orderCount > 0 ? round($totalAmount / $orderCount, 2) : 0,
-            'customer_count' => $customerCount,
+            'total_amount' => $totalAmount ?? 0,    // 总销售额
+            'order_count' => $orderCount,           // 订单数
+            'avg_amount' => $orderCount > 0 ? round($totalAmount / $orderCount, 2) : 0, // 平均订单金额
+            'customer_count' => $customerCount,     // 客户数
         ];
 
+        // 返回报表数据和统计信息
         return ApiResponse::success([
             'data' => $data,
             'stats' => $stats,
@@ -63,18 +66,20 @@ class SalesReportController extends Controller
      */
     public function byCustomer(Request $request)
     {
+        // 获取日期范围，默认为本月
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
         $endDate = $request->end_date ?? now()->toDateString();
 
+        // 按客户分组统计销售数据
         $report = SalesOrder::select('customers.id', 'customers.name', 'customers.code')
-            ->selectRaw('COUNT(sales_orders.id) as order_count')
-            ->selectRaw('SUM(sales_orders.total_amount) as total_amount')
-            ->selectRaw('AVG(sales_orders.total_amount) as avg_amount')
-            ->join('customers', 'sales_orders.customer_id', '=', 'customers.id')
+            ->selectRaw('COUNT(sales_orders.id) as order_count')       // 订单数
+            ->selectRaw('SUM(sales_orders.total_amount) as total_amount') // 总金额
+            ->selectRaw('AVG(sales_orders.total_amount) as avg_amount')   // 平均金额
+            ->join('customers', 'sales_orders.customer_id', '=', 'customers.id') // 关联客户表
             ->whereBetween('sales_orders.order_date', [$startDate, $endDate])
             ->where('sales_orders.status', '!=', 'cancelled')
             ->groupBy('customers.id', 'customers.name', 'customers.code')
-            ->orderBy('total_amount', 'desc')
+            ->orderBy('total_amount', 'desc') // 按总金额降序排列
             ->get();
 
         return response()->json($report);
@@ -88,19 +93,21 @@ class SalesReportController extends Controller
      */
     public function byProduct(Request $request)
     {
+        // 获取日期范围，默认为本月
         $startDate = $request->start_date ?? now()->startOfMonth()->toDateString();
         $endDate = $request->end_date ?? now()->toDateString();
 
+        // 按产品分组统计销售数据
         $report = SalesOrderItem::select('products.id', 'products.name', 'products.sku')
-            ->selectRaw('SUM(sales_order_items.quantity) as total_quantity')
-            ->selectRaw('SUM(sales_order_items.total_amount) as total_amount')
-            ->selectRaw('AVG(sales_order_items.unit_price) as avg_price')
-            ->join('products', 'sales_order_items.product_id', '=', 'products.id')
-            ->join('sales_orders', 'sales_order_items.sales_order_id', '=', 'sales_orders.id')
+            ->selectRaw('SUM(sales_order_items.quantity) as total_quantity')   // 总数量
+            ->selectRaw('SUM(sales_order_items.total_amount) as total_amount') // 总金额
+            ->selectRaw('AVG(sales_order_items.unit_price) as avg_price')      // 平均价格
+            ->join('products', 'sales_order_items.product_id', '=', 'products.id') // 关联产品表
+            ->join('sales_orders', 'sales_order_items.sales_order_id', '=', 'sales_orders.id') // 关联订单表
             ->whereBetween('sales_orders.order_date', [$startDate, $endDate])
             ->where('sales_orders.status', '!=', 'cancelled')
             ->groupBy('products.id', 'products.name', 'products.sku')
-            ->orderBy('total_amount', 'desc')
+            ->orderBy('total_amount', 'desc') // 按总金额降序排列
             ->get();
 
         return response()->json($report);
@@ -114,20 +121,23 @@ class SalesReportController extends Controller
      */
     public function trend(Request $request)
     {
+        // 获取日期范围，默认为最近6个月
         $startDate = $request->start_date ?? now()->subMonths(6)->startOfMonth()->toDateString();
         $endDate = $request->end_date ?? now()->toDateString();
-        $groupBy = $request->group_by ?? 'day'; // day, week, month
+        $groupBy = $request->group_by ?? 'day'; // 分组方式：day/week/month
 
+        // 根据分组方式确定日期格式
         $format = match($groupBy) {
-            'day' => '%Y-%m-%d',
-            'week' => '%Y-%u',
-            'month' => '%Y-%m',
+            'day' => '%Y-%m-%d',   // 按天
+            'week' => '%Y-%u',     // 按周
+            'month' => '%Y-%m',    // 按月
             default => '%Y-%m-%d',
         };
 
+        // 按时间段分组统计销售趋势
         $report = SalesOrder::selectRaw("DATE_FORMAT(order_date, '{$format}') as period")
-            ->selectRaw('COUNT(*) as order_count')
-            ->selectRaw('SUM(total_amount) as total_amount')
+            ->selectRaw('COUNT(*) as order_count')       // 订单数
+            ->selectRaw('SUM(total_amount) as total_amount') // 总金额
             ->whereBetween('order_date', [$startDate, $endDate])
             ->where('status', '!=', 'cancelled')
             ->groupBy('period')

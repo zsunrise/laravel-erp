@@ -14,6 +14,7 @@ class AccountsPayableController extends Controller
 
     public function __construct(FinancialService $financialService)
     {
+        // 注入财务服务
         $this->financialService = $financialService;
     }
 
@@ -25,20 +26,25 @@ class AccountsPayableController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载供应商和货币信息
         $query = AccountsPayable::with(['supplier', 'currency']);
 
+        // 按供应商ID筛选
         if ($request->has('supplier_id')) {
             $query->where('supplier_id', $request->supplier_id);
         }
 
+        // 按状态筛选（outstanding/partial/settled/overdue）
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
+        // 筛选逾期的应付账款
         if ($request->has('overdue')) {
             $query->where('status', 'overdue');
         }
 
+        // 按到期日升序排列，返回分页结果
         return response()->json($query->orderBy('due_date', 'asc')->paginate($request->get('per_page', 15)));
     }
 
@@ -50,23 +56,27 @@ class AccountsPayableController extends Controller
      */
     public function store(Request $request)
     {
+        // 验证应付账款参数
         $validated = $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'reference_type' => 'nullable|string',
-            'reference_id' => 'nullable|integer',
-            'reference_no' => 'nullable|string',
-            'invoice_date' => 'required|date',
-            'due_date' => 'required|date|after:invoice_date',
-            'original_amount' => 'required|numeric|min:0',
-            'paid_amount' => 'nullable|numeric|min:0',
-            'currency_id' => 'nullable|exists:currencies,id',
-            'remark' => 'nullable|string',
+            'supplier_id' => 'required|exists:suppliers,id',      // 供应商ID（必填）
+            'reference_type' => 'nullable|string',                // 关联业务类型
+            'reference_id' => 'nullable|integer',                 // 关联业务ID
+            'reference_no' => 'nullable|string',                  // 关联业务编号
+            'invoice_date' => 'required|date',                    // 发票日期（必填）
+            'due_date' => 'required|date|after:invoice_date',     // 到期日期
+            'original_amount' => 'required|numeric|min:0',        // 原始金额（必填）
+            'paid_amount' => 'nullable|numeric|min:0',            // 已付金额
+            'currency_id' => 'nullable|exists:currencies,id',     // 货币ID
+            'remark' => 'nullable|string',                        // 备注
         ]);
 
         try {
+            // 调用财务服务创建应付账款
             $payable = $this->financialService->createPayable($validated);
+            // 创建成功返回 201 状态码
             return response()->json($payable, 201);
         } catch (\Exception $e) {
+            // 创建失败返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
@@ -79,7 +89,9 @@ class AccountsPayableController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询应付账款，预加载供应商和货币信息，找不到则抛出404
         $payable = AccountsPayable::with(['supplier', 'currency'])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($payable, '获取成功');
     }
 
@@ -92,14 +104,18 @@ class AccountsPayableController extends Controller
      */
     public function makePayment($id, Request $request)
     {
+        // 验证付款参数
         $validated = $request->validate([
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0',  // 付款金额（必填）
         ]);
 
         try {
+            // 调用财务服务执行付款，更新应付账款状态
             $payable = $this->financialService->makePayment($id, $validated['amount']);
+            // 返回更新后的应付账款信息
             return response()->json($payable);
         } catch (\Exception $e) {
+            // 付款失败（如金额超过剩余）返回错误消息
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }

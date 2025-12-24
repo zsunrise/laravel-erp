@@ -17,28 +17,35 @@ class OperationLogController extends Controller
      */
     public function index(Request $request)
     {
+        // 构建查询，预加载用户信息
         $query = OperationLog::with(['user']);
 
+        // 按用户ID筛选
         if ($request->has('user_id')) {
             $query->where('user_id', $request->user_id);
         }
 
+        // 按模块筛选
         if ($request->has('module')) {
             $query->where('module', $request->module);
         }
 
+        // 按操作模糊筛选
         if ($request->has('action')) {
             $query->where('action', 'like', "%{$request->action}%");
         }
 
+        // 按HTTP请求方法筛选
         if ($request->has('method')) {
             $query->where('method', $request->input('method'));
         }
 
+        // 按响应状态码筛选
         if ($request->has('status_code')) {
             $query->where('status_code', $request->status_code);
         }
 
+        // 关键词搜索：支持搜索操作、路径、消息、用户名和邮箱
         if ($request->has('search')) {
             $search = $request->search;
             $query->leftJoin('users', 'operation_logs.user_id', '=', 'users.id')
@@ -53,14 +60,17 @@ class OperationLogController extends Controller
                   ->distinct();
         }
 
+        // 按日期范围筛选：开始日期
         if ($request->has('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
 
+        // 按日期范围筛选：结束日期
         if ($request->has('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
+        // 按创建时间倒序排列，返回分页结果
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->get('per_page', 15)));
     }
 
@@ -72,7 +82,9 @@ class OperationLogController extends Controller
      */
     public function show($id)
     {
+        // 根据ID查询日志，预加载用户信息，找不到则抛出404
         $log = OperationLog::with(['user'])->findOrFail($id);
+        // 返回标准化成功响应
         return ApiResponse::success($log, '获取成功');
     }
 }
