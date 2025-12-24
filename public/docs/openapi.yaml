@@ -26,12 +26,12 @@ paths:
                 email:
                   type: string
                   description: 'Must be a valid email address.'
-                  example: stoltenberg.stanley@example.com
+                  example: owen01@example.com
                   nullable: false
                 password:
                   type: string
                   description: ''
-                  example: voluptatem
+                  example: sint
                   nullable: false
               required:
                 - email
@@ -209,26 +209,26 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: zoqnfj
+                  example: ifwxvqtaq
                   nullable: false
                 email:
                   type: string
-                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
-                  example: iherman@example.com
+                  description: '用户名（必填）. Must be a valid email address. Must not be greater than 255 characters.'
+                  example: axel.hauck@example.net
                   nullable: false
                 password:
                   type: string
-                  description: 'Must be at least 8 characters.'
-                  example: '!k%mQT+w{g^|C-W2+)N<'
+                  description: '邮箱（唯一）. Must be at least 8 characters.'
+                  example: 'Kc!~P=]s6nliv?T'
                   nullable: false
                 phone:
                   type: string
-                  description: 'Must not be greater than 20 characters.'
-                  example: auihxq
+                  description: '密码（必填，至少8位）. Must not be greater than 20 characters.'
+                  example: axtgsnubgqrosyc
                   nullable: true
                 roles:
                   type: array
-                  description: 'The <code>id</code> of an existing record in the roles table.'
+                  description: '角色ID数组. The <code>id</code> of an existing record in the roles table.'
                   example: null
                   items:
                     type: string
@@ -283,7 +283,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: uwbcijcms
+                  example: vbiofdzpkfbpjcbuvws
                   nullable: false
                 email:
                   type: string
@@ -293,12 +293,12 @@ paths:
                 password:
                   type: string
                   description: 'Must be at least 8 characters.'
-                  example: ')|m]+r3r.xWv8o'
+                  example: '|M`%B;lm'
                   nullable: true
                 phone:
                   type: string
                   description: 'Must not be greater than 20 characters.'
-                  example: skafxvdqnp
+                  example: eynqlsakf
                   nullable: true
                 is_active:
                   type: boolean
@@ -326,7 +326,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the user.'
-        example: dolorem
+        example: enim
         required: true
         schema:
           type: string
@@ -377,26 +377,26 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: lrgomrfqkfrfqjxc
+                  example: dhuoczbxo
                   nullable: false
                 slug:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: nqptvps
+                  description: '角色名称（必填）. Must not be greater than 255 characters.'
+                  example: tmwtgr
                   nullable: false
                 description:
                   type: string
-                  description: ''
-                  example: 'Distinctio et culpa ut et voluptas aliquam.'
+                  description: 角色标识（唯一）.
+                  example: 'Incidunt iure tempore similique et repellendus odit voluptate.'
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
-                  example: true
+                  description: 描述.
+                  example: false
                   nullable: false
                 permissions:
                   type: array
-                  description: 'The <code>id</code> of an existing record in the permissions table.'
+                  description: '权限ID数组. The <code>id</code> of an existing record in the permissions table.'
                   example: null
                   items:
                     type: string
@@ -450,7 +450,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: rqlpmiidigdnkzomeh
+                  example: yw
                   nullable: false
                 slug:
                   type: string
@@ -460,7 +460,7 @@ paths:
                 description:
                   type: string
                   description: ''
-                  example: 'Ut quo tempore corporis officia.'
+                  example: 'Eaque placeat aliquid facere omnis reiciendis quisquam.'
                   nullable: true
                 is_active:
                   type: boolean
@@ -488,7 +488,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the role.'
-        example: vel
+        example: aut
         required: true
         schema:
           type: string
@@ -539,22 +539,22 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: lylwevddqwuxwltrxg
+                  example: mbe
                   nullable: false
                 slug:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: fkksjxwbvenwajro
+                  description: '权限名称（必填）. Must not be greater than 255 characters.'
+                  example: utlxelkg
                   nullable: false
                 group:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: vcvuampfsokuhfzthmnrw
+                  description: '权限标识（唯一）. Must not be greater than 255 characters.'
+                  example: r
                   nullable: true
                 description:
                   type: string
-                  description: ''
-                  example: 'Ducimus dicta ut delectus omnis pariatur.'
+                  description: 权限组.
+                  example: 'Adipisci eligendi voluptatem et incidunt qui.'
                   nullable: true
               required:
                 - name
@@ -606,7 +606,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: rzdtahogvte
+                  example: vwfjjounrzlozlkupj
                   nullable: false
                 slug:
                   type: string
@@ -616,12 +616,12 @@ paths:
                 group:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: rbtjsafplpyee
+                  example: fqtwpethjjrbkyq
                   nullable: true
                 description:
                   type: string
                   description: ''
-                  example: 'Assumenda autem ad inventore sit hic explicabo rerum.'
+                  example: 'Quis quae sit distinctio et sed aut accusantium.'
                   nullable: true
               required:
                 - name
@@ -638,7 +638,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the permission.'
-        example: alias
+        example: eum
         required: true
         schema:
           type: string
@@ -689,16 +689,16 @@ paths:
                 key:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: zojeqicdfiehuknpongyliu
+                  example: khcbwyklhkbeddnpb
                   nullable: false
                 value:
                   type: string
-                  description: ''
-                  example: cum
+                  description: 配置键名（唯一）.
+                  example: aut
                   nullable: true
                 type:
                   type: string
-                  description: ''
+                  description: 配置值.
                   example: number
                   nullable: false
                   enum:
@@ -708,13 +708,13 @@ paths:
                     - json
                 group:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: sazlnlw
+                  description: '值类型. Must not be greater than 255 characters.'
+                  example: hhyyhxtvbgozgzpxpu
                   nullable: true
                 description:
                   type: string
-                  description: ''
-                  example: 'Eos quod velit et quo.'
+                  description: 配置组.
+                  example: 'Similique unde assumenda non sunt delectus adipisci nihil.'
                   nullable: true
               required:
                 - key
@@ -770,7 +770,7 @@ paths:
                 value:
                   type: string
                   description: ''
-                  example: laboriosam
+                  example: sed
                   nullable: true
                 type:
                   type: string
@@ -785,12 +785,12 @@ paths:
                 group:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: ukvkacwxyqpnpcfrucaecyroi
+                  example: jtlsxfkf
                   nullable: true
                 description:
                   type: string
                   description: ''
-                  example: 'Sequi voluptas ab corrupti qui est blanditiis et.'
+                  example: 'Nihil quia eos quis itaque sunt accusamus.'
                   nullable: true
     delete:
       summary: 删除系统配置
@@ -805,7 +805,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the system config.'
-        example: non
+        example: autem
         required: true
         schema:
           type: string
@@ -843,7 +843,7 @@ paths:
         in: path
         name: key
         description: 'The key.'
-        example: veniam
+        example: veritatis
         required: true
         schema:
           type: string
@@ -894,37 +894,37 @@ paths:
                 type:
                   type: string
                   description: 'Must not be greater than 50 characters.'
-                  example: ljkxwzyyhsoot
+                  example: mrhnhvvpncc
                   nullable: false
                 code:
                   type: string
-                  description: 'Must not be greater than 50 characters.'
-                  example: mamqmhvfjnrkjjgfj
+                  description: '类型（必填）. Must not be greater than 50 characters.'
+                  example: akkulcuinxftpjuwfxvpr
                   nullable: false
                 label:
                   type: string
-                  description: 'Must not be greater than 100 characters.'
-                  example: rzbtddho
+                  description: '编码（必填）. Must not be greater than 100 characters.'
+                  example: fmvqsnqyjjic
                   nullable: false
                 value:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: ywfuh
+                  description: '标签（必填）. Must not be greater than 255 characters.'
+                  example: enmdsxtuvdauuhqgkldyho
                   nullable: false
                 sort:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 8
+                  description: '值（必填）. Must be at least 0.'
+                  example: 74
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
+                  description: 排序.
                   example: true
                   nullable: false
                 description:
                   type: string
-                  description: ''
-                  example: 'Ut qui velit accusantium aut quod expedita provident accusamus.'
+                  description: 是否激活.
+                  example: 'Sint illum totam eveniet ut omnis deleniti.'
                   nullable: true
               required:
                 - type
@@ -978,37 +978,37 @@ paths:
                 type:
                   type: string
                   description: 'Must not be greater than 50 characters.'
-                  example: djaxqfdrsgr
+                  example: kvistbhbogo
                   nullable: false
                 code:
                   type: string
                   description: 'Must not be greater than 50 characters.'
-                  example: megasuhop
+                  example: t
                   nullable: false
                 label:
                   type: string
                   description: 'Must not be greater than 100 characters.'
-                  example: noznfzdroe
+                  example: vqsenk
                   nullable: false
                 value:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: oiyzbyhppcl
+                  example: npnbpzdadnsdusackdwf
                   nullable: false
                 sort:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 78
+                  example: 45
                   nullable: true
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
                 description:
                   type: string
                   description: ''
-                  example: 'Qui dolor modi veniam quisquam quasi.'
+                  example: 'Laborum perferendis a voluptatem debitis ipsum rerum quam deserunt.'
                   nullable: true
     delete:
       summary: 删除字典项
@@ -1023,7 +1023,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the data dictionary.'
-        example: magni
+        example: ex
         required: true
         schema:
           type: string
@@ -1061,7 +1061,7 @@ paths:
         in: path
         name: type
         description: 'The type.'
-        example: quia
+        example: facere
         required: true
         schema:
           type: string
@@ -1145,33 +1145,33 @@ paths:
                   nullable: true
                 name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: s
+                  description: '父分类ID. Must not be greater than 255 characters.'
+                  example: gfwva
                   nullable: false
                 code:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: iavj
+                  description: '分类名称（必填）. Must not be greater than 255 characters.'
+                  example: k
                   nullable: false
                 image:
                   type: string
-                  description: ''
-                  example: magni
+                  description: 分类编码（唯一）.
+                  example: doloremque
                   nullable: true
                 sort:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 51
+                  description: '分类图片. Must be at least 0.'
+                  example: 73
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
-                  example: false
+                  description: 排序值.
+                  example: true
                   nullable: false
                 description:
                   type: string
-                  description: ''
-                  example: 'Facilis dolorem labore pariatur eos et rem.'
+                  description: 是否激活.
+                  example: 'Rerum dicta sit placeat et doloremque unde maiores.'
                   nullable: true
               required:
                 - name
@@ -1228,7 +1228,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: zzmczbsdrfze
+                  example: yvkdmzbioogxrncsebxavuhy
                   nullable: false
                 code:
                   type: string
@@ -1238,12 +1238,12 @@ paths:
                 image:
                   type: string
                   description: ''
-                  example: fugit
+                  example: vero
                   nullable: true
                 sort:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 77
+                  example: 62
                   nullable: true
                 is_active:
                   type: boolean
@@ -1253,7 +1253,7 @@ paths:
                 description:
                   type: string
                   description: ''
-                  example: 'Sint quasi laborum et.'
+                  example: 'Magni omnis harum laboriosam.'
                   nullable: true
               required:
                 - name
@@ -1270,7 +1270,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the product category.'
-        example: labore
+        example: modi
         required: true
         schema:
           type: string
@@ -1337,7 +1337,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the region.'
-        example: aut
+        example: ullam
         required: true
         schema:
           type: string
@@ -1404,7 +1404,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the unit.'
-        example: blanditiis
+        example: ut
         required: true
         schema:
           type: string
@@ -1471,7 +1471,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the currency.'
-        example: et
+        example: nobis
         required: true
         schema:
           type: string
@@ -1526,63 +1526,63 @@ paths:
                   nullable: true
                 name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: ata
+                  description: '产品分类. Must not be greater than 255 characters.'
+                  example: gbedv
                   nullable: false
                 sku:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: ptjdvjymfwgugtvdbzf
+                  description: '产品名称（必填）. Must not be greater than 255 characters.'
+                  example: mfbfqcixotsiorbzskzpxla
                   nullable: false
                 barcode:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: uvvmcctfxd
+                  description: 'SKU编码（唯一）. Must not be greater than 255 characters.'
+                  example: necoxjxxvfwnnaryyieaft
                   nullable: true
                 description:
                   type: string
-                  description: ''
-                  example: 'Illum animi id libero quos praesentium totam sapiente.'
+                  description: 条形码（唯一）.
+                  example: 'Harum reprehenderit corrupti ad.'
                   nullable: true
                 image:
                   type: string
-                  description: ''
-                  example: consectetur
+                  description: 产品描述.
+                  example: voluptatem
                   nullable: true
                 unit_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the units table.'
+                  description: '产品图片. The <code>id</code> of an existing record in the units table.'
                   example: null
                   nullable: true
                 purchase_price:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 4
+                  description: '计量单位. Must be at least 0.'
+                  example: 2
                   nullable: true
                 sale_price:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 36
+                  description: '采购价. Must be at least 0.'
+                  example: 0
                   nullable: true
                 cost_price:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 12
+                  description: '销售价. Must be at least 0.'
+                  example: 48
                   nullable: true
                 min_stock:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 15
+                  description: '成本价. Must be at least 0.'
+                  example: 56
                   nullable: true
                 max_stock:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 17
+                  description: '最低库存. Must be at least 0.'
+                  example: 12
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
-                  example: true
+                  description: 最高库存.
+                  example: false
                   nullable: false
               required:
                 - name
@@ -1639,7 +1639,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: fxwnccueptwqxqymuzt
+                  example: lumvkuzaxpgkaq
                   nullable: false
                 sku:
                   type: string
@@ -1654,12 +1654,12 @@ paths:
                 description:
                   type: string
                   description: ''
-                  example: 'Fugit porro architecto soluta nemo.'
+                  example: 'Nihil recusandae est minima.'
                   nullable: true
                 image:
                   type: string
                   description: ''
-                  example: ipsam
+                  example: dolore
                   nullable: true
                 unit_id:
                   type: string
@@ -1669,27 +1669,27 @@ paths:
                 purchase_price:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 43
+                  example: 26
                   nullable: true
                 sale_price:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 41
+                  example: 7
                   nullable: true
                 cost_price:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 28
+                  example: 2
                   nullable: true
                 min_stock:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 17
+                  example: 77
                   nullable: true
                 max_stock:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 80
+                  example: 81
                   nullable: true
                 is_active:
                   type: boolean
@@ -1711,7 +1711,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the product.'
-        example: deserunt
+        example: ut
         required: true
         schema:
           type: string
@@ -1762,47 +1762,47 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: ukrlqrpovtmovgpjuw
+                  example: dvzfnfqplvcapiwtznpkbhjk
                   nullable: false
                 code:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: mqqdwjajnuhwczfdc
+                  description: '仓库名称（必填）. Must not be greater than 255 characters.'
+                  example: bjmsoxddyochxga
                   nullable: false
                 region_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the regions table.'
+                  description: '仓库编码（唯一）. The <code>id</code> of an existing record in the regions table.'
                   example: null
                   nullable: true
                 address:
                   type: string
-                  description: 'Must not be greater than 500 characters.'
-                  example: gf
+                  description: '所属区域. Must not be greater than 500 characters.'
+                  example: jfgeipdovlbczwlxgn
                   nullable: true
                 contact_person:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: xfk
+                  description: '地址. Must not be greater than 255 characters.'
+                  example: pe
                   nullable: true
                 contact_phone:
                   type: string
-                  description: 'Must not be greater than 20 characters.'
-                  example: oqjdcdbbkoh
+                  description: '联系人. Must not be greater than 20 characters.'
+                  example: sxbwcbimhoggmam
                   nullable: true
                 is_default:
                   type: boolean
-                  description: ''
-                  example: false
+                  description: 联系电话.
+                  example: true
                   nullable: false
                 is_active:
                   type: boolean
-                  description: ''
-                  example: true
+                  description: 是否默认仓库.
+                  example: false
                   nullable: false
                 description:
                   type: string
-                  description: ''
-                  example: 'Velit voluptas ut nisi consequatur.'
+                  description: 是否激活.
+                  example: 'Ut neque sit laboriosam velit quis alias qui.'
                   nullable: true
               required:
                 - name
@@ -1854,7 +1854,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: uggfzlgzqocbj
+                  example: rfsjpnewaejokkpbfiphld
                   nullable: false
                 code:
                   type: string
@@ -1869,32 +1869,32 @@ paths:
                 address:
                   type: string
                   description: 'Must not be greater than 500 characters.'
-                  example: xsnn
+                  example: dabxxbfwrydmmhgx
                   nullable: true
                 contact_person:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: rllyufpswhwuihhnafivjarzq
+                  example: hdvrwltgncjjigzawrcrivzz
                   nullable: true
                 contact_phone:
                   type: string
                   description: 'Must not be greater than 20 characters.'
-                  example: mvzgcbmoqowtbjtgmnzg
+                  example: kbccdnszzurpovx
                   nullable: true
                 is_default:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
                 description:
                   type: string
                   description: ''
-                  example: 'Eos libero voluptatem in et odit id.'
+                  example: 'Deserunt excepturi dolor architecto incidunt blanditiis excepturi suscipit.'
                   nullable: true
               required:
                 - name
@@ -1911,7 +1911,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the warehouse.'
-        example: natus
+        example: vero
         required: true
         schema:
           type: string
@@ -1962,26 +1962,26 @@ paths:
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: aliquam
+                  example: quasi
                   nullable: false
                 name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: vdqpofsuekhodgcclc
+                  description: '仓库ID（必填）. Must not be greater than 255 characters.'
+                  example: tvdnecpkyyevjqceshvfpa
                   nullable: false
                 code:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: qonzhwfgyvdwesablwnkct
+                  description: '库位名称（必填）. Must not be greater than 255 characters.'
+                  example: qatx
                   nullable: false
                 sort:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 20
+                  description: '库位编码（必填）. Must be at least 0.'
+                  example: 6
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
+                  description: 排序值.
                   example: false
                   nullable: false
               required:
@@ -2035,17 +2035,17 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: ywhffbwbllsfm
+                  example: ljpazqrehuqsdkzbqw
                   nullable: false
                 code:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: xextyyihrkqm
+                  example: yqdgmpmkx
                   nullable: false
                 sort:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 12
+                  example: 75
                   nullable: true
                 is_active:
                   type: boolean
@@ -2068,7 +2068,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the warehouse location.'
-        example: expedita
+        example: ipsam
         required: true
         schema:
           type: string
@@ -2135,7 +2135,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the inventory.'
-        example: temporibus
+        example: recusandae
         required: true
         schema:
           type: string
@@ -2158,47 +2158,47 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: at
+                  example: sit
                   nullable: false
                 warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: sequi
+                  description: '产品ID（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: delectus
                   nullable: false
                 location_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                  description: '仓库ID（必填）. The <code>id</code> of an existing record in the warehouse_locations table.'
                   example: null
                   nullable: true
                 quantity:
                   type: integer
-                  description: 'Must be at least 1.'
-                  example: 18
+                  description: '库位ID. Must be at least 1.'
+                  example: 7
                   nullable: false
                 unit_cost:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 20
+                  description: '入库数量（必填）. Must be at least 0.'
+                  example: 29
                   nullable: true
                 reference_type:
                   type: string
-                  description: ''
-                  example: quidem
+                  description: 单位成本.
+                  example: quasi
                   nullable: true
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 15
+                  description: 关联单据类型.
+                  example: 18
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: qui
+                  description: 关联单据ID.
+                  example: libero
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: ut
+                  description: 关联单据号.
+                  example: esse
                   nullable: true
               required:
                 - product_id
@@ -2223,47 +2223,47 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: soluta
+                  example: rerum
                   nullable: false
                 warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: voluptatibus
+                  description: '产品ID（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: fugit
                   nullable: false
                 location_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                  description: '仓库ID（必填）. The <code>id</code> of an existing record in the warehouse_locations table.'
                   example: null
                   nullable: true
                 quantity:
                   type: integer
-                  description: 'Must be at least 1.'
-                  example: 4
+                  description: '库位ID. Must be at least 1.'
+                  example: 50
                   nullable: false
                 unit_cost:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 89
+                  description: '出库数量（必填）. Must be at least 0.'
+                  example: 7
                   nullable: true
                 reference_type:
                   type: string
-                  description: ''
+                  description: 单位成本.
                   example: ut
                   nullable: true
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 16
+                  description: 关联单据类型.
+                  example: 3
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: sunt
+                  description: 关联单据ID.
+                  example: dolore
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: consequatur
+                  description: 关联单据号.
+                  example: inventore
                   nullable: true
               required:
                 - product_id
@@ -2288,42 +2288,42 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: doloribus
+                  example: eum
                   nullable: false
                 from_warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: neque
+                  description: '产品ID（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: dolorem
                   nullable: false
                 to_warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: odio
+                  description: '源仓库ID（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: eveniet
                   nullable: false
                 from_location_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                  description: '目标仓库ID（必填）. The <code>id</code> of an existing record in the warehouse_locations table.'
                   example: null
                   nullable: true
                 to_location_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                  description: '源库位ID. The <code>id</code> of an existing record in the warehouse_locations table.'
                   example: null
                   nullable: true
                 quantity:
                   type: integer
-                  description: 'Must be at least 1.'
-                  example: 16
+                  description: '目标库位ID. Must be at least 1.'
+                  example: 1
                   nullable: false
                 reference_no:
                   type: string
-                  description: ''
-                  example: inventore
+                  description: 调拨数量（必填）.
+                  example: quia
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: architecto
+                  description: 关联单据号.
+                  example: soluta
                   nullable: true
               required:
                 - product_id
@@ -2349,37 +2349,37 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: reiciendis
+                  example: iste
                   nullable: false
                 warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: culpa
+                  description: '产品ID（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: doloribus
                   nullable: false
                 location_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                  description: '仓库ID（必填）. The <code>id</code> of an existing record in the warehouse_locations table.'
                   example: null
                   nullable: true
                 quantity:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 78
+                  description: '库位ID. Must be at least 0.'
+                  example: 73
                   nullable: false
                 unit_cost:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 0
+                  description: '调整后数量（必填）. Must be at least 0.'
+                  example: 74
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: nemo
+                  description: 单位成本.
+                  example: ut
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: adipisci
+                  description: 关联单据号.
+                  example: tempora
                   nullable: true
               required:
                 - product_id
@@ -2461,17 +2461,17 @@ paths:
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: mollitia
+                  example: rem
                   nullable: false
                 stocktake_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '仓库ID（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 remark:
                   type: string
-                  description: ''
-                  example: nobis
+                  description: 盘点日期（必填）.
+                  example: voluptatem
                   nullable: true
               required:
                 - warehouse_id
@@ -2510,7 +2510,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the inventory stocktake.'
-        example: error
+        example: necessitatibus
         required: true
         schema:
           type: string
@@ -2533,22 +2533,22 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: modi
+                  example: aut
                   nullable: false
                 location_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                  description: '产品ID（必填）. The <code>id</code> of an existing record in the warehouse_locations table.'
                   example: null
                   nullable: true
                 actual_quantity:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 43
+                  description: '库位ID. Must be at least 0.'
+                  example: 44
                   nullable: false
                 remark:
                   type: string
-                  description: ''
-                  example: inventore
+                  description: 实际盘点数量（必填）.
+                  example: et
                   nullable: true
               required:
                 - product_id
@@ -2558,7 +2558,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the inventory stocktake.'
-        example: rerum
+        example: sed
         required: true
         schema:
           type: string
@@ -2576,7 +2576,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the inventory stocktake.'
-        example: ex
+        example: tempore
         required: true
         schema:
           type: string
@@ -2627,57 +2627,57 @@ paths:
                 code:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: hi
+                  example: a
                   nullable: false
                 name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: qbsdqvgzxvh
+                  description: '供应商编码（唯一）. Must not be greater than 255 characters.'
+                  example: xaznfaplgmqzfxalwt
                   nullable: false
                 contact_person:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: vqrziwcra
+                  description: '供应商名称. Must not be greater than 255 characters.'
+                  example: jbhbgycncrqcltzkeejubqruw
                   nullable: true
                 contact_phone:
                   type: string
-                  description: 'Must not be greater than 20 characters.'
-                  example: ymgsruiuhirwdatvri
+                  description: '联系人. Must not be greater than 20 characters.'
+                  example: hhhazxnqqyaumst
                   nullable: true
                 email:
                   type: string
-                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
-                  example: thiel.ernest@example.net
+                  description: '联系电话. Must be a valid email address. Must not be greater than 255 characters.'
+                  example: zschimmel@example.net
                   nullable: true
                 region_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the regions table.'
+                  description: '邮箱. The <code>id</code> of an existing record in the regions table.'
                   example: null
                   nullable: true
                 address:
                   type: string
-                  description: 'Must not be greater than 500 characters.'
-                  example: fgypemcfbvaiaykblbma
+                  description: '所属区域. Must not be greater than 500 characters.'
+                  example: hvejrrusqtjhsopkawy
                   nullable: true
                 tax_number:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: zicsnvkagxcrnrqn
+                  description: '地址. Must not be greater than 255 characters.'
+                  example: pm
                   nullable: true
                 bank_name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: ksfpptmknfts
+                  description: '税号. Must not be greater than 255 characters.'
+                  example: isiskftmociwsjuz
                   nullable: true
                 bank_account:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: an
+                  description: '开户行. Must not be greater than 255 characters.'
+                  example: amxstvxuvcrbely
                   nullable: true
                 rating:
                   type: string
-                  description: ''
-                  example: C
+                  description: 银行账号.
+                  example: A
                   nullable: false
                   enum:
                     - A
@@ -2686,23 +2686,23 @@ paths:
                     - D
                 credit_limit:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 75
+                  description: '供应商评级. Must be at least 0.'
+                  example: 12
                   nullable: true
                 payment_days:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 56
+                  description: '信用额度. Must be at least 0.'
+                  example: 59
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
-                  example: false
+                  description: 账期天数.
+                  example: true
                   nullable: false
                 remark:
                   type: string
-                  description: ''
-                  example: commodi
+                  description: 是否激活.
+                  example: est
                   nullable: true
               required:
                 - code
@@ -2759,22 +2759,22 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: tir
+                  example: ibjyefobpdxeyqkvo
                   nullable: false
                 contact_person:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: fqchwaw
+                  example: fzlbdguypcgfen
                   nullable: true
                 contact_phone:
                   type: string
                   description: 'Must not be greater than 20 characters.'
-                  example: w
+                  example: jrrvdchpcvlnkxrypkt
                   nullable: true
                 email:
                   type: string
                   description: 'Must be a valid email address. Must not be greater than 255 characters.'
-                  example: thalia.corkery@example.net
+                  example: austin66@example.org
                   nullable: true
                 region_id:
                   type: string
@@ -2784,27 +2784,27 @@ paths:
                 address:
                   type: string
                   description: 'Must not be greater than 500 characters.'
-                  example: beddcqfqxbwhvjpfonadxz
+                  example: ztxjwb
                   nullable: true
                 tax_number:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: q
+                  example: ycqhvaxnjxosouav
                   nullable: true
                 bank_name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: dxgthluevujgidi
+                  example: bykyyhhdmcnrkbfqqfjksjfu
                   nullable: true
                 bank_account:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: xuzaipzubtowwgerrutt
+                  example: vdnezxqbonpna
                   nullable: true
                 rating:
                   type: string
                   description: ''
-                  example: D
+                  example: B
                   nullable: false
                   enum:
                     - A
@@ -2814,12 +2814,12 @@ paths:
                 credit_limit:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 61
+                  example: 27
                   nullable: true
                 payment_days:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 30
+                  example: 81
                   nullable: true
                 is_active:
                   type: boolean
@@ -2829,7 +2829,7 @@ paths:
                 remark:
                   type: string
                   description: ''
-                  example: exercitationem
+                  example: ut
                   nullable: true
               required:
                 - name
@@ -2846,7 +2846,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the supplier.'
-        example: velit
+        example: voluptas
         required: true
         schema:
           type: string
@@ -2897,57 +2897,57 @@ paths:
                 code:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: bxyhafvorskrttolxeyyo
+                  example: hhlqkckgsekmyrhssyfvyyrna
                   nullable: false
                 name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: zcxmyzojxrhpe
+                  description: '客户编码（唯一）. Must not be greater than 255 characters.'
+                  example: uzylglos
                   nullable: false
                 contact_person:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: kvsyvprbsbo
+                  description: '客户名称. Must not be greater than 255 characters.'
+                  example: ioiqbxzrppbp
                   nullable: true
                 contact_phone:
                   type: string
-                  description: 'Must not be greater than 20 characters.'
-                  example: shfxxmwtkmowehpw
+                  description: '联系人. Must not be greater than 20 characters.'
+                  example: ygknjdpk
                   nullable: true
                 email:
                   type: string
-                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
-                  example: cassidy19@example.org
+                  description: '联系电话. Must be a valid email address. Must not be greater than 255 characters.'
+                  example: lwilkinson@example.com
                   nullable: true
                 region_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the regions table.'
+                  description: '邮箱. The <code>id</code> of an existing record in the regions table.'
                   example: null
                   nullable: true
                 address:
                   type: string
-                  description: 'Must not be greater than 500 characters.'
-                  example: d
+                  description: '所属区域. Must not be greater than 500 characters.'
+                  example: ooewgwrtvyien
                   nullable: true
                 tax_number:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: ujtvdizv
+                  description: '地址. Must not be greater than 255 characters.'
+                  example: mylqnidhxguaunnsqyopknhnx
                   nullable: true
                 bank_name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: dgfxpzomlffxegdtv
+                  description: '税号. Must not be greater than 255 characters.'
+                  example: ntfrxjlfr
                   nullable: true
                 bank_account:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: wyvheucq
+                  description: '开户行. Must not be greater than 255 characters.'
+                  example: madbmjvgcmiwlfygqufj
                   nullable: true
                 rating:
                   type: string
-                  description: ''
-                  example: A
+                  description: 银行账号.
+                  example: B
                   nullable: false
                   enum:
                     - A
@@ -2956,23 +2956,23 @@ paths:
                     - D
                 credit_limit:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 62
+                  description: '客户评级. Must be at least 0.'
+                  example: 34
                   nullable: true
                 payment_days:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 33
+                  description: '信用额度. Must be at least 0.'
+                  example: 62
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
-                  example: true
+                  description: 账期天数.
+                  example: false
                   nullable: false
                 remark:
                   type: string
-                  description: ''
-                  example: dolorem
+                  description: 是否激活.
+                  example: excepturi
                   nullable: true
               required:
                 - code
@@ -3029,22 +3029,22 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: cvcsikua
+                  example: ztcshokiimyomokiayznhcgx
                   nullable: false
                 contact_person:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: hzsczyyofwzdslbzd
+                  example: kopqoprqymqaaere
                   nullable: true
                 contact_phone:
                   type: string
                   description: 'Must not be greater than 20 characters.'
-                  example: shesoecnbyqrsgucx
+                  example: ezqpxuluixwlzjjdhos
                   nullable: true
                 email:
                   type: string
                   description: 'Must be a valid email address. Must not be greater than 255 characters.'
-                  example: phagenes@example.com
+                  example: mlarkin@example.org
                   nullable: true
                 region_id:
                   type: string
@@ -3054,27 +3054,27 @@ paths:
                 address:
                   type: string
                   description: 'Must not be greater than 500 characters.'
-                  example: nlbnzpqzflrmfpgzlziqxs
+                  example: wmcdfc
                   nullable: true
                 tax_number:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: uuunfrpmbgsnk
+                  example: vmxziidkvl
                   nullable: true
                 bank_name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: ivxlycpmfqiayedsgrs
+                  example: pos
                   nullable: true
                 bank_account:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: dkbvbkiwut
+                  example: kgioxncrvvywzhkaclbtk
                   nullable: true
                 rating:
                   type: string
                   description: ''
-                  example: D
+                  example: C
                   nullable: false
                   enum:
                     - A
@@ -3084,22 +3084,22 @@ paths:
                 credit_limit:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 53
+                  example: 10
                   nullable: true
                 payment_days:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 58
+                  example: 67
                   nullable: true
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
                 remark:
                   type: string
                   description: ''
-                  example: fuga
+                  example: magnam
                   nullable: true
               required:
                 - name
@@ -3116,7 +3116,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the customer.'
-        example: in
+        example: inventore
         required: true
         schema:
           type: string
@@ -3167,41 +3167,41 @@ paths:
                 supplier_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the suppliers table.'
-                  example: saepe
+                  example: laboriosam
                   nullable: false
                 warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: quia
+                  description: '供应商ID（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: possimus
                   nullable: false
                 order_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '仓库ID（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 expected_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '订单日期（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: true
                 currency_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the currencies table.'
+                  description: '预计到货日期. The <code>id</code> of an existing record in the currencies table.'
                   example: null
                   nullable: true
                 discount_amount:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 2
+                  description: '币种ID. Must be at least 0.'
+                  example: 87
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: eligendi
+                  description: 折扣金额.
+                  example: accusamus
                   nullable: true
                 items:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '备注. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -3209,33 +3209,33 @@ paths:
                     properties:
                       product_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the products table.'
-                        example: molestiae
+                        description: '订单明细（至少一条）. The <code>id</code> of an existing record in the products table.'
+                        example: eius
                         nullable: false
                       quantity:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 17
+                        description: '产品ID. Must be at least 1.'
+                        example: 54
                         nullable: false
                       unit_price:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 90
+                        description: '数量. Must be at least 0.'
+                        example: 54
                         nullable: false
                       tax_rate:
                         type: number
-                        description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 12
+                        description: '单价. Must be at least 0. Must not be greater than 100.'
+                        example: 1
                         nullable: true
                       discount_rate:
                         type: number
-                        description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 23
+                        description: '税率. Must be at least 0. Must not be greater than 100.'
+                        example: 18
                         nullable: true
                       remark:
                         type: string
-                        description: ''
-                        example: praesentium
+                        description: 折扣率.
+                        example: sed
                         nullable: true
                     required:
                       - product_id
@@ -3293,22 +3293,22 @@ paths:
                 supplier_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the suppliers table.'
-                  example: sint
+                  example: sunt
                   nullable: false
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: eligendi
+                  example: tempora
                   nullable: false
                 order_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 expected_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: true
                 currency_id:
                   type: string
@@ -3318,12 +3318,12 @@ paths:
                 discount_amount:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 45
+                  example: 69
                   nullable: true
                 remark:
                   type: string
                   description: ''
-                  example: voluptatem
+                  example: beatae
                   nullable: true
                 items:
                   type: array
@@ -3336,32 +3336,32 @@ paths:
                       product_id:
                         type: string
                         description: 'The <code>id</code> of an existing record in the products table.'
-                        example: et
+                        example: nam
                         nullable: false
                       quantity:
                         type: integer
                         description: 'Must be at least 1.'
-                        example: 47
+                        example: 25
                         nullable: false
                       unit_price:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 27
+                        example: 36
                         nullable: false
                       tax_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 22
+                        example: 8
                         nullable: true
                       discount_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 23
+                        example: 13
                         nullable: true
                       remark:
                         type: string
                         description: ''
-                        example: et
+                        example: voluptates
                         nullable: true
                     required:
                       - product_id
@@ -3385,7 +3385,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase order.'
-        example: odit
+        example: qui
         required: true
         schema:
           type: string
@@ -3403,7 +3403,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase order.'
-        example: a
+        example: corrupti
         required: true
         schema:
           type: string
@@ -3433,13 +3433,13 @@ paths:
                     properties:
                       item_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the purchase_order_items table.'
-                        example: nisi
+                        description: '收货明细（至少一条）. The <code>id</code> of an existing record in the purchase_order_items table.'
+                        example: sint
                         nullable: false
                       quantity:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 32
+                        description: '订单明细ID. Must be at least 1.'
+                        example: 37
                         nullable: false
                     required:
                       - item_id
@@ -3451,7 +3451,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase order.'
-        example: vel
+        example: aspernatur
         required: true
         schema:
           type: string
@@ -3469,7 +3469,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase order.'
-        example: aut
+        example: similique
         required: true
         schema:
           type: string
@@ -3524,32 +3524,32 @@ paths:
                   nullable: true
                 supplier_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the suppliers table.'
-                  example: maxime
+                  description: '关联采购订单ID（可选）. The <code>id</code> of an existing record in the suppliers table.'
+                  example: qui
                   nullable: false
                 warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: dolorem
+                  description: '供应商ID（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: est
                   nullable: false
                 return_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '仓库ID（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 currency_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the currencies table.'
+                  description: '退货日期（必填）. The <code>id</code> of an existing record in the currencies table.'
                   example: null
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: dolorem
+                  description: 币种ID.
+                  example: magnam
                   nullable: true
                 items:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '备注. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -3557,28 +3557,28 @@ paths:
                     properties:
                       product_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the products table.'
-                        example: magni
+                        description: '退货明细（至少一条）. The <code>id</code> of an existing record in the products table.'
+                        example: voluptatem
                         nullable: false
                       quantity:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 25
+                        description: '产品ID. Must be at least 1.'
+                        example: 37
                         nullable: false
                       unit_price:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 57
+                        description: '退货数量. Must be at least 0.'
+                        example: 51
                         nullable: false
                       tax_rate:
                         type: number
-                        description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 25
+                        description: '单价. Must be at least 0. Must not be greater than 100.'
+                        example: 4
                         nullable: true
                       remark:
                         type: string
-                        description: ''
-                        example: necessitatibus
+                        description: 税率.
+                        example: ut
                         nullable: true
                     required:
                       - product_id
@@ -3623,7 +3623,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase return.'
-        example: eum
+        example: vitae
         required: true
         schema:
           type: string
@@ -3641,7 +3641,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase return.'
-        example: vero
+        example: soluta
         required: true
         schema:
           type: string
@@ -3692,26 +3692,26 @@ paths:
                 supplier_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the suppliers table.'
-                  example: non
+                  example: perferendis
                   nullable: false
                 settlement_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '供应商ID（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 currency_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the currencies table.'
+                  description: '结算日期（必填）. The <code>id</code> of an existing record in the currencies table.'
                   example: null
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: non
+                  description: 币种ID.
+                  example: possimus
                   nullable: true
                 items:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '备注. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -3719,21 +3719,21 @@ paths:
                     properties:
                       reference_type:
                         type: string
-                        description: ''
-                        example: purchase_order
+                        description: 结算明细（至少一条）.
+                        example: purchase_return
                         nullable: false
                         enum:
                           - purchase_order
                           - purchase_return
                       reference_id:
                         type: integer
-                        description: ''
-                        example: 7
+                        description: 关联类型.
+                        example: 3
                         nullable: false
                       remark:
                         type: string
-                        description: ''
-                        example: possimus
+                        description: 关联单据ID.
+                        example: enim
                         nullable: true
                     required:
                       - reference_type
@@ -3776,7 +3776,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase settlement.'
-        example: consequatur
+        example: quasi
         required: true
         schema:
           type: string
@@ -3794,7 +3794,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase settlement.'
-        example: vero
+        example: aliquam
         required: true
         schema:
           type: string
@@ -3817,7 +3817,7 @@ paths:
                 paid_amount:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 17
+                  example: 67
                   nullable: false
               required:
                 - paid_amount
@@ -3826,7 +3826,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase settlement.'
-        example: et
+        example: quia
         required: true
         schema:
           type: string
@@ -3877,22 +3877,22 @@ paths:
                 customer_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the customers table.'
-                  example: qui
+                  example: omnis
                   nullable: false
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: eligendi
+                  example: iusto
                   nullable: false
                 order_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 delivery_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: true
                 currency_id:
                   type: string
@@ -3907,7 +3907,7 @@ paths:
                 remark:
                   type: string
                   description: ''
-                  example: ut
+                  example: corrupti
                   nullable: true
                 items:
                   type: array
@@ -3920,32 +3920,32 @@ paths:
                       product_id:
                         type: string
                         description: 'The <code>id</code> of an existing record in the products table.'
-                        example: et
+                        example: est
                         nullable: false
                       quantity:
                         type: integer
                         description: 'Must be at least 1.'
-                        example: 83
+                        example: 36
                         nullable: false
                       unit_price:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 70
+                        example: 71
                         nullable: false
                       tax_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 11
+                        example: 20
                         nullable: true
                       discount_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 23
+                        example: 11
                         nullable: true
                       remark:
                         type: string
                         description: ''
-                        example: inventore
+                        example: omnis
                         nullable: true
                     required:
                       - product_id
@@ -4003,22 +4003,22 @@ paths:
                 customer_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the customers table.'
-                  example: ratione
+                  example: consectetur
                   nullable: false
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: consequatur
+                  example: velit
                   nullable: false
                 order_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 delivery_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: true
                 currency_id:
                   type: string
@@ -4028,12 +4028,12 @@ paths:
                 discount_amount:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 24
+                  example: 5
                   nullable: true
                 remark:
                   type: string
                   description: ''
-                  example: quod
+                  example: qui
                   nullable: true
                 items:
                   type: array
@@ -4046,32 +4046,32 @@ paths:
                       product_id:
                         type: string
                         description: 'The <code>id</code> of an existing record in the products table.'
-                        example: voluptatem
+                        example: quia
                         nullable: false
                       quantity:
                         type: integer
                         description: 'Must be at least 1.'
-                        example: 78
+                        example: 47
                         nullable: false
                       unit_price:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 22
+                        example: 71
                         nullable: false
                       tax_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 3
+                        example: 10
                         nullable: true
                       discount_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 3
+                        example: 17
                         nullable: true
                       remark:
                         type: string
                         description: ''
-                        example: eaque
+                        example: aut
                         nullable: true
                     required:
                       - product_id
@@ -4095,7 +4095,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales order.'
-        example: vel
+        example: perferendis
         required: true
         schema:
           type: string
@@ -4113,7 +4113,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales order.'
-        example: omnis
+        example: cupiditate
         required: true
         schema:
           type: string
@@ -4144,12 +4144,12 @@ paths:
                       item_id:
                         type: string
                         description: 'The <code>id</code> of an existing record in the sales_order_items table.'
-                        example: molestiae
+                        example: aut
                         nullable: false
                       quantity:
                         type: integer
                         description: 'Must be at least 1.'
-                        example: 43
+                        example: 64
                         nullable: false
                     required:
                       - item_id
@@ -4161,7 +4161,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales order.'
-        example: tenetur
+        example: non
         required: true
         schema:
           type: string
@@ -4179,7 +4179,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales order.'
-        example: id
+        example: repellat
         required: true
         schema:
           type: string
@@ -4235,17 +4235,17 @@ paths:
                 customer_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the customers table.'
-                  example: accusamus
+                  example: provident
                   nullable: false
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: saepe
+                  example: culpa
                   nullable: false
                 return_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 currency_id:
                   type: string
@@ -4255,7 +4255,7 @@ paths:
                 remark:
                   type: string
                   description: ''
-                  example: velit
+                  example: sit
                   nullable: true
                 items:
                   type: array
@@ -4268,27 +4268,27 @@ paths:
                       product_id:
                         type: string
                         description: 'The <code>id</code> of an existing record in the products table.'
-                        example: modi
+                        example: quibusdam
                         nullable: false
                       quantity:
                         type: integer
                         description: 'Must be at least 1.'
-                        example: 72
+                        example: 85
                         nullable: false
                       unit_price:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 62
+                        example: 14
                         nullable: false
                       tax_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 7
+                        example: 4
                         nullable: true
                       remark:
                         type: string
                         description: ''
-                        example: dolor
+                        example: qui
                         nullable: true
                     required:
                       - product_id
@@ -4333,7 +4333,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales return.'
-        example: non
+        example: eum
         required: true
         schema:
           type: string
@@ -4351,7 +4351,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales return.'
-        example: perferendis
+        example: quia
         required: true
         schema:
           type: string
@@ -4402,26 +4402,26 @@ paths:
                 customer_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the customers table.'
-                  example: voluptatem
+                  example: dolorem
                   nullable: false
                 settlement_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '客户ID（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 currency_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the currencies table.'
+                  description: '结算日期（必填）. The <code>id</code> of an existing record in the currencies table.'
                   example: null
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: enim
+                  description: 币种ID（可选）.
+                  example: minima
                   nullable: true
                 items:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '备注（可选）. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -4429,21 +4429,21 @@ paths:
                     properties:
                       reference_type:
                         type: string
-                        description: ''
-                        example: sales_return
+                        description: 结算明细（至少一条）.
+                        example: sales_order
                         nullable: false
                         enum:
                           - sales_order
                           - sales_return
                       reference_id:
                         type: integer
-                        description: ''
-                        example: 20
+                        description: 关联类型：销售订单或销售退货.
+                        example: 11
                         nullable: false
                       remark:
                         type: string
-                        description: ''
-                        example: assumenda
+                        description: 关联单据ID.
+                        example: saepe
                         nullable: true
                     required:
                       - reference_type
@@ -4486,7 +4486,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales settlement.'
-        example: quia
+        example: asperiores
         required: true
         schema:
           type: string
@@ -4504,7 +4504,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales settlement.'
-        example: voluptas
+        example: ut
         required: true
         schema:
           type: string
@@ -4527,7 +4527,7 @@ paths:
                 received_amount:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 12
+                  example: 10
                   nullable: false
               required:
                 - received_amount
@@ -4536,7 +4536,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales settlement.'
-        example: est
+        example: beatae
         required: true
         schema:
           type: string
@@ -4587,41 +4587,41 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: quod
+                  example: est
                   nullable: false
                 version:
                   type: string
-                  description: 'Must not be greater than 50 characters.'
-                  example: tccxp
+                  description: '产品ID（必填）. Must not be greater than 50 characters.'
+                  example: uaudtgafiqtzzsfgkbj
                   nullable: false
                 effective_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '版本号（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 expiry_date:
                   type: string
-                  description: 'Must be a valid date. Must be a date after <code>effective_date</code>.'
-                  example: '2109-08-22'
+                  description: '生效日期（必填）. Must be a valid date. Must be a date after <code>effective_date</code>.'
+                  example: '2089-12-29'
                   nullable: true
                 is_default:
                   type: boolean
-                  description: ''
-                  example: true
+                  description: 失效日期.
+                  example: false
                   nullable: false
                 is_active:
                   type: boolean
-                  description: ''
+                  description: 是否默认版本.
                   example: true
                   nullable: false
                 description:
                   type: string
-                  description: ''
-                  example: 'Enim repudiandae consequuntur consequatur fugiat.'
+                  description: 是否激活.
+                  example: 'Aspernatur sunt voluptas repellat.'
                   nullable: true
                 items:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '描述. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -4629,38 +4629,38 @@ paths:
                     properties:
                       component_product_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the products table.'
-                        example: ducimus
+                        description: '组件明细（至少一条）. The <code>id</code> of an existing record in the products table.'
+                        example: ea
                         nullable: false
                       quantity:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 51
+                        description: '组件产品ID. Must be at least 0.'
+                        example: 46
                         nullable: false
                       unit_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the units table.'
+                        description: '用量. The <code>id</code> of an existing record in the units table.'
                         example: null
                         nullable: true
                       loss_rate:
                         type: number
-                        description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 4
+                        description: '单位. Must be at least 0. Must not be greater than 100.'
+                        example: 9
                         nullable: true
                       sequence:
                         type: integer
-                        description: 'Must be at least 0.'
-                        example: 84
+                        description: '损耗率. Must be at least 0.'
+                        example: 28
                         nullable: true
                       position:
                         type: string
-                        description: 'Must not be greater than 100 characters.'
-                        example: ztcjzsdxyrst
+                        description: '序号. Must not be greater than 100 characters.'
+                        example: trxcgyattpy
                         nullable: true
                       remark:
                         type: string
-                        description: ''
-                        example: eos
+                        description: 位置.
+                        example: enim
                         nullable: true
                     required:
                       - component_product_id
@@ -4717,17 +4717,17 @@ paths:
                 version:
                   type: string
                   description: 'Must not be greater than 50 characters.'
-                  example: nowwvncylcfbuyfs
+                  example: rtmippunirbnzpindg
                   nullable: false
                 effective_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 expiry_date:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>effective_date</code>.'
-                  example: '2099-05-13'
+                  example: '2065-05-01'
                   nullable: true
                 is_default:
                   type: boolean
@@ -4742,7 +4742,7 @@ paths:
                 description:
                   type: string
                   description: ''
-                  example: 'Explicabo voluptatibus pariatur et.'
+                  example: 'Pariatur amet numquam nobis dicta molestiae consectetur.'
                   nullable: true
                 items:
                   type: array
@@ -4755,12 +4755,12 @@ paths:
                       component_product_id:
                         type: string
                         description: 'The <code>id</code> of an existing record in the products table.'
-                        example: eligendi
+                        example: assumenda
                         nullable: false
                       quantity:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 20
+                        example: 57
                         nullable: false
                       unit_id:
                         type: string
@@ -4770,22 +4770,22 @@ paths:
                       loss_rate:
                         type: number
                         description: 'Must be at least 0. Must not be greater than 100.'
-                        example: 1
+                        example: 15
                         nullable: true
                       sequence:
                         type: integer
                         description: 'Must be at least 0.'
-                        example: 18
+                        example: 60
                         nullable: true
                       position:
                         type: string
                         description: 'Must not be greater than 100 characters.'
-                        example: rizxpfjf
+                        example: blwgrxtnaar
                         nullable: true
                       remark:
                         type: string
                         description: ''
-                        example: earum
+                        example: omnis
                         nullable: true
                     required:
                       - component_product_id
@@ -4807,7 +4807,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the bom.'
-        example: repellat
+        example: repellendus
         required: true
         schema:
           type: string
@@ -4825,7 +4825,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the bom.'
-        example: nihil
+        example: sint
         required: true
         schema:
           type: string
@@ -4843,7 +4843,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the bom.'
-        example: omnis
+        example: delectus
         required: true
         schema:
           type: string
@@ -4894,41 +4894,41 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: assumenda
+                  example: velit
                   nullable: false
                 version:
                   type: string
-                  description: 'Must not be greater than 50 characters.'
-                  example: svvcsfwpydpvuxmredlmlc
+                  description: '产品ID（必填）. Must not be greater than 50 characters.'
+                  example: hqlckbhwkuyvczadqhwqk
                   nullable: false
                 effective_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '版本号（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 expiry_date:
                   type: string
-                  description: 'Must be a valid date. Must be a date after <code>effective_date</code>.'
-                  example: '2059-08-03'
+                  description: '生效日期（必填）. Must be a valid date. Must be a date after <code>effective_date</code>.'
+                  example: '2080-12-09'
                   nullable: true
                 is_default:
                   type: boolean
-                  description: ''
+                  description: 失效日期.
                   example: true
                   nullable: false
                 is_active:
                   type: boolean
-                  description: ''
-                  example: false
+                  description: 是否默认版本.
+                  example: true
                   nullable: false
                 description:
                   type: string
-                  description: ''
-                  example: 'Repellendus quam vel animi provident voluptas.'
+                  description: 是否激活.
+                  example: 'Et dolore et aliquid est mollitia eaque mollitia sed.'
                   nullable: true
                 steps:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '描述. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -4936,53 +4936,53 @@ paths:
                     properties:
                       step_name:
                         type: string
-                        description: 'Must not be greater than 255 characters.'
-                        example: obdnkuzuxzoeixmwygblai
+                        description: '工序步骤（至少一个）. Must not be greater than 255 characters.'
+                        example: qvvbvixspayzjudo
                         nullable: false
                       step_code:
                         type: string
-                        description: 'Must not be greater than 100 characters.'
-                        example: duyhngl
+                        description: '工序名称. Must not be greater than 100 characters.'
+                        example: mmgwnehcej
                         nullable: true
                       sequence:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 19
+                        description: '工序编码. Must be at least 1.'
+                        example: 32
                         nullable: false
                       work_center:
                         type: string
-                        description: 'Must not be greater than 100 characters.'
-                        example: jehxv
+                        description: '工序顺序. Must not be greater than 100 characters.'
+                        example: qqvphos
                         nullable: true
                       standard_time:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 48
+                        description: '工作中心. Must be at least 0.'
+                        example: 68
                         nullable: true
                       setup_time:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 0
+                        description: '标准工时. Must be at least 0.'
+                        example: 48
                         nullable: true
                       queue_time:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 87
+                        description: '准备时间. Must be at least 0.'
+                        example: 76
                         nullable: true
                       move_time:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 59
+                        description: '排队时间. Must be at least 0.'
+                        example: 15
                         nullable: true
                       description:
                         type: string
-                        description: ''
-                        example: 'Modi in error dolorem facere omnis autem magni.'
+                        description: 转移时间.
+                        example: 'Sunt aut iure reprehenderit voluptatem sit consectetur sunt magni.'
                         nullable: true
                       remark:
                         type: string
-                        description: ''
-                        example: alias
+                        description: 工序描述.
+                        example: labore
                         nullable: true
                     required:
                       - step_name
@@ -5039,32 +5039,32 @@ paths:
                 version:
                   type: string
                   description: 'Must not be greater than 50 characters.'
-                  example: q
+                  example: hprekvubqvmzukvouj
                   nullable: false
                 effective_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 expiry_date:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>effective_date</code>.'
-                  example: '2047-09-29'
+                  example: '2100-11-13'
                   nullable: true
                 is_default:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
                 is_active:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                   nullable: false
                 description:
                   type: string
                   description: ''
-                  example: 'Rerum dolor iure voluptate porro magni qui.'
+                  example: 'Aut quos fugit illum quidem aliquam culpa.'
                   nullable: true
                 steps:
                   type: array
@@ -5077,52 +5077,52 @@ paths:
                       step_name:
                         type: string
                         description: 'Must not be greater than 255 characters.'
-                        example: nbeufjcbkn
+                        example: jadirobhozeafhlxxuxeala
                         nullable: false
                       step_code:
                         type: string
                         description: 'Must not be greater than 100 characters.'
-                        example: kdigk
+                        example: wehwaxtgoygqol
                         nullable: true
                       sequence:
                         type: integer
                         description: 'Must be at least 1.'
-                        example: 80
+                        example: 47
                         nullable: false
                       work_center:
                         type: string
                         description: 'Must not be greater than 100 characters.'
-                        example: fhlrawpfqpfhcihmgyfdgea
+                        example: romiezphvzwgcoxaqb
                         nullable: true
                       standard_time:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 29
+                        example: 8
                         nullable: true
                       setup_time:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 81
+                        example: 53
                         nullable: true
                       queue_time:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 59
+                        example: 51
                         nullable: true
                       move_time:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 0
+                        example: 19
                         nullable: true
                       description:
                         type: string
                         description: ''
-                        example: 'Dolorem omnis cupiditate aut rerum saepe rem.'
+                        example: 'Sunt occaecati sint expedita.'
                         nullable: true
                       remark:
                         type: string
                         description: ''
-                        example: omnis
+                        example: culpa
                         nullable: true
                     required:
                       - step_name
@@ -5144,7 +5144,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the process route.'
-        example: neque
+        example: id
         required: true
         schema:
           type: string
@@ -5162,7 +5162,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the process route.'
-        example: corporis
+        example: est
         required: true
         schema:
           type: string
@@ -5180,7 +5180,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the process route.'
-        example: ipsam
+        example: corrupti
         required: true
         schema:
           type: string
@@ -5235,32 +5235,32 @@ paths:
                   nullable: true
                 plan_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '关联销售订单. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 start_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '计划日期（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 end_date:
                   type: string
-                  description: 'Must be a valid date. Must be a date after <code>start_date</code>.'
-                  example: '2026-09-25'
+                  description: '开始日期（必填）. Must be a valid date. Must be a date after <code>start_date</code>.'
+                  example: '2091-03-27'
                   nullable: false
                 warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: est
+                  description: '结束日期（必填）. The <code>id</code> of an existing record in the warehouses table.'
+                  example: dolorem
                   nullable: false
                 remark:
                   type: string
-                  description: ''
-                  example: vel
+                  description: 仓库（必填）.
+                  example: illum
                   nullable: true
                 items:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '备注. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -5268,43 +5268,43 @@ paths:
                     properties:
                       product_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the products table.'
-                        example: in
+                        description: '明细项（必填）. The <code>id</code> of an existing record in the products table.'
+                        example: blanditiis
                         nullable: false
                       bom_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the boms table.'
+                        description: '产品ID. The <code>id</code> of an existing record in the boms table.'
                         example: null
                         nullable: true
                       process_route_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the process_routes table.'
+                        description: 'BOM ID. The <code>id</code> of an existing record in the process_routes table.'
                         example: null
                         nullable: true
                       planned_quantity:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 88
+                        description: '工艺路线ID. Must be at least 1.'
+                        example: 79
                         nullable: false
                       planned_start_date:
                         type: string
-                        description: 'Must be a valid date.'
-                        example: '2025-12-24T06:40:50'
+                        description: '计划数量. Must be a valid date.'
+                        example: '2025-12-24T08:09:21'
                         nullable: false
                       planned_end_date:
                         type: string
-                        description: 'Must be a valid date. Must be a date after <code>items.*.planned_start_date</code>.'
-                        example: '2051-09-10'
+                        description: '计划开始日期. Must be a valid date. Must be a date after <code>items.*.planned_start_date</code>.'
+                        example: '2094-06-24'
                         nullable: false
                       priority:
                         type: integer
-                        description: 'Must be at least 0.'
-                        example: 32
+                        description: '计划结束日期. Must be at least 0.'
+                        example: 29
                         nullable: true
                       remark:
                         type: string
-                        description: ''
-                        example: quo
+                        description: 优先级.
+                        example: necessitatibus
                         nullable: true
                     required:
                       - product_id
@@ -5369,27 +5369,27 @@ paths:
                 plan_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 start_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 end_date:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>start_date</code>.'
-                  example: '2032-01-30'
+                  example: '2108-06-20'
                   nullable: false
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: similique
+                  example: officiis
                   nullable: false
                 remark:
                   type: string
                   description: ''
-                  example: delectus
+                  example: numquam
                   nullable: true
               required:
                 - plan_date
@@ -5409,7 +5409,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the production plan.'
-        example: quae
+        example: magni
         required: true
         schema:
           type: string
@@ -5427,7 +5427,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the production plan.'
-        example: velit
+        example: beatae
         required: true
         schema:
           type: string
@@ -5482,53 +5482,53 @@ paths:
                   nullable: true
                 production_plan_item_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the production_plan_items table.'
+                  description: '生产计划ID. The <code>id</code> of an existing record in the production_plan_items table.'
                   example: null
                   nullable: true
                 product_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the products table.'
-                  example: optio
+                  description: '生产计划明细ID. The <code>id</code> of an existing record in the products table.'
+                  example: omnis
                   nullable: false
                 bom_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the boms table.'
+                  description: '产品ID（必填）. The <code>id</code> of an existing record in the boms table.'
                   example: null
                   nullable: true
                 process_route_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the process_routes table.'
+                  description: 'BOM ID. The <code>id</code> of an existing record in the process_routes table.'
                   example: null
                   nullable: true
                 warehouse_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: voluptatem
+                  description: '工艺路线ID. The <code>id</code> of an existing record in the warehouses table.'
+                  example: accusamus
                   nullable: false
                 quantity:
                   type: integer
-                  description: 'Must be at least 1.'
-                  example: 15
+                  description: '仓库ID（必填）. Must be at least 1.'
+                  example: 33
                   nullable: false
                 start_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '生产数量（必填）. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 planned_end_date:
                   type: string
-                  description: 'Must be a valid date. Must be a date after <code>start_date</code>.'
-                  example: '2085-09-13'
+                  description: '开始日期（必填）. Must be a valid date. Must be a date after <code>start_date</code>.'
+                  example: '2034-06-26'
                   nullable: false
                 assigned_to:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the users table.'
+                  description: '计划结束日期. The <code>id</code> of an existing record in the users table.'
                   example: null
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: voluptates
+                  description: 分配人.
+                  example: rerum
                   nullable: true
               required:
                 - product_id
@@ -5583,7 +5583,7 @@ paths:
                 product_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the products table.'
-                  example: dolores
+                  example: placeat
                   nullable: false
                 bom_id:
                   type: string
@@ -5598,22 +5598,22 @@ paths:
                 warehouse_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: officia
+                  example: repudiandae
                   nullable: false
                 quantity:
                   type: integer
                   description: 'Must be at least 1.'
-                  example: 18
+                  example: 24
                   nullable: false
                 start_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 planned_end_date:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>start_date</code>.'
-                  example: '2047-05-27'
+                  example: '2092-08-15'
                   nullable: false
                 assigned_to:
                   type: string
@@ -5623,7 +5623,7 @@ paths:
                 remark:
                   type: string
                   description: ''
-                  example: amet
+                  example: deleniti
                   nullable: true
               required:
                 - product_id
@@ -5644,7 +5644,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the work order.'
-        example: aut
+        example: quas
         required: true
         schema:
           type: string
@@ -5662,7 +5662,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the work order.'
-        example: ut
+        example: est
         required: true
         schema:
           type: string
@@ -5692,17 +5692,17 @@ paths:
                     properties:
                       product_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the products table.'
-                        example: officia
+                        description: '领料明细（至少一条）. The <code>id</code> of an existing record in the products table.'
+                        example: omnis
                         nullable: false
                       quantity:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 66
+                        description: '产品ID. Must be at least 1.'
+                        example: 20
                         nullable: false
                       location_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                        description: '领料数量. The <code>id</code> of an existing record in the warehouse_locations table.'
                         example: null
                         nullable: true
                     required:
@@ -5715,7 +5715,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the work order.'
-        example: vitae
+        example: voluptatem
         required: true
         schema:
           type: string
@@ -5745,17 +5745,17 @@ paths:
                     properties:
                       product_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the products table.'
-                        example: libero
+                        description: '退料明细（至少一条）. The <code>id</code> of an existing record in the products table.'
+                        example: quasi
                         nullable: false
                       quantity:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 51
+                        description: '产品ID. Must be at least 1.'
+                        example: 83
                         nullable: false
                       location_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the warehouse_locations table.'
+                        description: '退料数量. The <code>id</code> of an existing record in the warehouse_locations table.'
                         example: null
                         nullable: true
                     required:
@@ -5768,7 +5768,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the work order.'
-        example: eaque
+        example: ab
         required: true
         schema:
           type: string
@@ -5786,7 +5786,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the work order.'
-        example: nesciunt
+        example: est
         required: true
         schema:
           type: string
@@ -5824,7 +5824,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the work order.'
-        example: quos
+        example: saepe
         required: true
         schema:
           type: string
@@ -5862,7 +5862,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the work order.'
-        example: magni
+        example: voluptatem
         required: true
         schema:
           type: string
@@ -5929,7 +5929,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the production material issue.'
-        example: qui
+        example: deleniti
         required: true
         schema:
           type: string
@@ -5980,47 +5980,47 @@ paths:
                 work_order_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the work_orders table.'
-                  example: quod
+                  example: dignissimos
                   nullable: false
                 work_order_item_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the work_order_items table.'
+                  description: '工单ID（必填）. The <code>id</code> of an existing record in the work_order_items table.'
                   example: null
                   nullable: true
                 report_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '工单明细ID. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 quantity:
                   type: integer
-                  description: 'Must be at least 1.'
-                  example: 80
+                  description: '报工日期（必填）. Must be at least 1.'
+                  example: 9
                   nullable: false
                 qualified_quantity:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 24
+                  description: '报工数量（必填）. Must be at least 0.'
+                  example: 18
                   nullable: true
                 defective_quantity:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 57
+                  description: '合格数量. Must be at least 0.'
+                  example: 44
                   nullable: true
                 work_hours:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 33
+                  description: '不合格数量. Must be at least 0.'
+                  example: 47
                   nullable: true
                 overtime_hours:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 89
+                  description: '工时. Must be at least 0.'
+                  example: 25
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: soluta
+                  description: 加班工时.
+                  example: odio
                   nullable: true
               required:
                 - work_order_id
@@ -6060,7 +6060,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the production report.'
-        example: nisi
+        example: sed
         required: true
         schema:
           type: string
@@ -6111,12 +6111,12 @@ paths:
                 code:
                   type: string
                   description: ''
-                  example: quis
+                  example: repellat
                   nullable: false
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: cpvvmbmgzq
+                  example: wrtkjjejxlsglhkcwgnisda
                   nullable: false
                 parent_id:
                   type: string
@@ -6126,7 +6126,7 @@ paths:
                 type:
                   type: string
                   description: ''
-                  example: revenue
+                  example: expense
                   nullable: false
                   enum:
                     - asset
@@ -6137,7 +6137,7 @@ paths:
                 category:
                   type: string
                   description: ''
-                  example: molestias
+                  example: quos
                   nullable: false
                 is_detail:
                   type: boolean
@@ -6147,22 +6147,22 @@ paths:
                 level:
                   type: integer
                   description: 'Must be at least 1.'
-                  example: 43
+                  example: 70
                   nullable: false
                 order:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 70
+                  example: 12
                   nullable: false
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
                 remark:
                   type: string
                   description: ''
-                  example: in
+                  example: voluptates
                   nullable: true
               required:
                 - code
@@ -6221,7 +6221,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: r
+                  example: nsmfy
                   nullable: false
                 parent_id:
                   type: string
@@ -6231,7 +6231,7 @@ paths:
                 type:
                   type: string
                   description: ''
-                  example: liability
+                  example: asset
                   nullable: false
                   enum:
                     - asset
@@ -6242,7 +6242,7 @@ paths:
                 category:
                   type: string
                   description: ''
-                  example: repellendus
+                  example: molestiae
                   nullable: false
                 is_detail:
                   type: boolean
@@ -6252,7 +6252,7 @@ paths:
                 order:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 77
+                  example: 44
                   nullable: false
                 is_active:
                   type: boolean
@@ -6262,7 +6262,7 @@ paths:
                 remark:
                   type: string
                   description: ''
-                  example: labore
+                  example: et
                   nullable: true
               required:
                 - name
@@ -6281,7 +6281,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the chart of account.'
-        example: optio
+        example: sit
         required: true
         schema:
           type: string
@@ -6332,12 +6332,12 @@ paths:
                 voucher_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 type:
                   type: string
-                  description: ''
-                  example: closing
+                  description: 凭证日期（必填）.
+                  example: adjustment
                   nullable: false
                   enum:
                     - general
@@ -6345,17 +6345,17 @@ paths:
                     - closing
                 attachment_count:
                   type: integer
-                  description: 'Must be at least 0.'
-                  example: 29
+                  description: '凭证类型. Must be at least 0.'
+                  example: 23
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: culpa
+                  description: 附件数量.
+                  example: suscipit
                   nullable: true
                 items:
                   type: array
-                  description: 'Must have at least 2 items.'
+                  description: '备注. Must have at least 2 items.'
                   example:
                     - []
                   items:
@@ -6363,12 +6363,12 @@ paths:
                     properties:
                       account_id:
                         type: string
-                        description: 'The <code>id</code> of an existing record in the chart_of_accounts table.'
-                        example: ut
+                        description: '明细项（至少2条）. The <code>id</code> of an existing record in the chart_of_accounts table.'
+                        example: exercitationem
                         nullable: false
                       direction:
                         type: string
-                        description: ''
+                        description: 科目ID.
                         example: credit
                         nullable: false
                         enum:
@@ -6376,33 +6376,33 @@ paths:
                           - credit
                       amount:
                         type: number
-                        description: 'Must be at least 0.'
-                        example: 5
+                        description: '借贷方向. Must be at least 0.'
+                        example: 3
                         nullable: false
                       summary:
                         type: string
-                        description: ''
-                        example: blanditiis
+                        description: 金额.
+                        example: dolorem
                         nullable: true
                       reference_type:
                         type: string
-                        description: ''
-                        example: aliquam
+                        description: 摘要.
+                        example: aspernatur
                         nullable: true
                       reference_id:
                         type: integer
-                        description: ''
-                        example: 19
+                        description: 关联业务类型.
+                        example: 4
                         nullable: true
                       reference_no:
                         type: string
-                        description: ''
-                        example: at
+                        description: 关联业务ID.
+                        example: ratione
                         nullable: true
                       sequence:
                         type: integer
-                        description: 'Must be at least 0.'
-                        example: 84
+                        description: '关联业务编号. Must be at least 0.'
+                        example: 13
                         nullable: true
                     required:
                       - account_id
@@ -6458,7 +6458,7 @@ paths:
                 voucher_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 type:
                   type: string
@@ -6472,12 +6472,12 @@ paths:
                 attachment_count:
                   type: integer
                   description: 'Must be at least 0.'
-                  example: 74
+                  example: 43
                   nullable: true
                 remark:
                   type: string
                   description: ''
-                  example: nihil
+                  example: dolorem
                   nullable: true
                 items:
                   type: array
@@ -6490,7 +6490,7 @@ paths:
                       account_id:
                         type: string
                         description: 'The <code>id</code> of an existing record in the chart_of_accounts table.'
-                        example: quod
+                        example: qui
                         nullable: false
                       direction:
                         type: string
@@ -6503,32 +6503,32 @@ paths:
                       amount:
                         type: number
                         description: 'Must be at least 0.'
-                        example: 24
+                        example: 4
                         nullable: false
                       summary:
                         type: string
                         description: ''
-                        example: sequi
+                        example: eos
                         nullable: true
                       reference_type:
                         type: string
                         description: ''
-                        example: et
+                        example: quis
                         nullable: true
                       reference_id:
                         type: integer
                         description: ''
-                        example: 12
+                        example: 17
                         nullable: true
                       reference_no:
                         type: string
                         description: ''
-                        example: rem
+                        example: dolor
                         nullable: true
                       sequence:
                         type: integer
                         description: 'Must be at least 0.'
-                        example: 69
+                        example: 54
                         nullable: true
                     required:
                       - account_id
@@ -6550,7 +6550,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the accounting voucher.'
-        example: labore
+        example: facilis
         required: true
         schema:
           type: string
@@ -6568,7 +6568,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the accounting voucher.'
-        example: modi
+        example: facere
         required: true
         schema:
           type: string
@@ -6635,7 +6635,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the account.'
-        example: ipsum
+        example: laboriosam
         required: true
         schema:
           type: string
@@ -6686,52 +6686,52 @@ paths:
                 customer_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the customers table.'
-                  example: nisi
+                  example: velit
                   nullable: false
                 reference_type:
                   type: string
-                  description: ''
-                  example: consequuntur
+                  description: 客户ID（必填）.
+                  example: error
                   nullable: true
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 18
+                  description: 关联业务类型.
+                  example: 9
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: voluptatem
+                  description: 关联业务ID.
+                  example: provident
                   nullable: true
                 invoice_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '关联业务编号. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 due_date:
                   type: string
-                  description: 'Must be a valid date. Must be a date after <code>invoice_date</code>.'
-                  example: '2028-02-09'
+                  description: '发票日期（必填）. Must be a valid date. Must be a date after <code>invoice_date</code>.'
+                  example: '2043-08-19'
                   nullable: false
                 original_amount:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 56
+                  description: '到期日期. Must be at least 0.'
+                  example: 85
                   nullable: false
                 received_amount:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 23
+                  description: '原始金额（必填）. Must be at least 0.'
+                  example: 3
                   nullable: true
                 currency_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the currencies table.'
+                  description: '已收金额. The <code>id</code> of an existing record in the currencies table.'
                   example: null
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: autem
+                  description: 货币ID.
+                  example: alias
                   nullable: true
               required:
                 - customer_id
@@ -6772,7 +6772,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the accounts receivable.'
-        example: a
+        example: beatae
         required: true
         schema:
           type: string
@@ -6795,7 +6795,7 @@ paths:
                 amount:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 4
+                  example: 87
                   nullable: false
               required:
                 - amount
@@ -6804,7 +6804,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the accounts receivable.'
-        example: nisi
+        example: magni
         required: true
         schema:
           type: string
@@ -6884,52 +6884,52 @@ paths:
                 supplier_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the suppliers table.'
-                  example: amet
+                  example: itaque
                   nullable: false
                 reference_type:
                   type: string
-                  description: ''
-                  example: neque
+                  description: 供应商ID（必填）.
+                  example: in
                   nullable: true
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 8
+                  description: 关联业务类型.
+                  example: 5
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: corporis
+                  description: 关联业务ID.
+                  example: at
                   nullable: true
                 invoice_date:
                   type: string
-                  description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  description: '关联业务编号. Must be a valid date.'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 due_date:
                   type: string
-                  description: 'Must be a valid date. Must be a date after <code>invoice_date</code>.'
-                  example: '2106-05-02'
+                  description: '发票日期（必填）. Must be a valid date. Must be a date after <code>invoice_date</code>.'
+                  example: '2028-05-07'
                   nullable: false
                 original_amount:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 84
+                  description: '到期日期. Must be at least 0.'
+                  example: 75
                   nullable: false
                 paid_amount:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 50
+                  description: '原始金额（必填）. Must be at least 0.'
+                  example: 90
                   nullable: true
                 currency_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the currencies table.'
+                  description: '已付金额. The <code>id</code> of an existing record in the currencies table.'
                   example: null
                   nullable: true
                 remark:
                   type: string
-                  description: ''
-                  example: natus
+                  description: 货币ID.
+                  example: sint
                   nullable: true
               required:
                 - supplier_id
@@ -6970,7 +6970,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the accounts payable.'
-        example: saepe
+        example: natus
         required: true
         schema:
           type: string
@@ -6993,7 +6993,7 @@ paths:
                 amount:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 81
+                  example: 79
                   nullable: false
               required:
                 - amount
@@ -7002,7 +7002,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the accounts payable.'
-        example: sint
+        example: eos
         required: true
         schema:
           type: string
@@ -7053,11 +7053,11 @@ paths:
                 allocation_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 cost_type:
                   type: string
-                  description: ''
+                  description: 分配日期.
                   example: material
                   nullable: false
                   enum:
@@ -7066,33 +7066,33 @@ paths:
                     - overhead
                 reference_type:
                   type: string
-                  description: ''
-                  example: odit
+                  description: 成本类型.
+                  example: sunt
                   nullable: true
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 4
+                  description: 关联业务类型.
+                  example: 11
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: dolorum
+                  description: 关联业务ID.
+                  example: dolores
                   nullable: true
                 product_id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the products table.'
+                  description: '关联业务编号. The <code>id</code> of an existing record in the products table.'
                   example: null
                   nullable: true
                 total_amount:
                   type: number
-                  description: 'Must be at least 0.'
-                  example: 27
+                  description: '产品ID. Must be at least 0.'
+                  example: 72
                   nullable: false
                 allocation_method:
                   type: string
-                  description: ''
-                  example: proportion
+                  description: 总金额.
+                  example: direct
                   nullable: false
                   enum:
                     - direct
@@ -7100,8 +7100,8 @@ paths:
                     - quantity
                 remark:
                   type: string
-                  description: ''
-                  example: voluptatem
+                  description: 分配方法.
+                  example: nihil
                   nullable: true
               required:
                 - allocation_date
@@ -7154,7 +7154,7 @@ paths:
                 allocation_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-12-24T06:40:50'
+                  example: '2025-12-24T08:09:21'
                   nullable: false
                 cost_type:
                   type: string
@@ -7168,17 +7168,17 @@ paths:
                 reference_type:
                   type: string
                   description: ''
-                  example: tempore
+                  example: ea
                   nullable: true
                 reference_id:
                   type: integer
                   description: ''
-                  example: 4
+                  example: 17
                   nullable: true
                 reference_no:
                   type: string
                   description: ''
-                  example: debitis
+                  example: quo
                   nullable: true
                 product_id:
                   type: string
@@ -7188,12 +7188,12 @@ paths:
                 total_amount:
                   type: number
                   description: 'Must be at least 0.'
-                  example: 69
+                  example: 86
                   nullable: false
                 allocation_method:
                   type: string
                   description: ''
-                  example: quantity
+                  example: direct
                   nullable: false
                   enum:
                     - direct
@@ -7202,7 +7202,7 @@ paths:
                 remark:
                   type: string
                   description: ''
-                  example: ipsa
+                  example: non
                   nullable: true
     delete:
       summary: 删除成本分配单
@@ -7217,7 +7217,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the cost allocation.'
-        example: est
+        example: earum
         required: true
         schema:
           type: string
@@ -7235,7 +7235,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the cost allocation.'
-        example: est
+        example: corrupti
         required: true
         schema:
           type: string
@@ -7253,7 +7253,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the cost allocation.'
-        example: amet
+        example: qui
         required: true
         schema:
           type: string
@@ -7362,17 +7362,17 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: jjzremshqgvqxyicng
+                  example: wteeuizdyvozacl
                   nullable: false
                 code:
                   type: string
-                  description: ''
-                  example: molestiae
+                  description: 工作流名称（必填）.
+                  example: velit
                   nullable: false
                 type:
                   type: string
-                  description: ''
-                  example: work_order
+                  description: 工作流编码（唯一）.
+                  example: purchase_order
                   nullable: false
                   enum:
                     - purchase_order
@@ -7382,17 +7382,17 @@ paths:
                     - production_plan
                 description:
                   type: string
-                  description: ''
-                  example: 'Aut quaerat inventore quia in atque ducimus cum.'
+                  description: 类型.
+                  example: 'Velit nisi autem qui ex.'
                   nullable: true
                 is_active:
                   type: boolean
-                  description: ''
+                  description: 描述.
                   example: true
                   nullable: false
                 nodes:
                   type: array
-                  description: 'Must have at least 1 items.'
+                  description: '是否激活. Must have at least 1 items.'
                   example:
                     - []
                   items:
@@ -7400,13 +7400,13 @@ paths:
                     properties:
                       node_name:
                         type: string
-                        description: 'Must not be greater than 255 characters.'
-                        example: cji
+                        description: '节点数组（至少一个）. Must not be greater than 255 characters.'
+                        example: urczfcbrh
                         nullable: false
                       node_type:
                         type: string
-                        description: ''
-                        example: end
+                        description: 节点名称.
+                        example: condition
                         nullable: false
                         enum:
                           - start
@@ -7415,12 +7415,12 @@ paths:
                           - end
                       sequence:
                         type: integer
-                        description: 'Must be at least 1.'
-                        example: 14
+                        description: '节点类型. Must be at least 1.'
+                        example: 63
                         nullable: false
                       approval_type:
                         type: string
-                        description: ''
+                        description: 节点顺序.
                         example: any
                         nullable: true
                         enum:
@@ -7429,36 +7429,36 @@ paths:
                           - any
                       approver_config:
                         type: object
-                        description: ''
+                        description: 审批类型.
                         example: null
                         nullable: true
                         properties: {  }
                       condition_config:
                         type: object
-                        description: ''
+                        description: 审批人配置.
                         example: null
                         nullable: true
                         properties: {  }
                       next_nodes:
                         type: object
-                        description: ''
+                        description: 条件配置.
                         example: null
                         nullable: true
                         properties: {  }
                       timeout_hours:
                         type: integer
-                        description: 'Must be at least 0.'
-                        example: 59
+                        description: '下一节点. Must be at least 0.'
+                        example: 70
                         nullable: true
                       is_required:
                         type: boolean
-                        description: ''
-                        example: true
+                        description: 超时时间.
+                        example: false
                         nullable: true
                       remark:
                         type: string
-                        description: ''
-                        example: veniam
+                        description: 是否必须.
+                        example: nemo
                         nullable: true
                     required:
                       - node_name
@@ -7516,7 +7516,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: vbxqychvizbpshyaacr
+                  example: dcgpzelvpwwzcbop
                   nullable: false
                 code:
                   type: string
@@ -7537,12 +7537,12 @@ paths:
                 description:
                   type: string
                   description: ''
-                  example: 'Soluta aut debitis vel et facilis laudantium voluptatem omnis.'
+                  example: 'Magni ea velit aut distinctio et neque error.'
                   nullable: true
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
               required:
                 - name
@@ -7560,7 +7560,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the workflow.'
-        example: a
+        example: tempora
         required: true
         schema:
           type: string
@@ -7611,22 +7611,22 @@ paths:
                 workflow_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the workflows table.'
-                  example: aperiam
+                  example: aut
                   nullable: false
                 reference_type:
                   type: string
-                  description: ''
-                  example: corrupti
+                  description: 工作流ID（必填）.
+                  example: cum
                   nullable: false
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 6
+                  description: '关联业务类型（如 purchase_order）.'
+                  example: 8
                   nullable: false
                 reference_no:
                   type: string
-                  description: ''
-                  example: commodi
+                  description: 关联业务ID.
+                  example: fuga
                   nullable: true
               required:
                 - workflow_id
@@ -7666,7 +7666,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the workflow instance.'
-        example: quaerat
+        example: et
         required: true
         schema:
           type: string
@@ -7747,14 +7747,14 @@ paths:
                 comment:
                   type: string
                   description: ''
-                  example: consequuntur
+                  example: rerum
                   nullable: true
     parameters:
       -
         in: path
         name: instanceId
         description: ''
-        example: soluta
+        example: fugit
         required: true
         schema:
           type: string
@@ -7777,14 +7777,14 @@ paths:
                 comment:
                   type: string
                   description: ''
-                  example: itaque
+                  example: id
                   nullable: true
     parameters:
       -
         in: path
         name: instanceId
         description: ''
-        example: deleniti
+        example: omnis
         required: true
         schema:
           type: string
@@ -7822,7 +7822,7 @@ paths:
         in: path
         name: instanceId
         description: ''
-        example: debitis
+        example: quia
         required: true
         schema:
           type: string
@@ -8221,17 +8221,17 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: uqfcfzczkpcpbxevs
+                  example: wony
                   nullable: false
                 code:
                   type: string
-                  description: ''
-                  example: illum
+                  description: 报表名称.
+                  example: temporibus
                   nullable: false
                 category:
                   type: string
-                  description: ''
-                  example: custom
+                  description: 报表编码（唯一）.
+                  example: inventory
                   nullable: false
                   enum:
                     - sales
@@ -8241,24 +8241,24 @@ paths:
                     - custom
                 description:
                   type: string
-                  description: ''
-                  example: 'Non tempora sit dolor nulla autem voluptate repellat.'
+                  description: 报表分类.
+                  example: 'Eos voluptatem omnis quia voluptatem quia.'
                   nullable: true
                 query_config:
                   type: object
-                  description: ''
+                  description: 报表描述.
                   example: []
                   nullable: false
                   properties: {  }
                 display_config:
                   type: object
-                  description: ''
+                  description: 查询配置（JSON）.
                   example: []
                   nullable: false
                   properties: {  }
                 is_active:
                   type: boolean
-                  description: ''
+                  description: 显示配置（JSON）.
                   example: true
                   nullable: false
               required:
@@ -8314,7 +8314,7 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: jchzqhnfwozfevm
+                  example: vzrd
                   nullable: false
                 code:
                   type: string
@@ -8335,7 +8335,7 @@ paths:
                 description:
                   type: string
                   description: ''
-                  example: 'Enim omnis fugiat deserunt similique blanditiis suscipit consectetur.'
+                  example: 'Delectus similique ducimus qui ad et.'
                   nullable: true
                 query_config:
                   type: object
@@ -8352,7 +8352,7 @@ paths:
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
               required:
                 - name
@@ -8372,7 +8372,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the custom report.'
-        example: natus
+        example: iure
         required: true
         schema:
           type: string
@@ -8390,7 +8390,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the custom report.'
-        example: aut
+        example: velit
         required: true
         schema:
           type: string
@@ -8523,7 +8523,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the notification.'
-        example: quo
+        example: aut
         required: true
         schema:
           type: string
@@ -8541,7 +8541,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the notification.'
-        example: itaque
+        example: sunt
         required: true
         schema:
           type: string
@@ -8573,12 +8573,12 @@ paths:
                 user_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the users table.'
-                  example: quisquam
+                  example: et
                   nullable: false
                 type:
                   type: string
-                  description: ''
-                  example: system
+                  description: 目标用户ID（必填）.
+                  example: financial
                   nullable: false
                   enum:
                     - system
@@ -8588,18 +8588,18 @@ paths:
                     - financial
                 title:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: eqoex
+                  description: '通知类型. Must not be greater than 255 characters.'
+                  example: wjbvp
                   nullable: false
                 content:
                   type: string
-                  description: ''
-                  example: voluptatibus
+                  description: 标题（必填）.
+                  example: rem
                   nullable: false
                 channel:
                   type: string
-                  description: ''
-                  example: email
+                  description: 内容（必填）.
+                  example: system
                   nullable: false
                   enum:
                     - system
@@ -8608,8 +8608,8 @@ paths:
                     - push
                 priority:
                   type: string
-                  description: ''
-                  example: low
+                  description: 发送渠道.
+                  example: urgent
                   nullable: false
                   enum:
                     - low
@@ -8618,22 +8618,22 @@ paths:
                     - urgent
                 reference_type:
                   type: string
-                  description: ''
-                  example: qui
+                  description: 优先级.
+                  example: sed
                   nullable: true
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 20
+                  description: 关联业务类型.
+                  example: 8
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: temporibus
+                  description: 关联业务ID.
+                  example: est
                   nullable: true
                 data:
                   type: object
-                  description: ''
+                  description: 关联业务编号.
                   example: null
                   nullable: true
                   properties: {  }
@@ -8661,33 +8661,33 @@ paths:
                 user_id:
                   type: string
                   description: 'The <code>id</code> of an existing record in the users table.'
-                  example: nesciunt
+                  example: deserunt
                   nullable: false
                 template_code:
                   type: string
-                  description: 'The <code>code</code> of an existing record in the notification_templates table.'
-                  example: quis
+                  description: '目标用户ID（必填）. The <code>code</code> of an existing record in the notification_templates table.'
+                  example: aut
                   nullable: false
                 data:
                   type: object
-                  description: ''
+                  description: 模板编码（必填）.
                   example: []
                   nullable: false
                   properties: {  }
                 reference_type:
                   type: string
-                  description: ''
-                  example: distinctio
+                  description: 模板变量数据（必填）.
+                  example: et
                   nullable: true
                 reference_id:
                   type: integer
-                  description: ''
-                  example: 4
+                  description: 关联业务类型.
+                  example: 1
                   nullable: true
                 reference_no:
                   type: string
-                  description: ''
-                  example: id
+                  description: 关联业务ID.
+                  example: saepe
                   nullable: true
               required:
                 - user_id
@@ -8740,16 +8740,16 @@ paths:
                 code:
                   type: string
                   description: ''
-                  example: voluptatem
+                  example: et
                   nullable: false
                 name:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: srxjdec
+                  description: '模板编码（唯一）. Must not be greater than 255 characters.'
+                  example: mkzilfmodyopjmvjnilzmhj
                   nullable: false
                 type:
                   type: string
-                  description: ''
+                  description: 模板名称（必填）.
                   example: inventory
                   nullable: false
                   enum:
@@ -8760,8 +8760,8 @@ paths:
                     - financial
                 channel:
                   type: string
-                  description: ''
-                  example: email
+                  description: 类型.
+                  example: system
                   nullable: false
                   enum:
                     - system
@@ -8770,24 +8770,24 @@ paths:
                     - push
                 subject:
                   type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: brcfeyvzpajnzmgituu
+                  description: '发送渠道. Must not be greater than 255 characters.'
+                  example: qp
                   nullable: true
                 content:
                   type: string
-                  description: ''
-                  example: enim
+                  description: 邮件主题.
+                  example: cupiditate
                   nullable: false
                 variables:
                   type: object
-                  description: ''
+                  description: 模板内容（必填）.
                   example: null
                   nullable: true
                   properties: {  }
                 is_active:
                   type: boolean
-                  description: ''
-                  example: false
+                  description: 模板变量定义.
+                  example: true
                   nullable: false
               required:
                 - code
@@ -8847,12 +8847,12 @@ paths:
                 name:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: exrhifm
+                  example: pmypewiunhfm
                   nullable: false
                 type:
                   type: string
                   description: ''
-                  example: system
+                  example: approval
                   nullable: false
                   enum:
                     - system
@@ -8863,7 +8863,7 @@ paths:
                 channel:
                   type: string
                   description: ''
-                  example: push
+                  example: email
                   nullable: false
                   enum:
                     - system
@@ -8873,12 +8873,12 @@ paths:
                 subject:
                   type: string
                   description: 'Must not be greater than 255 characters.'
-                  example: rsgvhfdx
+                  example: ggjgcpzgdsif
                   nullable: true
                 content:
                   type: string
                   description: ''
-                  example: accusamus
+                  example: architecto
                   nullable: false
                 variables:
                   type: object
@@ -8889,7 +8889,7 @@ paths:
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
               required:
                 - name
@@ -8909,7 +8909,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the notification template.'
-        example: minus
+        example: omnis
         required: true
         schema:
           type: string
@@ -8927,7 +8927,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the notification template.'
-        example: voluptatem
+        example: veniam
         required: true
         schema:
           type: string
@@ -8994,7 +8994,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the operation log.'
-        example: qui
+        example: repellendus
         required: true
         schema:
           type: string

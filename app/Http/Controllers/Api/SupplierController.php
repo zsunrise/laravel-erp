@@ -12,6 +12,9 @@ class SupplierController extends Controller
     /**
      * 获取供应商列表
      *
+     * @queryParam search string 搜索关键词 (按名称/编码/联系人/电话模糊匹配) Example: 华为
+     * @queryParam is_active boolean 是否激活 (1:激活, 0:未激活) Example: 1
+     * @queryParam rating string 供应商评级 (A/B/C/D) Example: A
      * @param Request $request 请求对象，支持 search（搜索关键词）、is_active（是否激活）和 rating（评级）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的供应商列表，包含区域信息
      */
@@ -48,6 +51,21 @@ class SupplierController extends Controller
     /**
      * 创建新供应商
      *
+     * @bodyParam code string required 供应商编码 (唯一) Example: SUP001
+     * @bodyParam name string required 供应商名称 Example: 华为技术有限公司
+     * @bodyParam contact_person string 联系人 Example: 张三
+     * @bodyParam contact_phone string 联系电话 Example: 13800138000
+     * @bodyParam email string 邮箱 Example: contact@huawei.com
+     * @bodyParam region_id integer 所属区域ID Example: 1
+     * @bodyParam address string 地址 Example: 深圳市龙岗区坂田华为基地
+     * @bodyParam tax_number string 税号 Example: 91440300192444025N
+     * @bodyParam bank_name string 开户行 Example: 中国工商银行
+     * @bodyParam bank_account string 银行账号 Example: 6222024000000000000
+     * @bodyParam rating string 供应商评级 (A/B/C/D) Example: A
+     * @bodyParam credit_limit number 信用额度 Example: 100000
+     * @bodyParam payment_days integer 账期天数 Example: 30
+     * @bodyParam is_active boolean 是否激活 Example: 1
+     * @bodyParam remark string 备注 Example: 优质供应商
      * @param Request $request 请求对象，包含供应商信息（编码、名称、联系方式等）
      * @return \Illuminate\Http\JsonResponse 返回创建的供应商信息，状态码 201
      */
@@ -96,6 +114,21 @@ class SupplierController extends Controller
     /**
      * 更新供应商信息
      *
+     * @bodyParam code string 供应商编码 (唯一) Example: SUP001
+     * @bodyParam name string 供应商名称 Example: 华为技术有限公司
+     * @bodyParam contact_person string 联系人 Example: 张三
+     * @bodyParam contact_phone string 联系电话 Example: 13800138000
+     * @bodyParam email string 邮箱 Example: contact@huawei.com
+     * @bodyParam region_id integer 所属区域ID Example: 1
+     * @bodyParam address string 地址 Example: 深圳市龙岗区坂田华为基地
+     * @bodyParam tax_number string 税号 Example: 91440300192444025N
+     * @bodyParam bank_name string 开户行 Example: 中国工商银行
+     * @bodyParam bank_account string 银行账号 Example: 6222024000000000000
+     * @bodyParam rating string 供应商评级 (A/B/C/D) Example: A
+     * @bodyParam credit_limit number 信用额度 Example: 100000
+     * @bodyParam payment_days integer 账期天数 Example: 30
+     * @bodyParam is_active boolean 是否激活 Example: 1
+     * @bodyParam remark string 备注 Example: 优质供应商
      * @param Request $request 请求对象，包含要更新的供应商字段
      * @param int $id 供应商ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的供应商信息
