@@ -13,6 +13,7 @@ class FinancialReportController extends Controller
     /**
      * 资产负债表
      *
+     * @queryParam date date 报表日期（默认当前日期） Example: 2024-01-31
      * @param Request $request 请求对象，支持 date（报表日期，默认为当前日期）
      * @return \Illuminate\Http\JsonResponse 返回资产负债表数据，包含资产、负债、所有者权益及其合计
      */
@@ -81,6 +82,8 @@ class FinancialReportController extends Controller
     /**
      * 利润表（损益表）
      *
+     * @queryParam start_date date 开始日期（默认本月第一天） Example: 2024-01-01
+     * @queryParam end_date date 结束日期（默认今天） Example: 2024-01-31
      * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
      * @return \Illuminate\Http\JsonResponse 返回利润表数据，包含收入、费用、利润和利润率统计
      */

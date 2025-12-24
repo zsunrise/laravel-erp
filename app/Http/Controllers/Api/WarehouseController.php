@@ -12,6 +12,10 @@ class WarehouseController extends Controller
     /**
      * 获取仓库列表
      *
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam is_default boolean 是否默认仓库（1:是, 0:否） Example: 0
+     * @queryParam search string 搜索关键词（按名称/编码模糊匹配） Example: 主仓库
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 is_active（是否激活）、is_default（是否默认）和 search（搜索关键词）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的仓库列表，包含区域信息
      */
@@ -46,6 +50,15 @@ class WarehouseController extends Controller
     /**
      * 创建新仓库
      *
+     * @bodyParam name string required 仓库名称 Example: 主仓库
+     * @bodyParam code string required 仓库编码（唯一） Example: WH001
+     * @bodyParam region_id integer 所属区域ID Example: 1
+     * @bodyParam address string 地址 Example: 北京市朝阳区xxx路xxx号
+     * @bodyParam contact_person string 联系人 Example: 张三
+     * @bodyParam contact_phone string 联系电话 Example: 13800138000
+     * @bodyParam is_default boolean 是否默认仓库 Example: false
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam description string 描述 Example: 主要存储仓库
      * @param Request $request 请求对象，包含仓库信息（名称、编码、区域等）
      * @return \Illuminate\Http\JsonResponse 返回创建的仓库信息，状态码 201
      */
@@ -93,6 +106,15 @@ class WarehouseController extends Controller
     /**
      * 更新仓库信息
      *
+     * @bodyParam name string 仓库名称 Example: 主仓库
+     * @bodyParam code string 仓库编码（唯一，排除当前仓库） Example: WH001
+     * @bodyParam region_id integer 所属区域ID Example: 1
+     * @bodyParam address string 地址 Example: 北京市朝阳区xxx路xxx号
+     * @bodyParam contact_person string 联系人 Example: 张三
+     * @bodyParam contact_phone string 联系电话 Example: 13800138000
+     * @bodyParam is_default boolean 是否默认仓库 Example: false
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam description string 描述 Example: 主要存储仓库
      * @param Request $request 请求对象，包含要更新的仓库字段
      * @param int $id 仓库ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的仓库信息

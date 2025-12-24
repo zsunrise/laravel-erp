@@ -22,6 +22,13 @@ class WorkOrderController extends Controller
     /**
      * 获取工单列表
      *
+     * @queryParam product_id integer 产品ID Example: 1
+     * @queryParam warehouse_id integer 仓库ID Example: 1
+     * @queryParam status string 工单状态（draft/approved/in_progress/completed/cancelled） Example: approved
+     * @queryParam assigned_to integer 分配人ID Example: 1
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-12-31
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 product_id（产品ID）、warehouse_id（仓库ID）、status（状态）、assigned_to（分配人ID）和 start_date/end_date（日期范围）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的工单列表，包含产品、仓库、分配人和创建人信息
      */
@@ -67,6 +74,17 @@ class WorkOrderController extends Controller
     /**
      * 创建工单
      *
+     * @bodyParam production_plan_id integer 生产计划ID Example: 1
+     * @bodyParam production_plan_item_id integer 生产计划明细ID Example: 1
+     * @bodyParam product_id integer required 产品ID Example: 1
+     * @bodyParam bom_id integer BOM ID Example: 1
+     * @bodyParam process_route_id integer 工艺路线ID Example: 1
+     * @bodyParam warehouse_id integer required 仓库ID Example: 1
+     * @bodyParam quantity integer required 生产数量（最小1） Example: 100
+     * @bodyParam start_date date required 开始日期 Example: 2024-01-15
+     * @bodyParam planned_end_date date required 计划结束日期（必须晚于开始日期） Example: 2024-01-20
+     * @bodyParam assigned_to integer 分配人ID Example: 1
+     * @bodyParam remark string 备注 Example: 紧急工单
      * @param Request $request 请求对象，包含工单信息（产品ID、BOM、工艺路线、数量等）
      * @return \Illuminate\Http\JsonResponse 返回创建的工单信息，状态码 201，失败时返回错误消息
      */

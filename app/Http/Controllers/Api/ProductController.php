@@ -12,6 +12,10 @@ class ProductController extends Controller
     /**
      * 获取产品列表
      *
+     * @queryParam search string 搜索关键词（按名称/SKU/条码模糊匹配） Example: 手机
+     * @queryParam category_id integer 产品分类ID Example: 1
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 search（搜索关键词）、category_id（分类ID）和 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的产品列表，包含分类和单位信息
      */
@@ -47,6 +51,19 @@ class ProductController extends Controller
     /**
      * 创建新产品
      *
+     * @bodyParam category_id integer 产品分类ID Example: 1
+     * @bodyParam name string required 产品名称 Example: iPhone 15 Pro
+     * @bodyParam sku string required SKU编码（唯一） Example: IPHONE15PRO001
+     * @bodyParam barcode string 条形码（唯一） Example: 1234567890123
+     * @bodyParam description string 产品描述 Example: 最新款iPhone手机
+     * @bodyParam image string 产品图片 Example: https://example.com/image.jpg
+     * @bodyParam unit_id integer 计量单位ID Example: 1
+     * @bodyParam purchase_price number 采购价 Example: 8000
+     * @bodyParam sale_price number 销售价 Example: 9999
+     * @bodyParam cost_price number 成本价 Example: 7500
+     * @bodyParam min_stock integer 最低库存 Example: 10
+     * @bodyParam max_stock integer 最高库存 Example: 1000
+     * @bodyParam is_active boolean 是否激活 Example: true
      * @param Request $request 请求对象，包含产品信息（名称、SKU、价格等）
      * @return \Illuminate\Http\JsonResponse 返回创建的产品信息，状态码 201
      */
@@ -93,6 +110,19 @@ class ProductController extends Controller
     /**
      * 更新产品信息
      *
+     * @bodyParam category_id integer 产品分类ID Example: 1
+     * @bodyParam name string 产品名称 Example: iPhone 15 Pro
+     * @bodyParam sku string SKU编码（唯一，排除当前产品） Example: IPHONE15PRO001
+     * @bodyParam barcode string 条形码（唯一，排除当前产品） Example: 1234567890123
+     * @bodyParam description string 产品描述 Example: 最新款iPhone手机
+     * @bodyParam image string 产品图片 Example: https://example.com/image.jpg
+     * @bodyParam unit_id integer 计量单位ID Example: 1
+     * @bodyParam purchase_price number 采购价 Example: 8000
+     * @bodyParam sale_price number 销售价 Example: 9999
+     * @bodyParam cost_price number 成本价 Example: 7500
+     * @bodyParam min_stock integer 最低库存 Example: 10
+     * @bodyParam max_stock integer 最高库存 Example: 1000
+     * @bodyParam is_active boolean 是否激活 Example: true
      * @param Request $request 请求对象，包含要更新的产品字段
      * @param int $id 产品ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的产品信息

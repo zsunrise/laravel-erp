@@ -21,6 +21,11 @@ class WorkflowInstanceController extends Controller
     /**
      * 获取工作流实例列表
      *
+     * @queryParam workflow_id integer 工作流ID Example: 1
+     * @queryParam status string 实例状态（pending/approved/rejected/cancelled） Example: pending
+     * @queryParam reference_type string 关联业务类型 Example: purchase_order
+     * @queryParam reference_id integer 关联业务ID Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 workflow_id（工作流ID）、status（状态）和 reference_type/reference_id（关联信息）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的工作流实例列表，包含工作流、当前节点和发起人信息，按创建时间降序排列
      */
@@ -56,6 +61,10 @@ class WorkflowInstanceController extends Controller
     /**
      * 启动工作流实例
      *
+     * @bodyParam workflow_id integer required 工作流ID Example: 1
+     * @bodyParam reference_type string required 关联业务类型 Example: purchase_order
+     * @bodyParam reference_id integer required 关联业务ID Example: 1
+     * @bodyParam reference_no string 关联业务编号 Example: PO001
      * @param Request $request 请求对象，包含工作流ID和关联业务信息
      * @return \Illuminate\Http\JsonResponse 返回创建的工作流实例信息，状态码 201，失败时返回错误消息
      */

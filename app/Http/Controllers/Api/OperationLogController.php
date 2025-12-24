@@ -12,6 +12,15 @@ class OperationLogController extends Controller
     /**
      * 获取操作日志列表
      *
+     * @queryParam user_id integer 用户ID Example: 1
+     * @queryParam module string 模块 Example: 用户管理
+     * @queryParam action string 操作（模糊匹配） Example: 创建
+     * @queryParam method string HTTP请求方法（GET/POST/PUT/DELETE） Example: POST
+     * @queryParam status_code integer 响应状态码 Example: 200
+     * @queryParam search string 搜索关键词（按操作/路径/消息/用户名/邮箱模糊匹配） Example: 创建用户
+     * @queryParam date_from date 开始日期 Example: 2024-01-01
+     * @queryParam date_to date 结束日期 Example: 2024-12-31
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 user_id（用户ID）、module（模块）、action（操作）、method（请求方法）、status_code（状态码）、search（搜索关键词）和 date_from/date_to（日期范围）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的操作日志列表，包含用户信息
      */

@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel",
-        "_postman_id": "74255d53-8d95-482b-9a09-beb70fc2a83e",
+        "_postman_id": "37cb006c-e361-425d-8a46-cabe77eec098",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -41,7 +41,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"owen01@example.com\",\"password\":\"sint\"}"
+                            "raw": "{\"email\":\"user@example.com\",\"password\":\"password123\"}"
                         },
                         "description": "",
                         "auth": {
@@ -261,8 +261,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/users",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/users"
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "%E5%BC%A0%E4%B8%89",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u7528\u6237\u540d\/\u90ae\u7bb1\/\u7535\u8bdd\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/users?search=%E5%BC%A0%E4%B8%89&is_active=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -322,7 +341,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"ifwxvqtaq\",\"email\":\"axel.hauck@example.net\",\"password\":\"Kc!~P=]s6nliv?T\",\"phone\":\"axtgsnubgqrosyc\"}"
+                            "raw": "{\"name\":\"\u5f20\u4e09\",\"email\":\"zhangsan@example.com\",\"password\":\"password123\",\"phone\":\"13800138000\",\"roles\":null}"
                         },
                         "description": ""
                     },
@@ -340,7 +359,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "enim",
+                                    "value": "ducimus",
                                     "description": "The ID of the user."
                                 }
                             ]
@@ -393,7 +412,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "dicta",
+                                    "value": "laboriosam",
                                     "description": "The ID of the user."
                                 }
                             ]
@@ -411,7 +430,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"vbiofdzpkfbpjcbuvws\",\"password\":\"|M`%B;lm\",\"phone\":\"eynqlsakf\",\"is_active\":true}"
+                            "raw": "{\"name\":\"\u5f20\u4e09\",\"email\":\"zhangsan@example.com\",\"password\":\"newpassword123\",\"phone\":\"13800138000\",\"is_active\":true,\"roles\":null}"
                         },
                         "description": ""
                     },
@@ -429,7 +448,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "sit",
+                                    "value": "id",
                                     "description": "The ID of the user."
                                 }
                             ]
@@ -456,8 +475,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/roles",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/roles"
+                            "query": [
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "%E7%AE%A1%E7%90%86%E5%91%98",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u89d2\u8272\u540d\u79f0\/\u6807\u8bc6\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/roles?is_active=1&search=%E7%AE%A1%E7%90%86%E5%91%98&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -517,7 +555,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"dhuoczbxo\",\"slug\":\"tmwtgr\",\"description\":\"Incidunt iure tempore similique et repellendus odit voluptate.\",\"is_active\":false}"
+                            "raw": "{\"name\":\"\u7ba1\u7406\u5458\",\"slug\":\"admin\",\"description\":\"\u7cfb\u7edf\u7ba1\u7406\u5458\u89d2\u8272\",\"is_active\":true,\"permissions\":null}"
                         },
                         "description": ""
                     },
@@ -535,7 +573,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "aut",
+                                    "value": "non",
                                     "description": "The ID of the role."
                                 }
                             ]
@@ -588,7 +626,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "est",
+                                    "value": "quam",
                                     "description": "The ID of the role."
                                 }
                             ]
@@ -606,7 +644,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"yw\",\"description\":\"Eaque placeat aliquid facere omnis reiciendis quisquam.\",\"is_active\":true}"
+                            "raw": "{\"name\":\"\u7ba1\u7406\u5458\",\"slug\":\"admin\",\"description\":\"\u7cfb\u7edf\u7ba1\u7406\u5458\u89d2\u8272\",\"is_active\":true,\"permissions\":null}"
                         },
                         "description": ""
                     },
@@ -624,7 +662,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "molestiae",
+                                    "value": "qui",
                                     "description": "The ID of the role."
                                 }
                             ]
@@ -651,8 +689,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/permissions",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/permissions"
+                            "query": [
+                                {
+                                    "key": "group",
+                                    "value": "%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86",
+                                    "description": "\u6743\u9650\u7ec4",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "%E7%94%A8%E6%88%B7",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u6743\u9650\u540d\u79f0\/\u6807\u8bc6\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/permissions?group=%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86&search=%E7%94%A8%E6%88%B7&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -712,7 +769,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"mbe\",\"slug\":\"utlxelkg\",\"group\":\"r\",\"description\":\"Adipisci eligendi voluptatem et incidunt qui.\"}"
+                            "raw": "{\"name\":\"\u7528\u6237\u7ba1\u7406\",\"slug\":\"users.manage\",\"group\":\"\u7528\u6237\u7ba1\u7406\",\"description\":\"\u7ba1\u7406\u7528\u6237\u4fe1\u606f\"}"
                         },
                         "description": ""
                     },
@@ -730,7 +787,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "eum",
+                                    "value": "aliquam",
                                     "description": "The ID of the permission."
                                 }
                             ]
@@ -783,7 +840,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "voluptatem",
+                                    "value": "iusto",
                                     "description": "The ID of the permission."
                                 }
                             ]
@@ -801,7 +858,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"vwfjjounrzlozlkupj\",\"group\":\"fqtwpethjjrbkyq\",\"description\":\"Quis quae sit distinctio et sed aut accusantium.\"}"
+                            "raw": "{\"name\":\"\u7528\u6237\u7ba1\u7406\",\"slug\":\"users.manage\",\"group\":\"\u7528\u6237\u7ba1\u7406\",\"description\":\"\u7ba1\u7406\u7528\u6237\u4fe1\u606f\"}"
                         },
                         "description": ""
                     },
@@ -819,7 +876,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "omnis",
+                                    "value": "in",
                                     "description": "The ID of the permission."
                                 }
                             ]
@@ -846,8 +903,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/system-configs",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/system-configs"
+                            "query": [
+                                {
+                                    "key": "group",
+                                    "value": "system",
+                                    "description": "\u914d\u7f6e\u7ec4",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "%E7%B3%BB%E7%BB%9F",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u952e\u540d\/\u63cf\u8ff0\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/system-configs?group=system&search=%E7%B3%BB%E7%BB%9F&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -907,7 +983,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"key\":\"khcbwyklhkbeddnpb\",\"value\":\"aut\",\"type\":\"number\",\"group\":\"hhyyhxtvbgozgzpxpu\",\"description\":\"Similique unde assumenda non sunt delectus adipisci nihil.\"}"
+                            "raw": "{\"key\":\"system.name\",\"value\":\"ERP\u7cfb\u7edf\",\"type\":\"string\",\"group\":\"system\",\"description\":\"\u7cfb\u7edf\u540d\u79f0\"}"
                         },
                         "description": ""
                     },
@@ -925,7 +1001,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "autem",
+                                    "value": "at",
                                     "description": "The ID of the system config."
                                 }
                             ]
@@ -978,7 +1054,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "autem",
+                                    "value": "a",
                                     "description": "The ID of the system config."
                                 }
                             ]
@@ -996,7 +1072,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"value\":\"sed\",\"type\":\"string\",\"group\":\"jtlsxfkf\",\"description\":\"Nihil quia eos quis itaque sunt accusamus.\"}"
+                            "raw": "{\"key\":\"system.name\",\"value\":\"ERP\u7cfb\u7edf\",\"type\":\"string\",\"group\":\"system\",\"description\":\"\u7cfb\u7edf\u540d\u79f0\"}"
                         },
                         "description": ""
                     },
@@ -1014,7 +1090,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "a",
+                                    "value": "deleniti",
                                     "description": "The ID of the system config."
                                 }
                             ]
@@ -1047,7 +1123,7 @@
                                 {
                                     "id": "key",
                                     "key": "key",
-                                    "value": "veritatis",
+                                    "value": "et",
                                     "description": "The key."
                                 }
                             ]
@@ -1094,8 +1170,45 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/data-dictionaries",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/data-dictionaries"
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "order_status",
+                                    "description": "\u5b57\u5178\u7c7b\u578b",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "code",
+                                    "value": "pending",
+                                    "description": "\u7f16\u7801\uff08\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "label",
+                                    "value": "%E5%BE%85%E5%A4%84%E7%90%86",
+                                    "description": "\u6807\u7b7e\uff08\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "group_by_type",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6309\u7c7b\u578b\u5206\u7ec4\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/data-dictionaries?type=order_status&code=pending&label=%E5%BE%85%E5%A4%84%E7%90%86&is_active=1&group_by_type=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -1155,7 +1268,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"type\":\"mrhnhvvpncc\",\"code\":\"akkulcuinxftpjuwfxvpr\",\"label\":\"fmvqsnqyjjic\",\"value\":\"enmdsxtuvdauuhqgkldyho\",\"sort\":74,\"is_active\":true,\"description\":\"Sint illum totam eveniet ut omnis deleniti.\"}"
+                            "raw": "{\"type\":\"order_status\",\"code\":\"pending\",\"label\":\"\u5f85\u5904\u7406\",\"value\":\"pending\",\"sort\":1,\"is_active\":true,\"description\":\"\u8ba2\u5355\u5f85\u5904\u7406\u72b6\u6001\"}"
                         },
                         "description": ""
                     },
@@ -1173,7 +1286,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ex",
+                                    "value": "animi",
                                     "description": "The ID of the data dictionary."
                                 }
                             ]
@@ -1226,7 +1339,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ad",
+                                    "value": "ut",
                                     "description": "The ID of the data dictionary."
                                 }
                             ]
@@ -1244,7 +1357,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"type\":\"kvistbhbogo\",\"code\":\"t\",\"label\":\"vqsenk\",\"value\":\"npnbpzdadnsdusackdwf\",\"sort\":45,\"is_active\":true,\"description\":\"Laborum perferendis a voluptatem debitis ipsum rerum quam deserunt.\"}"
+                            "raw": "{\"type\":\"upxuzlvunfmepshbhtqpd\",\"code\":\"kiyldu\",\"label\":\"eezwvccoe\",\"value\":\"fnuvbzepxalhvjucsbikpktq\",\"sort\":2,\"is_active\":false,\"description\":\"Suscipit occaecati dicta reiciendis tenetur.\"}"
                         },
                         "description": ""
                     },
@@ -1262,7 +1375,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "nulla",
+                                    "value": "iure",
                                     "description": "The ID of the data dictionary."
                                 }
                             ]
@@ -1295,7 +1408,7 @@
                                 {
                                     "id": "type",
                                     "key": "type",
-                                    "value": "facere",
+                                    "value": "in",
                                     "description": "The type."
                                 }
                             ]
@@ -1387,8 +1500,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/product-categories",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/product-categories"
+                            "query": [
+                                {
+                                    "key": "parent_id",
+                                    "value": "1",
+                                    "description": "\u7236\u5206\u7c7bID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "tree",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u8fd4\u56de\u6811\u5f62\u7ed3\u6784\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/product-categories?parent_id=1&is_active=1&tree=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -1448,7 +1586,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"gfwva\",\"code\":\"k\",\"image\":\"doloremque\",\"sort\":73,\"is_active\":true,\"description\":\"Rerum dicta sit placeat et doloremque unde maiores.\"}"
+                            "raw": "{\"parent_id\":1,\"name\":\"\u7535\u5b50\u4ea7\u54c1\",\"code\":\"ELEC001\",\"image\":\"https:\\\/\\\/example.com\\\/image.jpg\",\"sort\":1,\"is_active\":true,\"description\":\"\u7535\u5b50\u4ea7\u54c1\u5206\u7c7b\"}"
                         },
                         "description": ""
                     },
@@ -1466,7 +1604,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "modi",
+                                    "value": "veritatis",
                                     "description": "The ID of the product category."
                                 }
                             ]
@@ -1519,7 +1657,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "modi",
+                                    "value": "sint",
                                     "description": "The ID of the product category."
                                 }
                             ]
@@ -1537,7 +1675,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"yvkdmzbioogxrncsebxavuhy\",\"image\":\"vero\",\"sort\":62,\"is_active\":true,\"description\":\"Magni omnis harum laboriosam.\"}"
+                            "raw": "{\"parent_id\":1,\"name\":\"\u7535\u5b50\u4ea7\u54c1\",\"code\":\"ELEC001\",\"image\":\"https:\\\/\\\/example.com\\\/image.jpg\",\"sort\":1,\"is_active\":true,\"description\":\"\u7535\u5b50\u4ea7\u54c1\u5206\u7c7b\"}"
                         },
                         "description": ""
                     },
@@ -1555,7 +1693,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "nihil",
+                                    "value": "pariatur",
                                     "description": "The ID of the product category."
                                 }
                             ]
@@ -1582,8 +1720,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/regions",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/regions"
+                            "query": [
+                                {
+                                    "key": "parent_id",
+                                    "value": "1",
+                                    "description": "\u7236\u533a\u57dfID\uff08\u4e0d\u4f20\u5219\u67e5\u8be2\u9876\u7ea7\u533a\u57df\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "level",
+                                    "value": "%E7%9C%81",
+                                    "description": "\u7ea7\u522b\uff08\u7701\/\u5e02\/\u533a\u7b49\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "tree",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u8fd4\u56de\u6811\u5f62\u7ed3\u6784\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "1000",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/regions?parent_id=1&level=%E7%9C%81&is_active=1&tree=1&per_page=1000"
                         },
                         "method": "GET",
                         "header": [
@@ -1633,7 +1802,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ullam",
+                                    "value": "assumenda",
                                     "description": "The ID of the region."
                                 }
                             ]
@@ -1680,8 +1849,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/units",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/units"
+                            "query": [
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "1000",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/units?is_active=1&per_page=1000"
                         },
                         "method": "GET",
                         "header": [
@@ -1731,7 +1913,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ut",
+                                    "value": "quod",
                                     "description": "The ID of the unit."
                                 }
                             ]
@@ -1778,8 +1960,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/currencies",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/currencies"
+                            "query": [
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "1000",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/currencies?is_active=1&per_page=1000"
                         },
                         "method": "GET",
                         "header": [
@@ -1829,7 +2024,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "nobis",
+                                    "value": "et",
                                     "description": "The ID of the currency."
                                 }
                             ]
@@ -1876,8 +2071,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/products",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/products"
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "%E6%89%8B%E6%9C%BA",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u540d\u79f0\/SKU\/\u6761\u7801\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "category_id",
+                                    "value": "1",
+                                    "description": "\u4ea7\u54c1\u5206\u7c7bID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/products?search=%E6%89%8B%E6%9C%BA&category_id=1&is_active=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -1937,7 +2157,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"gbedv\",\"sku\":\"mfbfqcixotsiorbzskzpxla\",\"barcode\":\"necoxjxxvfwnnaryyieaft\",\"description\":\"Harum reprehenderit corrupti ad.\",\"image\":\"voluptatem\",\"purchase_price\":2,\"sale_price\":0,\"cost_price\":48,\"min_stock\":56,\"max_stock\":12,\"is_active\":false}"
+                            "raw": "{\"category_id\":1,\"name\":\"iPhone 15 Pro\",\"sku\":\"IPHONE15PRO001\",\"barcode\":\"1234567890123\",\"description\":\"\u6700\u65b0\u6b3eiPhone\u624b\u673a\",\"image\":\"https:\\\/\\\/example.com\\\/image.jpg\",\"unit_id\":1,\"purchase_price\":8000,\"sale_price\":9999,\"cost_price\":7500,\"min_stock\":10,\"max_stock\":1000,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -1955,7 +2175,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ut",
+                                    "value": "illum",
                                     "description": "The ID of the product."
                                 }
                             ]
@@ -2008,7 +2228,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quia",
+                                    "value": "est",
                                     "description": "The ID of the product."
                                 }
                             ]
@@ -2026,7 +2246,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"lumvkuzaxpgkaq\",\"description\":\"Nihil recusandae est minima.\",\"image\":\"dolore\",\"purchase_price\":26,\"sale_price\":7,\"cost_price\":2,\"min_stock\":77,\"max_stock\":81,\"is_active\":false}"
+                            "raw": "{\"category_id\":1,\"name\":\"iPhone 15 Pro\",\"sku\":\"IPHONE15PRO001\",\"barcode\":\"1234567890123\",\"description\":\"\u6700\u65b0\u6b3eiPhone\u624b\u673a\",\"image\":\"https:\\\/\\\/example.com\\\/image.jpg\",\"unit_id\":1,\"purchase_price\":8000,\"sale_price\":9999,\"cost_price\":7500,\"min_stock\":10,\"max_stock\":1000,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -2044,7 +2264,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "suscipit",
+                                    "value": "et",
                                     "description": "The ID of the product."
                                 }
                             ]
@@ -2071,8 +2291,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/warehouses",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/warehouses"
+                            "query": [
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_default",
+                                    "value": "",
+                                    "description": "\u662f\u5426\u9ed8\u8ba4\u4ed3\u5e93\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "%E4%B8%BB%E4%BB%93%E5%BA%93",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u540d\u79f0\/\u7f16\u7801\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/warehouses?is_active=1&is_default=&search=%E4%B8%BB%E4%BB%93%E5%BA%93&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -2132,7 +2377,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"dvzfnfqplvcapiwtznpkbhjk\",\"code\":\"bjmsoxddyochxga\",\"address\":\"jfgeipdovlbczwlxgn\",\"contact_person\":\"pe\",\"contact_phone\":\"sxbwcbimhoggmam\",\"is_default\":true,\"is_active\":false,\"description\":\"Ut neque sit laboriosam velit quis alias qui.\"}"
+                            "raw": "{\"name\":\"\u4e3b\u4ed3\u5e93\",\"code\":\"WH001\",\"region_id\":1,\"address\":\"\u5317\u4eac\u5e02\u671d\u9633\u533axxx\u8defxxx\u53f7\",\"contact_person\":\"\u5f20\u4e09\",\"contact_phone\":\"13800138000\",\"is_default\":false,\"is_active\":true,\"description\":\"\u4e3b\u8981\u5b58\u50a8\u4ed3\u5e93\"}"
                         },
                         "description": ""
                     },
@@ -2150,7 +2395,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "vero",
+                                    "value": "rerum",
                                     "description": "The ID of the warehouse."
                                 }
                             ]
@@ -2203,7 +2448,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "reprehenderit",
+                                    "value": "corporis",
                                     "description": "The ID of the warehouse."
                                 }
                             ]
@@ -2221,7 +2466,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"rfsjpnewaejokkpbfiphld\",\"address\":\"dabxxbfwrydmmhgx\",\"contact_person\":\"hdvrwltgncjjigzawrcrivzz\",\"contact_phone\":\"kbccdnszzurpovx\",\"is_default\":true,\"is_active\":true,\"description\":\"Deserunt excepturi dolor architecto incidunt blanditiis excepturi suscipit.\"}"
+                            "raw": "{\"name\":\"\u4e3b\u4ed3\u5e93\",\"code\":\"WH001\",\"region_id\":1,\"address\":\"\u5317\u4eac\u5e02\u671d\u9633\u533axxx\u8defxxx\u53f7\",\"contact_person\":\"\u5f20\u4e09\",\"contact_phone\":\"13800138000\",\"is_default\":false,\"is_active\":true,\"description\":\"\u4e3b\u8981\u5b58\u50a8\u4ed3\u5e93\"}"
                         },
                         "description": ""
                     },
@@ -2239,7 +2484,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "aut",
+                                    "value": "et",
                                     "description": "The ID of the warehouse."
                                 }
                             ]
@@ -2266,8 +2511,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/warehouse-locations",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/warehouse-locations"
+                            "query": [
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "1000",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/warehouse-locations?warehouse_id=1&is_active=1&per_page=1000"
                         },
                         "method": "GET",
                         "header": [
@@ -2327,7 +2591,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"warehouse_id\":\"quasi\",\"name\":\"tvdnecpkyyevjqceshvfpa\",\"code\":\"qatx\",\"sort\":6,\"is_active\":false}"
+                            "raw": "{\"warehouse_id\":1,\"name\":\"A\u533a-01-01\",\"code\":\"A-01-01\",\"sort\":1,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -2345,7 +2609,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ipsam",
+                                    "value": "ut",
                                     "description": "The ID of the warehouse location."
                                 }
                             ]
@@ -2398,7 +2662,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quam",
+                                    "value": "quia",
                                     "description": "The ID of the warehouse location."
                                 }
                             ]
@@ -2416,7 +2680,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"ljpazqrehuqsdkzbqw\",\"code\":\"yqdgmpmkx\",\"sort\":75,\"is_active\":false}"
+                            "raw": "{\"name\":\"A\u533a-01-01\",\"code\":\"A-01-01\",\"sort\":1,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -2434,7 +2698,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "est",
+                                    "value": "rem",
                                     "description": "The ID of the warehouse location."
                                 }
                             ]
@@ -2461,8 +2725,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/inventory",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/inventory"
+                            "query": [
+                                {
+                                    "key": "product_id",
+                                    "value": "1",
+                                    "description": "\u4ea7\u54c1ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "location_id",
+                                    "value": "1",
+                                    "description": "\u5e93\u4f4dID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "low_stock",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u4f4e\u5e93\u5b58\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/inventory?product_id=1&warehouse_id=1&location_id=1&low_stock=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -2512,7 +2807,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "recusandae",
+                                    "value": "et",
                                     "description": "The ID of the inventory."
                                 }
                             ]
@@ -2575,7 +2870,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"sit\",\"warehouse_id\":\"delectus\",\"quantity\":7,\"unit_cost\":29,\"reference_type\":\"quasi\",\"reference_id\":18,\"reference_no\":\"libero\",\"remark\":\"esse\"}"
+                            "raw": "{\"product_id\":1,\"warehouse_id\":1,\"location_id\":1,\"quantity\":100,\"unit_cost\":50,\"reference_type\":\"purchase_order\",\"reference_id\":1,\"reference_no\":\"PO001\",\"remark\":\"\u91c7\u8d2d\u5165\u5e93\"}"
                         },
                         "description": ""
                     },
@@ -2603,7 +2898,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"rerum\",\"warehouse_id\":\"fugit\",\"quantity\":50,\"unit_cost\":7,\"reference_type\":\"ut\",\"reference_id\":3,\"reference_no\":\"dolore\",\"remark\":\"inventore\"}"
+                            "raw": "{\"product_id\":\"ut\",\"warehouse_id\":\"voluptatibus\",\"quantity\":23,\"unit_cost\":49,\"reference_type\":\"assumenda\",\"reference_id\":14,\"reference_no\":\"dolor\",\"remark\":\"velit\"}"
                         },
                         "description": ""
                     },
@@ -2631,7 +2926,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"eum\",\"from_warehouse_id\":\"dolorem\",\"to_warehouse_id\":\"eveniet\",\"quantity\":1,\"reference_no\":\"quia\",\"remark\":\"soluta\"}"
+                            "raw": "{\"product_id\":\"vel\",\"from_warehouse_id\":\"ipsa\",\"to_warehouse_id\":\"sapiente\",\"quantity\":63,\"reference_no\":\"et\",\"remark\":\"impedit\"}"
                         },
                         "description": ""
                     },
@@ -2659,7 +2954,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"iste\",\"warehouse_id\":\"doloribus\",\"quantity\":73,\"unit_cost\":74,\"reference_no\":\"ut\",\"remark\":\"tempora\"}"
+                            "raw": "{\"product_id\":\"est\",\"warehouse_id\":\"distinctio\",\"quantity\":89,\"unit_cost\":62,\"reference_no\":\"alias\",\"remark\":\"iusto\"}"
                         },
                         "description": ""
                     },
@@ -2777,7 +3072,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"warehouse_id\":\"rem\",\"stocktake_date\":\"2025-12-24T08:09:21\",\"remark\":\"voluptatem\"}"
+                            "raw": "{\"warehouse_id\":\"odit\",\"stocktake_date\":\"2025-12-24T08:39:43\",\"remark\":\"possimus\"}"
                         },
                         "description": ""
                     },
@@ -2795,7 +3090,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "necessitatibus",
+                                    "value": "occaecati",
                                     "description": "The ID of the inventory stocktake."
                                 }
                             ]
@@ -2848,7 +3143,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "sed",
+                                    "value": "non",
                                     "description": "The ID of the inventory stocktake."
                                 }
                             ]
@@ -2866,7 +3161,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"aut\",\"actual_quantity\":44,\"remark\":\"et\"}"
+                            "raw": "{\"product_id\":\"id\",\"actual_quantity\":6,\"remark\":\"quas\"}"
                         },
                         "description": ""
                     },
@@ -2884,7 +3179,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "tempore",
+                                    "value": "saepe",
                                     "description": "The ID of the inventory stocktake."
                                 }
                             ]
@@ -2911,8 +3206,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/suppliers",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/suppliers"
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "%E5%8D%8E%E4%B8%BA",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd (\u6309\u540d\u79f0\/\u7f16\u7801\/\u8054\u7cfb\u4eba\/\u7535\u8bdd\u6a21\u7cca\u5339\u914d)",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b (1:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b)",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "rating",
+                                    "value": "A",
+                                    "description": "\u4f9b\u5e94\u5546\u8bc4\u7ea7 (A\/B\/C\/D)",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/suppliers?search=%E5%8D%8E%E4%B8%BA&is_active=1&rating=A"
                         },
                         "method": "GET",
                         "header": [
@@ -2972,7 +3286,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"code\":\"a\",\"name\":\"xaznfaplgmqzfxalwt\",\"contact_person\":\"jbhbgycncrqcltzkeejubqruw\",\"contact_phone\":\"hhhazxnqqyaumst\",\"email\":\"zschimmel@example.net\",\"address\":\"hvejrrusqtjhsopkawy\",\"tax_number\":\"pm\",\"bank_name\":\"isiskftmociwsjuz\",\"bank_account\":\"amxstvxuvcrbely\",\"rating\":\"A\",\"credit_limit\":12,\"payment_days\":59,\"is_active\":true,\"remark\":\"est\"}"
+                            "raw": "{\"code\":\"SUP001\",\"name\":\"\u534e\u4e3a\u6280\u672f\u6709\u9650\u516c\u53f8\",\"contact_person\":\"\u5f20\u4e09\",\"contact_phone\":\"13800138000\",\"email\":\"contact@huawei.com\",\"region_id\":1,\"address\":\"\u6df1\u5733\u5e02\u9f99\u5c97\u533a\u5742\u7530\u534e\u4e3a\u57fa\u5730\",\"tax_number\":\"91440300192444025N\",\"bank_name\":\"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c\",\"bank_account\":\"6222024000000000000\",\"rating\":\"A\",\"credit_limit\":100000,\"payment_days\":30,\"is_active\":true,\"remark\":\"\u4f18\u8d28\u4f9b\u5e94\u5546\"}"
                         },
                         "description": ""
                     },
@@ -2990,7 +3304,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "voluptas",
+                                    "value": "commodi",
                                     "description": "The ID of the supplier."
                                 }
                             ]
@@ -3043,7 +3357,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "repellat",
+                                    "value": "at",
                                     "description": "The ID of the supplier."
                                 }
                             ]
@@ -3061,7 +3375,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"ibjyefobpdxeyqkvo\",\"contact_person\":\"fzlbdguypcgfen\",\"contact_phone\":\"jrrvdchpcvlnkxrypkt\",\"email\":\"austin66@example.org\",\"address\":\"ztxjwb\",\"tax_number\":\"ycqhvaxnjxosouav\",\"bank_name\":\"bykyyhhdmcnrkbfqqfjksjfu\",\"bank_account\":\"vdnezxqbonpna\",\"rating\":\"B\",\"credit_limit\":27,\"payment_days\":81,\"is_active\":true,\"remark\":\"ut\"}"
+                            "raw": "{\"code\":\"SUP001\",\"name\":\"\u534e\u4e3a\u6280\u672f\u6709\u9650\u516c\u53f8\",\"contact_person\":\"\u5f20\u4e09\",\"contact_phone\":\"13800138000\",\"email\":\"contact@huawei.com\",\"region_id\":1,\"address\":\"\u6df1\u5733\u5e02\u9f99\u5c97\u533a\u5742\u7530\u534e\u4e3a\u57fa\u5730\",\"tax_number\":\"91440300192444025N\",\"bank_name\":\"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c\",\"bank_account\":\"6222024000000000000\",\"rating\":\"A\",\"credit_limit\":100000,\"payment_days\":30,\"is_active\":true,\"remark\":\"\u4f18\u8d28\u4f9b\u5e94\u5546\"}"
                         },
                         "description": ""
                     },
@@ -3079,7 +3393,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "velit",
+                                    "value": "est",
                                     "description": "The ID of the supplier."
                                 }
                             ]
@@ -3106,8 +3420,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/customers",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/customers"
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "%E5%8D%8E%E4%B8%BA",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u540d\u79f0\/\u7f16\u7801\/\u8054\u7cfb\u4eba\/\u7535\u8bdd\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "rating",
+                                    "value": "A",
+                                    "description": "\u5ba2\u6237\u8bc4\u7ea7\uff08A\/B\/C\/D\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/customers?search=%E5%8D%8E%E4%B8%BA&is_active=1&rating=A&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -3167,7 +3506,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"code\":\"hhlqkckgsekmyrhssyfvyyrna\",\"name\":\"uzylglos\",\"contact_person\":\"ioiqbxzrppbp\",\"contact_phone\":\"ygknjdpk\",\"email\":\"lwilkinson@example.com\",\"address\":\"ooewgwrtvyien\",\"tax_number\":\"mylqnidhxguaunnsqyopknhnx\",\"bank_name\":\"ntfrxjlfr\",\"bank_account\":\"madbmjvgcmiwlfygqufj\",\"rating\":\"B\",\"credit_limit\":34,\"payment_days\":62,\"is_active\":false,\"remark\":\"excepturi\"}"
+                            "raw": "{\"code\":\"CUS001\",\"name\":\"\u534e\u4e3a\u6280\u672f\u6709\u9650\u516c\u53f8\",\"contact_person\":\"\u5f20\u4e09\",\"contact_phone\":\"13800138000\",\"email\":\"contact@huawei.com\",\"region_id\":1,\"address\":\"\u6df1\u5733\u5e02\u9f99\u5c97\u533a\u5742\u7530\u534e\u4e3a\u57fa\u5730\",\"tax_number\":\"91440300192444025N\",\"bank_name\":\"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c\",\"bank_account\":\"6222024000000000000\",\"rating\":\"A\",\"credit_limit\":100000,\"payment_days\":30,\"is_active\":true,\"remark\":\"\u4f18\u8d28\u5ba2\u6237\"}"
                         },
                         "description": ""
                     },
@@ -3185,7 +3524,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "inventore",
+                                    "value": "rem",
                                     "description": "The ID of the customer."
                                 }
                             ]
@@ -3238,7 +3577,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "beatae",
+                                    "value": "facere",
                                     "description": "The ID of the customer."
                                 }
                             ]
@@ -3256,7 +3595,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"ztcshokiimyomokiayznhcgx\",\"contact_person\":\"kopqoprqymqaaere\",\"contact_phone\":\"ezqpxuluixwlzjjdhos\",\"email\":\"mlarkin@example.org\",\"address\":\"wmcdfc\",\"tax_number\":\"vmxziidkvl\",\"bank_name\":\"pos\",\"bank_account\":\"kgioxncrvvywzhkaclbtk\",\"rating\":\"C\",\"credit_limit\":10,\"payment_days\":67,\"is_active\":true,\"remark\":\"magnam\"}"
+                            "raw": "{\"code\":\"CUS001\",\"name\":\"\u534e\u4e3a\u6280\u672f\u6709\u9650\u516c\u53f8\",\"contact_person\":\"\u5f20\u4e09\",\"contact_phone\":\"13800138000\",\"email\":\"contact@huawei.com\",\"region_id\":1,\"address\":\"\u6df1\u5733\u5e02\u9f99\u5c97\u533a\u5742\u7530\u534e\u4e3a\u57fa\u5730\",\"tax_number\":\"91440300192444025N\",\"bank_name\":\"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c\",\"bank_account\":\"6222024000000000000\",\"rating\":\"A\",\"credit_limit\":100000,\"payment_days\":30,\"is_active\":true,\"remark\":\"\u4f18\u8d28\u5ba2\u6237\"}"
                         },
                         "description": ""
                     },
@@ -3274,7 +3613,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "praesentium",
+                                    "value": "dolore",
                                     "description": "The ID of the customer."
                                 }
                             ]
@@ -3301,8 +3640,51 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/purchase-orders",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/purchase-orders"
+                            "query": [
+                                {
+                                    "key": "supplier_id",
+                                    "value": "1",
+                                    "description": "\u4f9b\u5e94\u5546ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "approved",
+                                    "description": "\u8ba2\u5355\u72b6\u6001\uff08draft\/approved\/receiving\/completed\/cancelled\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "PO001",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u8ba2\u5355\u53f7\/\u4f9b\u5e94\u5546\u540d\u79f0\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/purchase-orders?supplier_id=1&warehouse_id=1&status=approved&start_date=2024-01-01&end_date=2024-12-31&search=PO001&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -3362,7 +3744,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"supplier_id\":\"laboriosam\",\"warehouse_id\":\"possimus\",\"order_date\":\"2025-12-24T08:09:21\",\"expected_date\":\"2025-12-24T08:09:21\",\"discount_amount\":87,\"remark\":\"accusamus\",\"items\":[{\"product_id\":\"eius\",\"quantity\":54,\"unit_price\":54,\"tax_rate\":1,\"discount_rate\":18,\"remark\":\"sed\"}]}"
+                            "raw": "{\"supplier_id\":1,\"warehouse_id\":1,\"order_date\":\"2024-01-15\",\"expected_date\":\"2024-01-20\",\"currency_id\":1,\"discount_amount\":100,\"remark\":\"\u7d27\u6025\u8ba2\u5355\",\"items\":null}"
                         },
                         "description": ""
                     },
@@ -3380,7 +3762,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "qui",
+                                    "value": "quo",
                                     "description": "The ID of the purchase order."
                                 }
                             ]
@@ -3433,7 +3815,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "dolores",
+                                    "value": "eum",
                                     "description": "The ID of the purchase order."
                                 }
                             ]
@@ -3451,7 +3833,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"supplier_id\":\"sunt\",\"warehouse_id\":\"tempora\",\"order_date\":\"2025-12-24T08:09:21\",\"expected_date\":\"2025-12-24T08:09:21\",\"discount_amount\":69,\"remark\":\"beatae\",\"items\":[{\"product_id\":\"nam\",\"quantity\":25,\"unit_price\":36,\"tax_rate\":8,\"discount_rate\":13,\"remark\":\"voluptates\"}]}"
+                            "raw": "{\"supplier_id\":\"aliquid\",\"warehouse_id\":\"quia\",\"order_date\":\"2025-12-24T08:39:43\",\"expected_date\":\"2025-12-24T08:39:43\",\"discount_amount\":88,\"remark\":\"unde\",\"items\":[{\"product_id\":\"maxime\",\"quantity\":78,\"unit_price\":38,\"tax_rate\":22,\"discount_rate\":16,\"remark\":\"ut\"}]}"
                         },
                         "description": ""
                     },
@@ -3469,7 +3851,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "vero",
+                                    "value": "iusto",
                                     "description": "The ID of the purchase order."
                                 }
                             ]
@@ -3502,7 +3884,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "corrupti",
+                                    "value": "a",
                                     "description": "The ID of the purchase order."
                                 }
                             ]
@@ -3535,7 +3917,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "aspernatur",
+                                    "value": "sapiente",
                                     "description": "The ID of the purchase order."
                                 }
                             ]
@@ -3553,7 +3935,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"items\":[{\"item_id\":\"sint\",\"quantity\":37}]}"
+                            "raw": "{\"items\":[{\"item_id\":\"sunt\",\"quantity\":55}]}"
                         },
                         "description": ""
                     },
@@ -3571,7 +3953,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "similique",
+                                    "value": "quibusdam",
                                     "description": "The ID of the purchase order."
                                 }
                             ]
@@ -3659,7 +4041,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"supplier_id\":\"qui\",\"warehouse_id\":\"est\",\"return_date\":\"2025-12-24T08:09:21\",\"remark\":\"magnam\",\"items\":[{\"product_id\":\"voluptatem\",\"quantity\":37,\"unit_price\":51,\"tax_rate\":4,\"remark\":\"ut\"}]}"
+                            "raw": "{\"supplier_id\":\"saepe\",\"warehouse_id\":\"sequi\",\"return_date\":\"2025-12-24T08:39:43\",\"remark\":\"aut\",\"items\":[{\"product_id\":\"nihil\",\"quantity\":82,\"unit_price\":19,\"tax_rate\":18,\"remark\":\"consequatur\"}]}"
                         },
                         "description": ""
                     },
@@ -3677,7 +4059,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "vitae",
+                                    "value": "ducimus",
                                     "description": "The ID of the purchase return."
                                 }
                             ]
@@ -3730,7 +4112,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "soluta",
+                                    "value": "voluptas",
                                     "description": "The ID of the purchase return."
                                 }
                             ]
@@ -3818,7 +4200,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"supplier_id\":\"perferendis\",\"settlement_date\":\"2025-12-24T08:09:21\",\"remark\":\"possimus\",\"items\":[{\"reference_type\":\"purchase_return\",\"reference_id\":3,\"remark\":\"enim\"}]}"
+                            "raw": "{\"supplier_id\":\"corporis\",\"settlement_date\":\"2025-12-24T08:39:43\",\"remark\":\"laborum\",\"items\":[{\"reference_type\":\"purchase_order\",\"reference_id\":14,\"remark\":\"dolores\"}]}"
                         },
                         "description": ""
                     },
@@ -3836,7 +4218,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quasi",
+                                    "value": "velit",
                                     "description": "The ID of the purchase settlement."
                                 }
                             ]
@@ -3889,7 +4271,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "aliquam",
+                                    "value": "magni",
                                     "description": "The ID of the purchase settlement."
                                 }
                             ]
@@ -3922,7 +4304,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quia",
+                                    "value": "voluptas",
                                     "description": "The ID of the purchase settlement."
                                 }
                             ]
@@ -3940,7 +4322,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"paid_amount\":67}"
+                            "raw": "{\"paid_amount\":36}"
                         },
                         "description": ""
                     },
@@ -3952,8 +4334,51 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/sales-orders",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/sales-orders"
+                            "query": [
+                                {
+                                    "key": "customer_id",
+                                    "value": "1",
+                                    "description": "\u5ba2\u6237ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "approved",
+                                    "description": "\u8ba2\u5355\u72b6\u6001\uff08draft\/approved\/shipping\/completed\/cancelled\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "SO001",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u8ba2\u5355\u53f7\/\u5ba2\u6237\u540d\u79f0\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/sales-orders?customer_id=1&warehouse_id=1&status=approved&start_date=2024-01-01&end_date=2024-12-31&search=SO001&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -4013,7 +4438,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"customer_id\":\"omnis\",\"warehouse_id\":\"iusto\",\"order_date\":\"2025-12-24T08:09:21\",\"delivery_date\":\"2025-12-24T08:09:21\",\"discount_amount\":60,\"remark\":\"corrupti\",\"items\":[{\"product_id\":\"est\",\"quantity\":36,\"unit_price\":71,\"tax_rate\":20,\"discount_rate\":11,\"remark\":\"omnis\"}]}"
+                            "raw": "{\"customer_id\":1,\"warehouse_id\":1,\"order_date\":\"2024-01-15\",\"delivery_date\":\"2024-01-20\",\"currency_id\":1,\"discount_amount\":100,\"remark\":\"\u91cd\u8981\u5ba2\u6237\u8ba2\u5355\",\"items\":null}"
                         },
                         "description": ""
                     },
@@ -4031,7 +4456,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "perferendis",
+                                    "value": "magni",
                                     "description": "The ID of the sales order."
                                 }
                             ]
@@ -4084,7 +4509,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "tempora",
+                                    "value": "sed",
                                     "description": "The ID of the sales order."
                                 }
                             ]
@@ -4102,7 +4527,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"customer_id\":\"consectetur\",\"warehouse_id\":\"velit\",\"order_date\":\"2025-12-24T08:09:21\",\"delivery_date\":\"2025-12-24T08:09:21\",\"discount_amount\":5,\"remark\":\"qui\",\"items\":[{\"product_id\":\"quia\",\"quantity\":47,\"unit_price\":71,\"tax_rate\":10,\"discount_rate\":17,\"remark\":\"aut\"}]}"
+                            "raw": "{\"customer_id\":\"cum\",\"warehouse_id\":\"cumque\",\"order_date\":\"2025-12-24T08:39:43\",\"delivery_date\":\"2025-12-24T08:39:43\",\"discount_amount\":16,\"remark\":\"saepe\",\"items\":[{\"product_id\":\"maiores\",\"quantity\":70,\"unit_price\":6,\"tax_rate\":11,\"discount_rate\":7,\"remark\":\"inventore\"}]}"
                         },
                         "description": ""
                     },
@@ -4120,7 +4545,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "iure",
+                                    "value": "error",
                                     "description": "The ID of the sales order."
                                 }
                             ]
@@ -4153,7 +4578,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "cupiditate",
+                                    "value": "officia",
                                     "description": "The ID of the sales order."
                                 }
                             ]
@@ -4186,7 +4611,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "non",
+                                    "value": "iste",
                                     "description": "The ID of the sales order."
                                 }
                             ]
@@ -4204,7 +4629,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"items\":[{\"item_id\":\"aut\",\"quantity\":64}]}"
+                            "raw": "{\"items\":[{\"item_id\":\"voluptas\",\"quantity\":49}]}"
                         },
                         "description": ""
                     },
@@ -4222,7 +4647,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "repellat",
+                                    "value": "amet",
                                     "description": "The ID of the sales order."
                                 }
                             ]
@@ -4310,7 +4735,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"customer_id\":\"provident\",\"warehouse_id\":\"culpa\",\"return_date\":\"2025-12-24T08:09:21\",\"remark\":\"sit\",\"items\":[{\"product_id\":\"quibusdam\",\"quantity\":85,\"unit_price\":14,\"tax_rate\":4,\"remark\":\"qui\"}]}"
+                            "raw": "{\"customer_id\":\"maiores\",\"warehouse_id\":\"molestiae\",\"return_date\":\"2025-12-24T08:39:43\",\"remark\":\"ut\",\"items\":[{\"product_id\":\"sint\",\"quantity\":67,\"unit_price\":69,\"tax_rate\":7,\"remark\":\"id\"}]}"
                         },
                         "description": ""
                     },
@@ -4328,7 +4753,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "eum",
+                                    "value": "ut",
                                     "description": "The ID of the sales return."
                                 }
                             ]
@@ -4381,7 +4806,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quia",
+                                    "value": "fugit",
                                     "description": "The ID of the sales return."
                                 }
                             ]
@@ -4469,7 +4894,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"customer_id\":\"dolorem\",\"settlement_date\":\"2025-12-24T08:09:21\",\"remark\":\"minima\",\"items\":[{\"reference_type\":\"sales_order\",\"reference_id\":11,\"remark\":\"saepe\"}]}"
+                            "raw": "{\"customer_id\":\"nemo\",\"settlement_date\":\"2025-12-24T08:39:43\",\"remark\":\"quaerat\",\"items\":[{\"reference_type\":\"sales_order\",\"reference_id\":2,\"remark\":\"quod\"}]}"
                         },
                         "description": ""
                     },
@@ -4487,7 +4912,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "asperiores",
+                                    "value": "omnis",
                                     "description": "The ID of the sales settlement."
                                 }
                             ]
@@ -4540,7 +4965,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ut",
+                                    "value": "dolor",
                                     "description": "The ID of the sales settlement."
                                 }
                             ]
@@ -4573,7 +4998,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "beatae",
+                                    "value": "odio",
                                     "description": "The ID of the sales settlement."
                                 }
                             ]
@@ -4591,7 +5016,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"received_amount\":10}"
+                            "raw": "{\"received_amount\":14}"
                         },
                         "description": ""
                     },
@@ -4603,8 +5028,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/boms",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/boms"
+                            "query": [
+                                {
+                                    "key": "product_id",
+                                    "value": "1",
+                                    "description": "\u4ea7\u54c1ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_default",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u9ed8\u8ba4\u7248\u672c\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "V1.0",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309BOM\u7248\u672c\u53f7\/\u4ea7\u54c1\u540d\u79f0\/SKU\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/boms?product_id=1&is_active=1&is_default=1&search=V1.0&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -4664,7 +5120,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"est\",\"version\":\"uaudtgafiqtzzsfgkbj\",\"effective_date\":\"2025-12-24T08:09:21\",\"expiry_date\":\"2089-12-29\",\"is_default\":false,\"is_active\":true,\"description\":\"Aspernatur sunt voluptas repellat.\",\"items\":[{\"component_product_id\":\"ea\",\"quantity\":46,\"loss_rate\":9,\"sequence\":28,\"position\":\"trxcgyattpy\",\"remark\":\"enim\"}]}"
+                            "raw": "{\"product_id\":1,\"version\":\"V1.0\",\"effective_date\":\"2024-01-01\",\"expiry_date\":\"2024-12-31\",\"is_default\":true,\"is_active\":true,\"description\":\"\u521d\u59cb\u7248\u672cBOM\",\"items\":null}"
                         },
                         "description": ""
                     },
@@ -4682,7 +5138,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "repellendus",
+                                    "value": "molestiae",
                                     "description": "The ID of the bom."
                                 }
                             ]
@@ -4735,7 +5191,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "exercitationem",
+                                    "value": "quo",
                                     "description": "The ID of the bom."
                                 }
                             ]
@@ -4753,7 +5209,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"version\":\"rtmippunirbnzpindg\",\"effective_date\":\"2025-12-24T08:09:21\",\"expiry_date\":\"2065-05-01\",\"is_default\":false,\"is_active\":true,\"description\":\"Pariatur amet numquam nobis dicta molestiae consectetur.\",\"items\":[{\"component_product_id\":\"assumenda\",\"quantity\":57,\"loss_rate\":15,\"sequence\":60,\"position\":\"blwgrxtnaar\",\"remark\":\"omnis\"}]}"
+                            "raw": "{\"version\":\"smzbppzbcnymsgpobyeqah\",\"effective_date\":\"2025-12-24T08:39:43\",\"expiry_date\":\"2095-01-19\",\"is_default\":false,\"is_active\":false,\"description\":\"Omnis corporis qui veniam quos placeat.\",\"items\":[{\"component_product_id\":\"aliquam\",\"quantity\":48,\"loss_rate\":23,\"sequence\":75,\"position\":\"u\",\"remark\":\"voluptatum\"}]}"
                         },
                         "description": ""
                     },
@@ -4771,7 +5227,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "et",
+                                    "value": "quas",
                                     "description": "The ID of the bom."
                                 }
                             ]
@@ -4804,7 +5260,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "sint",
+                                    "value": "aut",
                                     "description": "The ID of the bom."
                                 }
                             ]
@@ -4837,7 +5293,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "delectus",
+                                    "value": "eos",
                                     "description": "The ID of the bom."
                                 }
                             ]
@@ -4864,8 +5320,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/process-routes",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/process-routes"
+                            "query": [
+                                {
+                                    "key": "product_id",
+                                    "value": "1",
+                                    "description": "\u4ea7\u54c1ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_default",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u9ed8\u8ba4\u7248\u672c\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "V1.0",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u7248\u672c\u53f7\/\u4ea7\u54c1\u540d\u79f0\/SKU\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/process-routes?product_id=1&is_active=1&is_default=1&search=V1.0&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -4925,7 +5412,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"velit\",\"version\":\"hqlckbhwkuyvczadqhwqk\",\"effective_date\":\"2025-12-24T08:09:21\",\"expiry_date\":\"2080-12-09\",\"is_default\":true,\"is_active\":true,\"description\":\"Et dolore et aliquid est mollitia eaque mollitia sed.\",\"steps\":[{\"step_name\":\"qvvbvixspayzjudo\",\"step_code\":\"mmgwnehcej\",\"sequence\":32,\"work_center\":\"qqvphos\",\"standard_time\":68,\"setup_time\":48,\"queue_time\":76,\"move_time\":15,\"description\":\"Sunt aut iure reprehenderit voluptatem sit consectetur sunt magni.\",\"remark\":\"labore\"}]}"
+                            "raw": "{\"product_id\":1,\"version\":\"V1.0\",\"effective_date\":\"2024-01-01\",\"expiry_date\":\"2024-12-31\",\"is_default\":true,\"is_active\":true,\"description\":\"\u521d\u59cb\u7248\u672c\u5de5\u827a\u8def\u7ebf\",\"steps\":null}"
                         },
                         "description": ""
                     },
@@ -4943,7 +5430,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "id",
+                                    "value": "quia",
                                     "description": "The ID of the process route."
                                 }
                             ]
@@ -4996,7 +5483,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ratione",
+                                    "value": "velit",
                                     "description": "The ID of the process route."
                                 }
                             ]
@@ -5014,7 +5501,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"version\":\"hprekvubqvmzukvouj\",\"effective_date\":\"2025-12-24T08:09:21\",\"expiry_date\":\"2100-11-13\",\"is_default\":true,\"is_active\":false,\"description\":\"Aut quos fugit illum quidem aliquam culpa.\",\"steps\":[{\"step_name\":\"jadirobhozeafhlxxuxeala\",\"step_code\":\"wehwaxtgoygqol\",\"sequence\":47,\"work_center\":\"romiezphvzwgcoxaqb\",\"standard_time\":8,\"setup_time\":53,\"queue_time\":51,\"move_time\":19,\"description\":\"Sunt occaecati sint expedita.\",\"remark\":\"culpa\"}]}"
+                            "raw": "{\"version\":\"mpegimsyocajlr\",\"effective_date\":\"2025-12-24T08:39:43\",\"expiry_date\":\"2057-05-24\",\"is_default\":true,\"is_active\":true,\"description\":\"Voluptatem suscipit recusandae maiores.\",\"steps\":[{\"step_name\":\"niyqdmdzcwdax\",\"step_code\":\"ggxumqf\",\"sequence\":1,\"work_center\":\"cxmkzdkynslgiudz\",\"standard_time\":19,\"setup_time\":33,\"queue_time\":60,\"move_time\":35,\"description\":\"Harum ut aut debitis eligendi voluptatibus excepturi.\",\"remark\":\"laboriosam\"}]}"
                         },
                         "description": ""
                     },
@@ -5032,7 +5519,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "odio",
+                                    "value": "est",
                                     "description": "The ID of the process route."
                                 }
                             ]
@@ -5065,7 +5552,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "est",
+                                    "value": "consequatur",
                                     "description": "The ID of the process route."
                                 }
                             ]
@@ -5098,7 +5585,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "corrupti",
+                                    "value": "omnis",
                                     "description": "The ID of the process route."
                                 }
                             ]
@@ -5125,8 +5612,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/production-plans",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/production-plans"
+                            "query": [
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "approved",
+                                    "description": "\u8ba1\u5212\u72b6\u6001\uff08draft\/approved\/in_progress\/completed\/cancelled\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/production-plans?warehouse_id=1&status=approved&start_date=2024-01-01&end_date=2024-12-31&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -5186,7 +5704,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"plan_date\":\"2025-12-24T08:09:21\",\"start_date\":\"2025-12-24T08:09:21\",\"end_date\":\"2091-03-27\",\"warehouse_id\":\"dolorem\",\"remark\":\"illum\",\"items\":[{\"product_id\":\"blanditiis\",\"planned_quantity\":79,\"planned_start_date\":\"2025-12-24T08:09:21\",\"planned_end_date\":\"2094-06-24\",\"priority\":29,\"remark\":\"necessitatibus\"}]}"
+                            "raw": "{\"sales_order_id\":1,\"plan_date\":\"2024-01-15\",\"start_date\":\"2024-01-15\",\"end_date\":\"2024-01-20\",\"warehouse_id\":1,\"remark\":\"\u7d27\u6025\u751f\u4ea7\u8ba1\u5212\",\"items\":null}"
                         },
                         "description": ""
                     },
@@ -5204,7 +5722,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "magni",
+                                    "value": "eveniet",
                                     "description": "The ID of the production plan."
                                 }
                             ]
@@ -5257,7 +5775,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "et",
+                                    "value": "consequatur",
                                     "description": "The ID of the production plan."
                                 }
                             ]
@@ -5275,7 +5793,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"plan_date\":\"2025-12-24T08:09:21\",\"start_date\":\"2025-12-24T08:09:21\",\"end_date\":\"2108-06-20\",\"warehouse_id\":\"officiis\",\"remark\":\"numquam\"}"
+                            "raw": "{\"plan_date\":\"2025-12-24T08:39:43\",\"start_date\":\"2025-12-24T08:39:43\",\"end_date\":\"2048-01-09\",\"warehouse_id\":\"adipisci\",\"remark\":\"voluptate\"}"
                         },
                         "description": ""
                     },
@@ -5293,7 +5811,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "exercitationem",
+                                    "value": "aut",
                                     "description": "The ID of the production plan."
                                 }
                             ]
@@ -5326,7 +5844,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "beatae",
+                                    "value": "fuga",
                                     "description": "The ID of the production plan."
                                 }
                             ]
@@ -5353,8 +5871,51 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/work-orders",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/work-orders"
+                            "query": [
+                                {
+                                    "key": "product_id",
+                                    "value": "1",
+                                    "description": "\u4ea7\u54c1ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "approved",
+                                    "description": "\u5de5\u5355\u72b6\u6001\uff08draft\/approved\/in_progress\/completed\/cancelled\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "assigned_to",
+                                    "value": "1",
+                                    "description": "\u5206\u914d\u4ebaID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/work-orders?product_id=1&warehouse_id=1&status=approved&assigned_to=1&start_date=2024-01-01&end_date=2024-12-31&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -5414,7 +5975,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"omnis\",\"warehouse_id\":\"accusamus\",\"quantity\":33,\"start_date\":\"2025-12-24T08:09:21\",\"planned_end_date\":\"2034-06-26\",\"remark\":\"rerum\"}"
+                            "raw": "{\"production_plan_id\":1,\"production_plan_item_id\":1,\"product_id\":1,\"bom_id\":1,\"process_route_id\":1,\"warehouse_id\":1,\"quantity\":100,\"start_date\":\"2024-01-15\",\"planned_end_date\":\"2024-01-20\",\"assigned_to\":1,\"remark\":\"\u7d27\u6025\u5de5\u5355\"}"
                         },
                         "description": ""
                     },
@@ -5432,7 +5993,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quas",
+                                    "value": "voluptatem",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5485,7 +6046,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "perferendis",
+                                    "value": "laboriosam",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5503,7 +6064,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":\"placeat\",\"warehouse_id\":\"repudiandae\",\"quantity\":24,\"start_date\":\"2025-12-24T08:09:21\",\"planned_end_date\":\"2092-08-15\",\"remark\":\"deleniti\"}"
+                            "raw": "{\"product_id\":\"quia\",\"warehouse_id\":\"itaque\",\"quantity\":69,\"start_date\":\"2025-12-24T08:39:43\",\"planned_end_date\":\"2087-01-21\",\"remark\":\"ad\"}"
                         },
                         "description": ""
                     },
@@ -5521,7 +6082,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "molestiae",
+                                    "value": "consectetur",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5554,7 +6115,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "est",
+                                    "value": "voluptatibus",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5587,7 +6148,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "voluptatem",
+                                    "value": "ut",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5605,7 +6166,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"items\":[{\"product_id\":\"omnis\",\"quantity\":20}]}"
+                            "raw": "{\"items\":[{\"product_id\":\"nulla\",\"quantity\":78}]}"
                         },
                         "description": ""
                     },
@@ -5623,7 +6184,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "ab",
+                                    "value": "accusamus",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5641,7 +6202,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"items\":[{\"product_id\":\"quasi\",\"quantity\":83}]}"
+                            "raw": "{\"items\":[{\"product_id\":\"recusandae\",\"quantity\":25}]}"
                         },
                         "description": ""
                     },
@@ -5659,7 +6220,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "est",
+                                    "value": "possimus",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5692,7 +6253,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "saepe",
+                                    "value": "eius",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5745,7 +6306,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "voluptatem",
+                                    "value": "doloribus",
                                     "description": "The ID of the work order."
                                 }
                             ]
@@ -5792,8 +6353,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/production-material-issues",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/production-material-issues"
+                            "query": [
+                                {
+                                    "key": "work_order_id",
+                                    "value": "1",
+                                    "description": "\u5de5\u5355ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "type",
+                                    "value": "issue",
+                                    "description": "\u7c7b\u578b\uff08issue\/return\uff0c\u9886\u6599\/\u9000\u6599\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "approved",
+                                    "description": "\u72b6\u6001\uff08draft\/approved\/completed\/cancelled\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/production-material-issues?work_order_id=1&warehouse_id=1&type=issue&status=approved&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -5843,7 +6435,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "deleniti",
+                                    "value": "dolores",
                                     "description": "The ID of the production material issue."
                                 }
                             ]
@@ -5890,8 +6482,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/production-reports",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/production-reports"
+                            "query": [
+                                {
+                                    "key": "work_order_id",
+                                    "value": "1",
+                                    "description": "\u5de5\u5355ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/production-reports?work_order_id=1&start_date=2024-01-01&end_date=2024-01-31&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -5951,7 +6568,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"work_order_id\":\"dignissimos\",\"report_date\":\"2025-12-24T08:09:21\",\"quantity\":9,\"qualified_quantity\":18,\"defective_quantity\":44,\"work_hours\":47,\"overtime_hours\":25,\"remark\":\"odio\"}"
+                            "raw": "{\"work_order_id\":1,\"work_order_item_id\":1,\"report_date\":\"2024-01-15\",\"quantity\":100,\"qualified_quantity\":95,\"defective_quantity\":5,\"work_hours\":8,\"overtime_hours\":2,\"remark\":\"\u6b63\u5e38\u62a5\u5de5\"}"
                         },
                         "description": ""
                     },
@@ -5969,7 +6586,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "sed",
+                                    "value": "pariatur",
                                     "description": "The ID of the production report."
                                 }
                             ]
@@ -6016,8 +6633,45 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/chart-of-accounts",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/chart-of-accounts"
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "asset",
+                                    "description": "\u79d1\u76ee\u7c7b\u578b\uff08asset\/liability\/equity\/revenue\/expense\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "category",
+                                    "value": "%E6%B5%81%E5%8A%A8%E8%B5%84%E4%BA%A7",
+                                    "description": "\u79d1\u76ee\u5206\u7c7b",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "value": "1",
+                                    "description": "\u7236\u79d1\u76eeID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "tree",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u8fd4\u56de\u6811\u5f62\u7ed3\u6784\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/chart-of-accounts?type=asset&category=%E6%B5%81%E5%8A%A8%E8%B5%84%E4%BA%A7&is_active=1&parent_id=1&tree=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -6077,7 +6731,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"code\":\"repellat\",\"name\":\"wrtkjjejxlsglhkcwgnisda\",\"type\":\"expense\",\"category\":\"quos\",\"is_detail\":true,\"level\":70,\"order\":12,\"is_active\":true,\"remark\":\"voluptates\"}"
+                            "raw": "{\"code\":\"1001\",\"name\":\"\u5e93\u5b58\u73b0\u91d1\",\"parent_id\":1,\"type\":\"asset\",\"category\":\"\u6d41\u52a8\u8d44\u4ea7\",\"is_detail\":true,\"level\":1,\"order\":1,\"is_active\":true,\"remark\":\"\u4e3b\u8981\u79d1\u76ee\"}"
                         },
                         "description": ""
                     },
@@ -6095,7 +6749,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "sit",
+                                    "value": "cupiditate",
                                     "description": "The ID of the chart of account."
                                 }
                             ]
@@ -6148,7 +6802,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "autem",
+                                    "value": "sint",
                                     "description": "The ID of the chart of account."
                                 }
                             ]
@@ -6166,7 +6820,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"nsmfy\",\"type\":\"asset\",\"category\":\"molestiae\",\"is_detail\":false,\"order\":44,\"is_active\":true,\"remark\":\"et\"}"
+                            "raw": "{\"code\":\"1001\",\"name\":\"\u5e93\u5b58\u73b0\u91d1\",\"parent_id\":1,\"type\":\"asset\",\"category\":\"\u6d41\u52a8\u8d44\u4ea7\",\"is_detail\":true,\"order\":1,\"is_active\":true,\"remark\":\"\u4e3b\u8981\u79d1\u76ee\"}"
                         },
                         "description": ""
                     },
@@ -6184,7 +6838,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quidem",
+                                    "value": "itaque",
                                     "description": "The ID of the chart of account."
                                 }
                             ]
@@ -6211,8 +6865,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/accounting-vouchers",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/accounting-vouchers"
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "draft",
+                                    "description": "\u51ed\u8bc1\u72b6\u6001\uff08draft\/posted\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "type",
+                                    "value": "general",
+                                    "description": "\u51ed\u8bc1\u7c7b\u578b\uff08general\/adjustment\/closing\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/accounting-vouchers?status=draft&type=general&start_date=2024-01-01&end_date=2024-12-31&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -6272,7 +6957,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"voucher_date\":\"2025-12-24T08:09:21\",\"type\":\"adjustment\",\"attachment_count\":23,\"remark\":\"suscipit\",\"items\":[{\"account_id\":\"exercitationem\",\"direction\":\"credit\",\"amount\":3,\"summary\":\"dolorem\",\"reference_type\":\"aspernatur\",\"reference_id\":4,\"reference_no\":\"ratione\",\"sequence\":13}]}"
+                            "raw": "{\"voucher_date\":\"2024-01-15\",\"type\":\"general\",\"attachment_count\":2,\"remark\":\"\u65e5\u5e38\u51ed\u8bc1\",\"items\":null}"
                         },
                         "description": ""
                     },
@@ -6290,7 +6975,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "facilis",
+                                    "value": "praesentium",
                                     "description": "The ID of the accounting voucher."
                                 }
                             ]
@@ -6343,7 +7028,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "enim",
+                                    "value": "tempore",
                                     "description": "The ID of the accounting voucher."
                                 }
                             ]
@@ -6361,7 +7046,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"voucher_date\":\"2025-12-24T08:09:21\",\"type\":\"general\",\"attachment_count\":43,\"remark\":\"dolorem\",\"items\":[{\"account_id\":\"qui\",\"direction\":\"debit\",\"amount\":4,\"summary\":\"eos\",\"reference_type\":\"quis\",\"reference_id\":17,\"reference_no\":\"dolor\",\"sequence\":54}]}"
+                            "raw": "{\"voucher_date\":\"2025-12-24T08:39:43\",\"type\":\"general\",\"attachment_count\":34,\"remark\":\"fugit\",\"items\":[{\"account_id\":\"numquam\",\"direction\":\"debit\",\"amount\":23,\"summary\":\"eos\",\"reference_type\":\"quod\",\"reference_id\":5,\"reference_no\":\"voluptatem\",\"sequence\":56}]}"
                         },
                         "description": ""
                     },
@@ -6379,7 +7064,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "est",
+                                    "value": "culpa",
                                     "description": "The ID of the accounting voucher."
                                 }
                             ]
@@ -6412,7 +7097,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "facere",
+                                    "value": "in",
                                     "description": "The ID of the accounting voucher."
                                 }
                             ]
@@ -6439,8 +7124,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/general-ledger",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/general-ledger"
+                            "query": [
+                                {
+                                    "key": "account_id",
+                                    "value": "1",
+                                    "description": "\u79d1\u76eeID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/general-ledger?account_id=1&start_date=2024-01-01&end_date=2024-12-31&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -6484,13 +7194,26 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/general-ledger\/account\/:id\/balance",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/general-ledger\/account\/:id\/balance",
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/general-ledger\/account\/:id\/balance?start_date=2024-01-01&end_date=2024-12-31",
                             "variable": [
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "laboriosam",
+                                    "value": "velit",
                                     "description": "The ID of the account."
                                 }
                             ]
@@ -6537,8 +7260,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/accounts-receivable",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/accounts-receivable"
+                            "query": [
+                                {
+                                    "key": "customer_id",
+                                    "value": "1",
+                                    "description": "\u5ba2\u6237ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "outstanding",
+                                    "description": "\u72b6\u6001\uff08outstanding\/partial\/settled\/overdue\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "overdue",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u903e\u671f\uff081:\u662f, 0:\u5426\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/accounts-receivable?customer_id=1&status=outstanding&overdue=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -6598,7 +7346,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"customer_id\":\"velit\",\"reference_type\":\"error\",\"reference_id\":9,\"reference_no\":\"provident\",\"invoice_date\":\"2025-12-24T08:09:21\",\"due_date\":\"2043-08-19\",\"original_amount\":85,\"received_amount\":3,\"remark\":\"alias\"}"
+                            "raw": "{\"customer_id\":1,\"reference_type\":\"sales_order\",\"reference_id\":1,\"reference_no\":\"SO001\",\"invoice_date\":\"2024-01-15\",\"due_date\":\"2024-02-15\",\"original_amount\":10000,\"received_amount\":0,\"currency_id\":1,\"remark\":\"\u9500\u552e\u8ba2\u5355\u5e94\u6536\u8d26\u6b3e\"}"
                         },
                         "description": ""
                     },
@@ -6616,7 +7364,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "beatae",
+                                    "value": "quia",
                                     "description": "The ID of the accounts receivable."
                                 }
                             ]
@@ -6669,7 +7417,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "magni",
+                                    "value": "ea",
                                     "description": "The ID of the accounts receivable."
                                 }
                             ]
@@ -6687,7 +7435,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"amount\":87}"
+                            "raw": "{\"amount\":5000}"
                         },
                         "description": ""
                     },
@@ -6805,7 +7553,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"supplier_id\":\"itaque\",\"reference_type\":\"in\",\"reference_id\":5,\"reference_no\":\"at\",\"invoice_date\":\"2025-12-24T08:09:21\",\"due_date\":\"2028-05-07\",\"original_amount\":75,\"paid_amount\":90,\"remark\":\"sint\"}"
+                            "raw": "{\"supplier_id\":1,\"reference_type\":\"purchase_order\",\"reference_id\":1,\"reference_no\":\"PO001\",\"invoice_date\":\"2024-01-15\",\"due_date\":\"2024-02-15\",\"original_amount\":10000,\"paid_amount\":0,\"currency_id\":1,\"remark\":\"\u91c7\u8d2d\u8ba2\u5355\u5e94\u4ed8\u8d26\u6b3e\"}"
                         },
                         "description": ""
                     },
@@ -6823,7 +7571,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "natus",
+                                    "value": "exercitationem",
                                     "description": "The ID of the accounts payable."
                                 }
                             ]
@@ -6876,7 +7624,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "eos",
+                                    "value": "ut",
                                     "description": "The ID of the accounts payable."
                                 }
                             ]
@@ -6894,7 +7642,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"amount\":79}"
+                            "raw": "{\"amount\":5000}"
                         },
                         "description": ""
                     },
@@ -6906,8 +7654,63 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/cost-allocations",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/cost-allocations"
+                            "query": [
+                                {
+                                    "key": "allocation_no",
+                                    "value": "CA20240115001",
+                                    "description": "\u5206\u914d\u5355\u53f7\uff08\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "cost_type",
+                                    "value": "material",
+                                    "description": "\u6210\u672c\u7c7b\u578b\uff08material\/labor\/overhead\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "approved",
+                                    "description": "\u72b6\u6001\uff08draft\/approved\/completed\/cancelled\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "reference_type",
+                                    "value": "work_order",
+                                    "description": "\u5173\u8054\u4e1a\u52a1\u7c7b\u578b",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "reference_id",
+                                    "value": "1",
+                                    "description": "\u5173\u8054\u4e1a\u52a1ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "product_id",
+                                    "value": "1",
+                                    "description": "\u4ea7\u54c1ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/cost-allocations?allocation_no=CA20240115001&cost_type=material&status=approved&reference_type=work_order&reference_id=1&product_id=1&start_date=2024-01-01&end_date=2024-12-31&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -6967,7 +7770,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"allocation_date\":\"2025-12-24T08:09:21\",\"cost_type\":\"material\",\"reference_type\":\"sunt\",\"reference_id\":11,\"reference_no\":\"dolores\",\"total_amount\":72,\"allocation_method\":\"direct\",\"remark\":\"nihil\"}"
+                            "raw": "{\"allocation_date\":\"2024-01-15\",\"cost_type\":\"material\",\"reference_type\":\"work_order\",\"reference_id\":1,\"reference_no\":\"WO001\",\"product_id\":1,\"total_amount\":5000,\"allocation_method\":\"direct\",\"remark\":\"\u6750\u6599\u6210\u672c\u5206\u914d\"}"
                         },
                         "description": ""
                     },
@@ -6985,7 +7788,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "earum",
+                                    "value": "ullam",
                                     "description": "The ID of the cost allocation."
                                 }
                             ]
@@ -7038,7 +7841,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "praesentium",
+                                    "value": "voluptatem",
                                     "description": "The ID of the cost allocation."
                                 }
                             ]
@@ -7056,7 +7859,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"allocation_date\":\"2025-12-24T08:09:21\",\"cost_type\":\"overhead\",\"reference_type\":\"ea\",\"reference_id\":17,\"reference_no\":\"quo\",\"total_amount\":86,\"allocation_method\":\"direct\",\"remark\":\"non\"}"
+                            "raw": "{\"allocation_date\":\"2025-12-24T08:39:43\",\"cost_type\":\"overhead\",\"reference_type\":\"veniam\",\"reference_id\":18,\"reference_no\":\"minima\",\"total_amount\":51,\"allocation_method\":\"proportion\",\"remark\":\"voluptatem\"}"
                         },
                         "description": ""
                     },
@@ -7074,7 +7877,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "error",
+                                    "value": "odio",
                                     "description": "The ID of the cost allocation."
                                 }
                             ]
@@ -7107,7 +7910,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "corrupti",
+                                    "value": "consequatur",
                                     "description": "The ID of the cost allocation."
                                 }
                             ]
@@ -7140,7 +7943,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "qui",
+                                    "value": "alias",
                                     "description": "The ID of the cost allocation."
                                 }
                             ]
@@ -7167,8 +7970,15 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/financial-reports\/balance-sheet",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/financial-reports\/balance-sheet"
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u62a5\u8868\u65e5\u671f\uff08\u9ed8\u8ba4\u5f53\u524d\u65e5\u671f\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/financial-reports\/balance-sheet?date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -7212,8 +8022,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/financial-reports\/income-statement",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/financial-reports\/income-statement"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/financial-reports\/income-statement?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -7257,8 +8080,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/workflows",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/workflows"
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "purchase_order",
+                                    "description": "\u5de5\u4f5c\u6d41\u7c7b\u578b\uff08purchase_order\/sales_order\/expense\/work_order\/production_plan\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/workflows?type=purchase_order&is_active=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -7318,7 +8160,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"wteeuizdyvozacl\",\"code\":\"velit\",\"type\":\"purchase_order\",\"description\":\"Velit nisi autem qui ex.\",\"is_active\":true,\"nodes\":[{\"node_name\":\"urczfcbrh\",\"node_type\":\"condition\",\"sequence\":63,\"approval_type\":\"any\",\"timeout_hours\":70,\"is_required\":false,\"remark\":\"nemo\"}]}"
+                            "raw": "{\"name\":\"\u91c7\u8d2d\u8ba2\u5355\u5ba1\u6279\u6d41\u7a0b\",\"code\":\"PO_APPROVAL\",\"type\":\"purchase_order\",\"description\":\"\u91c7\u8d2d\u8ba2\u5355\u5ba1\u6279\u6d41\u7a0b\",\"is_active\":true,\"nodes\":null}"
                         },
                         "description": ""
                     },
@@ -7336,7 +8178,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "tempora",
+                                    "value": "recusandae",
                                     "description": "The ID of the workflow."
                                 }
                             ]
@@ -7389,7 +8231,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "eum",
+                                    "value": "est",
                                     "description": "The ID of the workflow."
                                 }
                             ]
@@ -7407,7 +8249,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"dcgpzelvpwwzcbop\",\"type\":\"sales_order\",\"description\":\"Magni ea velit aut distinctio et neque error.\",\"is_active\":true}"
+                            "raw": "{\"name\":\"iadg\",\"type\":\"purchase_order\",\"description\":\"Nam est rerum saepe eos modi.\",\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -7425,7 +8267,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "mollitia",
+                                    "value": "est",
                                     "description": "The ID of the workflow."
                                 }
                             ]
@@ -7452,8 +8294,39 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/workflow-instances",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/workflow-instances"
+                            "query": [
+                                {
+                                    "key": "workflow_id",
+                                    "value": "1",
+                                    "description": "\u5de5\u4f5c\u6d41ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "pending",
+                                    "description": "\u5b9e\u4f8b\u72b6\u6001\uff08pending\/approved\/rejected\/cancelled\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "reference_type",
+                                    "value": "purchase_order",
+                                    "description": "\u5173\u8054\u4e1a\u52a1\u7c7b\u578b",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "reference_id",
+                                    "value": "1",
+                                    "description": "\u5173\u8054\u4e1a\u52a1ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/workflow-instances?workflow_id=1&status=pending&reference_type=purchase_order&reference_id=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -7513,7 +8386,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"workflow_id\":\"aut\",\"reference_type\":\"cum\",\"reference_id\":8,\"reference_no\":\"fuga\"}"
+                            "raw": "{\"workflow_id\":1,\"reference_type\":\"purchase_order\",\"reference_id\":1,\"reference_no\":\"PO001\"}"
                         },
                         "description": ""
                     },
@@ -7531,7 +8404,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "et",
+                                    "value": "sapiente",
                                     "description": "The ID of the workflow instance."
                                 }
                             ]
@@ -7578,8 +8451,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/approval-records",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/approval-records"
+                            "query": [
+                                {
+                                    "key": "instance_id",
+                                    "value": "1",
+                                    "description": "\u6d41\u7a0b\u5b9e\u4f8bID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "approver_id",
+                                    "value": "1",
+                                    "description": "\u5ba1\u6279\u4ebaID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "pending",
+                                    "description": "\u5ba1\u6279\u72b6\u6001\uff08pending\/approved\/rejected\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/approval-records?instance_id=1&approver_id=1&status=pending&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -7674,7 +8572,7 @@
                                 {
                                     "id": "instanceId",
                                     "key": "instanceId",
-                                    "value": "fugit",
+                                    "value": "natus",
                                     "description": ""
                                 }
                             ]
@@ -7692,7 +8590,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"comment\":\"rerum\"}"
+                            "raw": "{\"comment\":\"\u540c\u610f\"}"
                         },
                         "description": ""
                     },
@@ -7710,7 +8608,7 @@
                                 {
                                     "id": "instanceId",
                                     "key": "instanceId",
-                                    "value": "omnis",
+                                    "value": "eum",
                                     "description": ""
                                 }
                             ]
@@ -7728,7 +8626,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"comment\":\"id\"}"
+                            "raw": "{\"comment\":\"\u91d1\u989d\u8d85\u51fa\u9884\u7b97\"}"
                         },
                         "description": ""
                     },
@@ -7746,7 +8644,7 @@
                                 {
                                     "id": "instanceId",
                                     "key": "instanceId",
-                                    "value": "quia",
+                                    "value": "occaecati",
                                     "description": ""
                                 }
                             ]
@@ -7793,8 +8691,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/sales-reports\/summary",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/sales-reports\/summary"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/sales-reports\/summary?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -7838,8 +8749,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/sales-reports\/by-customer",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/sales-reports\/by-customer"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/sales-reports\/by-customer?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -7883,8 +8807,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/sales-reports\/by-product",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/sales-reports\/by-product"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/sales-reports\/by-product?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -7928,8 +8865,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/sales-reports\/trend",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/sales-reports\/trend"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u6700\u8fd16\u4e2a\u6708\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-06-30",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "group_by",
+                                    "value": "month",
+                                    "description": "\u5206\u7ec4\u65b9\u5f0f\uff08day\/week\/month\uff0c\u9ed8\u8ba4day\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/sales-reports\/trend?start_date=2024-01-01&end_date=2024-06-30&group_by=month"
                         },
                         "method": "GET",
                         "header": [
@@ -7973,8 +8929,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/purchase-reports\/summary",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/purchase-reports\/summary"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/purchase-reports\/summary?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -8018,8 +8987,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/purchase-reports\/by-supplier",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/purchase-reports\/by-supplier"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/purchase-reports\/by-supplier?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -8063,8 +9045,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/purchase-reports\/by-product",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/purchase-reports\/by-product"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/purchase-reports\/by-product?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -8108,8 +9103,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/purchase-reports\/trend",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/purchase-reports\/trend"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u6700\u8fd16\u4e2a\u6708\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-06-30",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "group_by",
+                                    "value": "month",
+                                    "description": "\u5206\u7ec4\u65b9\u5f0f\uff08day\/week\/month\uff0c\u9ed8\u8ba4day\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/purchase-reports\/trend?start_date=2024-01-01&end_date=2024-06-30&group_by=month"
                         },
                         "method": "GET",
                         "header": [
@@ -8153,8 +9167,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/inventory-reports\/turnover",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/inventory-reports\/turnover"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/inventory-reports\/turnover?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -8198,8 +9225,15 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/inventory-reports\/slow-moving",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/inventory-reports\/slow-moving"
+                            "query": [
+                                {
+                                    "key": "days",
+                                    "value": "90",
+                                    "description": "\u5929\u6570\u9608\u503c\uff08\u9ed8\u8ba490\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/inventory-reports\/slow-moving?days=90"
                         },
                         "method": "GET",
                         "header": [
@@ -8243,8 +9277,15 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/inventory-reports\/valuation",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/inventory-reports\/valuation"
+                            "query": [
+                                {
+                                    "key": "warehouse_id",
+                                    "value": "1",
+                                    "description": "\u4ed3\u5e93ID",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/inventory-reports\/valuation?warehouse_id=1"
                         },
                         "method": "GET",
                         "header": [
@@ -8288,8 +9329,21 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/inventory-reports\/movement",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/inventory-reports\/movement"
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f\uff08\u9ed8\u8ba4\u672c\u6708\u7b2c\u4e00\u5929\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2024-01-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f\uff08\u9ed8\u8ba4\u4eca\u5929\uff09",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/inventory-reports\/movement?start_date=2024-01-01&end_date=2024-01-31"
                         },
                         "method": "GET",
                         "header": [
@@ -8333,8 +9387,27 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/custom-reports",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/custom-reports"
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "sales",
+                                    "description": "\u62a5\u8868\u5206\u7c7b\uff08sales\/purchase\/inventory\/financial\/custom\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/custom-reports?category=sales&is_active=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -8394,7 +9467,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"wony\",\"code\":\"temporibus\",\"category\":\"inventory\",\"description\":\"Eos voluptatem omnis quia voluptatem quia.\",\"query_config\":[],\"display_config\":[],\"is_active\":true}"
+                            "raw": "{\"name\":\"\u9500\u552e\u65e5\u62a5\",\"code\":\"SALES_DAILY\",\"category\":\"sales\",\"description\":\"\u6bcf\u65e5\u9500\u552e\u7edf\u8ba1\u62a5\u8868\",\"query_config\":null,\"display_config\":null,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -8412,7 +9485,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "iure",
+                                    "value": "cumque",
                                     "description": "The ID of the custom report."
                                 }
                             ]
@@ -8465,7 +9538,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quos",
+                                    "value": "inventore",
                                     "description": "The ID of the custom report."
                                 }
                             ]
@@ -8483,7 +9556,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"vzrd\",\"category\":\"sales\",\"description\":\"Delectus similique ducimus qui ad et.\",\"query_config\":[],\"display_config\":[],\"is_active\":true}"
+                            "raw": "{\"name\":\"\u9500\u552e\u65e5\u62a5\",\"code\":\"SALES_DAILY\",\"category\":\"sales\",\"description\":\"\u6bcf\u65e5\u9500\u552e\u7edf\u8ba1\u62a5\u8868\",\"query_config\":null,\"display_config\":null,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -8501,7 +9574,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "autem",
+                                    "value": "modi",
                                     "description": "The ID of the custom report."
                                 }
                             ]
@@ -8534,7 +9607,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "velit",
+                                    "value": "ut",
                                     "description": "The ID of the custom report."
                                 }
                             ]
@@ -8702,7 +9775,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "aut",
+                                    "value": "expedita",
                                     "description": "The ID of the notification."
                                 }
                             ]
@@ -8755,7 +9828,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "sunt",
+                                    "value": "ut",
                                     "description": "The ID of the notification."
                                 }
                             ]
@@ -8813,7 +9886,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "quae",
+                                    "value": "rerum",
                                     "description": "The ID of the notification."
                                 }
                             ]
@@ -8856,7 +9929,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"user_id\":\"et\",\"type\":\"financial\",\"title\":\"wjbvp\",\"content\":\"rem\",\"channel\":\"system\",\"priority\":\"urgent\",\"reference_type\":\"sed\",\"reference_id\":8,\"reference_no\":\"est\"}"
+                            "raw": "{\"user_id\":1,\"type\":\"system\",\"title\":\"\u7cfb\u7edf\u901a\u77e5\",\"content\":\"\u60a8\u6709\u4e00\u6761\u65b0\u7684\u6d88\u606f\",\"channel\":\"system\",\"priority\":\"normal\",\"reference_type\":\"purchase_order\",\"reference_id\":1,\"reference_no\":\"PO001\",\"data\":null}"
                         },
                         "description": ""
                     },
@@ -8884,7 +9957,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"user_id\":\"deserunt\",\"template_code\":\"aut\",\"data\":[],\"reference_type\":\"et\",\"reference_id\":1,\"reference_no\":\"saepe\"}"
+                            "raw": "{\"user_id\":1,\"template_code\":\"order_approved\",\"data\":null,\"reference_type\":\"purchase_order\",\"reference_id\":1,\"reference_no\":\"PO001\"}"
                         },
                         "description": ""
                     },
@@ -8896,8 +9969,33 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/notification-templates",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/notification-templates"
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "system",
+                                    "description": "\u6a21\u677f\u7c7b\u578b\uff08system\/approval\/order\/inventory\/financial\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "channel",
+                                    "value": "email",
+                                    "description": "\u53d1\u9001\u6e20\u9053\uff08system\/email\/sms\/push\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "description": "\u662f\u5426\u6fc0\u6d3b\uff081:\u6fc0\u6d3b, 0:\u672a\u6fc0\u6d3b\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/notification-templates?type=system&channel=email&is_active=1&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -8957,7 +10055,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"code\":\"et\",\"name\":\"mkzilfmodyopjmvjnilzmhj\",\"type\":\"inventory\",\"channel\":\"system\",\"subject\":\"qp\",\"content\":\"cupiditate\",\"is_active\":true}"
+                            "raw": "{\"code\":\"order_approved\",\"name\":\"\u8ba2\u5355\u5ba1\u6279\u901a\u8fc7\u901a\u77e5\",\"type\":\"order\",\"channel\":\"email\",\"subject\":\"\u8ba2\u5355\u5ba1\u6279\u901a\u8fc7\",\"content\":\"\u60a8\u7684\u8ba2\u5355{{order_no}}\u5df2\u5ba1\u6279\u901a\u8fc7\",\"variables\":null,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -8975,7 +10073,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "omnis",
+                                    "value": "quisquam",
                                     "description": "The ID of the notification template."
                                 }
                             ]
@@ -9028,7 +10126,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "doloremque",
+                                    "value": "impedit",
                                     "description": "The ID of the notification template."
                                 }
                             ]
@@ -9046,7 +10144,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"pmypewiunhfm\",\"type\":\"approval\",\"channel\":\"email\",\"subject\":\"ggjgcpzgdsif\",\"content\":\"architecto\",\"is_active\":true}"
+                            "raw": "{\"code\":\"order_approved\",\"name\":\"\u8ba2\u5355\u5ba1\u6279\u901a\u8fc7\u901a\u77e5\",\"type\":\"order\",\"channel\":\"email\",\"subject\":\"\u8ba2\u5355\u5ba1\u6279\u901a\u8fc7\",\"content\":\"\u60a8\u7684\u8ba2\u5355{{order_no}}\u5df2\u5ba1\u6279\u901a\u8fc7\",\"variables\":null,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -9064,7 +10162,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "totam",
+                                    "value": "ea",
                                     "description": "The ID of the notification template."
                                 }
                             ]
@@ -9097,7 +10195,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "veniam",
+                                    "value": "aut",
                                     "description": "The ID of the notification template."
                                 }
                             ]
@@ -9124,8 +10222,63 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/operation-logs",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/operation-logs"
+                            "query": [
+                                {
+                                    "key": "user_id",
+                                    "value": "1",
+                                    "description": "\u7528\u6237ID",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "module",
+                                    "value": "%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86",
+                                    "description": "\u6a21\u5757",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "action",
+                                    "value": "%E5%88%9B%E5%BB%BA",
+                                    "description": "\u64cd\u4f5c\uff08\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "method",
+                                    "value": "POST",
+                                    "description": "HTTP\u8bf7\u6c42\u65b9\u6cd5\uff08GET\/POST\/PUT\/DELETE\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status_code",
+                                    "value": "200",
+                                    "description": "\u54cd\u5e94\u72b6\u6001\u7801",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7",
+                                    "description": "\u641c\u7d22\u5173\u952e\u8bcd\uff08\u6309\u64cd\u4f5c\/\u8def\u5f84\/\u6d88\u606f\/\u7528\u6237\u540d\/\u90ae\u7bb1\u6a21\u7cca\u5339\u914d\uff09",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "date_from",
+                                    "value": "2024-01-01",
+                                    "description": "date \u5f00\u59cb\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "date_to",
+                                    "value": "2024-12-31",
+                                    "description": "date \u7ed3\u675f\u65e5\u671f",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "\u6bcf\u9875\u6570\u91cf",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/operation-logs?user_id=1&module=%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86&action=%E5%88%9B%E5%BB%BA&method=POST&status_code=200&search=%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7&date_from=2024-01-01&date_to=2024-12-31&per_page=15"
                         },
                         "method": "GET",
                         "header": [
@@ -9175,7 +10328,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "repellendus",
+                                    "value": "dolore",
                                     "description": "The ID of the operation log."
                                 }
                             ]

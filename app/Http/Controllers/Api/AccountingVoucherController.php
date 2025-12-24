@@ -21,6 +21,11 @@ class AccountingVoucherController extends Controller
     /**
      * 获取会计凭证列表
      *
+     * @queryParam status string 凭证状态（draft/posted） Example: draft
+     * @queryParam type string 凭证类型（general/adjustment/closing） Example: general
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-12-31
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 status（状态）、type（类型）和 start_date/end_date（日期范围）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的凭证列表，包含创建人和过账人信息，按凭证日期降序排列
      */
@@ -56,6 +61,19 @@ class AccountingVoucherController extends Controller
     /**
      * 创建会计凭证
      *
+     * @bodyParam voucher_date date required 凭证日期 Example: 2024-01-15
+     * @bodyParam type string 凭证类型（general/adjustment/closing） Example: general
+     * @bodyParam attachment_count integer 附件数量 Example: 2
+     * @bodyParam remark string 备注 Example: 日常凭证
+     * @bodyParam items array required 明细项（至少2条，借贷必须平衡） Example: 凭证明细数组
+     * @bodyParam items.*.account_id integer required 科目ID Example: 1
+     * @bodyParam items.*.direction string required 借贷方向（debit/credit） Example: debit
+     * @bodyParam items.*.amount number required 金额（最小0） Example: 1000
+     * @bodyParam items.*.summary string 摘要 Example: 支付货款
+     * @bodyParam items.*.reference_type string 关联业务类型 Example: purchase_order
+     * @bodyParam items.*.reference_id integer 关联业务ID Example: 1
+     * @bodyParam items.*.reference_no string 关联业务编号 Example: PO001
+     * @bodyParam items.*.sequence integer 分录序号 Example: 1
      * @param Request $request 请求对象，包含凭证信息和明细项数组（至少2条，借贷必须平衡）
      * @return \Illuminate\Http\JsonResponse 返回创建的凭证信息，状态码 201，失败时返回错误消息
      */

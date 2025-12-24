@@ -12,6 +12,11 @@ class ProductionMaterialIssueController extends Controller
     /**
      * 获取生产领料单列表
      *
+     * @queryParam work_order_id integer 工单ID Example: 1
+     * @queryParam warehouse_id integer 仓库ID Example: 1
+     * @queryParam type string 类型（issue/return，领料/退料） Example: issue
+     * @queryParam status string 状态（draft/approved/completed/cancelled） Example: approved
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 work_order_id（工单ID）、warehouse_id（仓库ID）、type（类型）和 status（状态）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的生产领料单列表，包含工单、仓库和创建人信息，按领料日期降序排列
      */

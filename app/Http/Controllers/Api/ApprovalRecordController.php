@@ -22,6 +22,10 @@ class ApprovalRecordController extends Controller
     /**
      * 获取审批记录列表
      *
+     * @queryParam instance_id integer 流程实例ID Example: 1
+     * @queryParam approver_id integer 审批人ID Example: 1
+     * @queryParam status string 审批状态（pending/approved/rejected） Example: pending
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 instance_id（流程实例ID）、approver_id（审批人ID）和 status（状态）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的审批记录列表，包含流程实例、节点和审批人信息
      */
@@ -52,6 +56,7 @@ class ApprovalRecordController extends Controller
     /**
      * 审批通过
      *
+     * @bodyParam comment string 审批意见 Example: 同意
      * @param int $instanceId 流程实例ID
      * @param Request $request 请求对象，包含 comment（审批意见）
      * @return \Illuminate\Http\JsonResponse 返回审批后的流程实例信息，失败时返回错误消息
@@ -77,6 +82,7 @@ class ApprovalRecordController extends Controller
     /**
      * 审批拒绝
      *
+     * @bodyParam comment string 拒绝原因 Example: 金额超出预算
      * @param int $instanceId 流程实例ID
      * @param Request $request 请求对象，包含 comment（拒绝原因）
      * @return \Illuminate\Http\JsonResponse 返回拒绝后的流程实例信息，失败时返回错误消息

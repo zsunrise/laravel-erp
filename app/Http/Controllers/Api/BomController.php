@@ -13,6 +13,11 @@ class BomController extends Controller
     /**
      * 获取BOM列表
      *
+     * @queryParam product_id integer 产品ID Example: 1
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam is_default boolean 是否默认版本（1:是, 0:否） Example: 1
+     * @queryParam search string 搜索关键词（按BOM版本号/产品名称/SKU模糊匹配） Example: V1.0
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 product_id（产品ID）、is_active（是否激活）、is_default（是否默认）和 search（搜索关键词）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的BOM列表，包含产品和创建人信息
      */
@@ -56,6 +61,21 @@ class BomController extends Controller
     /**
      * 创建BOM
      *
+     * @bodyParam product_id integer required 产品ID Example: 1
+     * @bodyParam version string required 版本号 Example: V1.0
+     * @bodyParam effective_date date required 生效日期 Example: 2024-01-01
+     * @bodyParam expiry_date date 失效日期（必须晚于生效日期） Example: 2024-12-31
+     * @bodyParam is_default boolean 是否默认版本 Example: true
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam description string 描述 Example: 初始版本BOM
+     * @bodyParam items array required 组件明细（至少一条） Example: 组件明细数组
+     * @bodyParam items.*.component_product_id integer required 组件产品ID Example: 2
+     * @bodyParam items.*.quantity number required 用量（最小0） Example: 2
+     * @bodyParam items.*.unit_id integer 单位ID Example: 1
+     * @bodyParam items.*.loss_rate number 损耗率（0-100） Example: 5
+     * @bodyParam items.*.sequence integer 序号 Example: 1
+     * @bodyParam items.*.position string 位置 Example: 主板
+     * @bodyParam items.*.remark string 备注 Example: 关键组件
      * @param Request $request 请求对象，包含BOM信息和明细项数组
      * @return \Illuminate\Http\JsonResponse 返回创建的BOM信息，状态码 201
      */

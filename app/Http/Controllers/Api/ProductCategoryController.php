@@ -12,6 +12,10 @@ class ProductCategoryController extends Controller
     /**
      * 获取产品分类列表
      *
+     * @queryParam parent_id integer 父分类ID Example: 1
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam tree boolean 是否返回树形结构（1:是, 0:否） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 parent_id（父分类ID）、is_active（是否激活）和 tree（树形结构）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的分类列表或树形结构，包含父分类信息
      */
@@ -46,6 +50,13 @@ class ProductCategoryController extends Controller
     /**
      * 创建新产品分类
      *
+     * @bodyParam parent_id integer 父分类ID Example: 1
+     * @bodyParam name string required 分类名称 Example: 电子产品
+     * @bodyParam code string required 分类编码（唯一） Example: ELEC001
+     * @bodyParam image string 分类图片 Example: https://example.com/image.jpg
+     * @bodyParam sort integer 排序值 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam description string 描述 Example: 电子产品分类
      * @param Request $request 请求对象，包含分类信息（名称、编码、父分类ID等）
      * @return \Illuminate\Http\JsonResponse 返回创建的分类信息，状态码 201
      */
@@ -86,6 +97,13 @@ class ProductCategoryController extends Controller
     /**
      * 更新分类信息
      *
+     * @bodyParam parent_id integer 父分类ID（不能是自己） Example: 1
+     * @bodyParam name string 分类名称 Example: 电子产品
+     * @bodyParam code string 分类编码（唯一，排除当前分类） Example: ELEC001
+     * @bodyParam image string 分类图片 Example: https://example.com/image.jpg
+     * @bodyParam sort integer 排序值 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam description string 描述 Example: 电子产品分类
      * @param Request $request 请求对象，包含要更新的分类字段
      * @param int $id 分类ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的分类信息

@@ -51,6 +51,16 @@ class AccountsPayableController extends Controller
     /**
      * 创建应付账款
      *
+     * @bodyParam supplier_id integer required 供应商ID Example: 1
+     * @bodyParam reference_type string 关联业务类型 Example: purchase_order
+     * @bodyParam reference_id integer 关联业务ID Example: 1
+     * @bodyParam reference_no string 关联业务编号 Example: PO001
+     * @bodyParam invoice_date date required 发票日期 Example: 2024-01-15
+     * @bodyParam due_date date required 到期日期（必须晚于发票日期） Example: 2024-02-15
+     * @bodyParam original_amount number required 原始金额（最小0） Example: 10000
+     * @bodyParam paid_amount number 已付金额 Example: 0
+     * @bodyParam currency_id integer 货币ID Example: 1
+     * @bodyParam remark string 备注 Example: 采购订单应付账款
      * @param Request $request 请求对象，包含应付账款信息（供应商ID、发票日期、到期日、金额等）
      * @return \Illuminate\Http\JsonResponse 返回创建的应付账款信息，状态码 201，失败时返回错误消息
      */
@@ -98,6 +108,7 @@ class AccountsPayableController extends Controller
     /**
      * 付款（应付账款）
      *
+     * @bodyParam amount number required 付款金额（最小0） Example: 5000
      * @param int $id 应付账款ID
      * @param Request $request 请求对象，包含 amount（付款金额）
      * @return \Illuminate\Http\JsonResponse 返回付款后的应付账款信息，失败时返回错误消息

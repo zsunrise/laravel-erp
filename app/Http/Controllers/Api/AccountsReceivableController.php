@@ -21,6 +21,10 @@ class AccountsReceivableController extends Controller
     /**
      * 获取应收账款列表
      *
+     * @queryParam customer_id integer 客户ID Example: 1
+     * @queryParam status string 状态（outstanding/partial/settled/overdue） Example: outstanding
+     * @queryParam overdue boolean 是否逾期（1:是, 0:否） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 customer_id（客户ID）、status（状态）和 overdue（逾期）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的应收账款列表，包含客户和货币信息，按到期日升序排列
      */
@@ -51,6 +55,16 @@ class AccountsReceivableController extends Controller
     /**
      * 创建应收账款
      *
+     * @bodyParam customer_id integer required 客户ID Example: 1
+     * @bodyParam reference_type string 关联业务类型 Example: sales_order
+     * @bodyParam reference_id integer 关联业务ID Example: 1
+     * @bodyParam reference_no string 关联业务编号 Example: SO001
+     * @bodyParam invoice_date date required 发票日期 Example: 2024-01-15
+     * @bodyParam due_date date required 到期日期（必须晚于发票日期） Example: 2024-02-15
+     * @bodyParam original_amount number required 原始金额（最小0） Example: 10000
+     * @bodyParam received_amount number 已收金额 Example: 0
+     * @bodyParam currency_id integer 货币ID Example: 1
+     * @bodyParam remark string 备注 Example: 销售订单应收账款
      * @param Request $request 请求对象，包含应收账款信息（客户ID、发票日期、到期日、金额等）
      * @return \Illuminate\Http\JsonResponse 返回创建的应收账款信息，状态码 201，失败时返回错误消息
      */
@@ -98,6 +112,7 @@ class AccountsReceivableController extends Controller
     /**
      * 收款（应收账款）
      *
+     * @bodyParam amount number required 收款金额（最小0） Example: 5000
      * @param int $id 应收账款ID
      * @param Request $request 请求对象，包含 amount（收款金额）
      * @return \Illuminate\Http\JsonResponse 返回收款后的应收账款信息，失败时返回错误消息

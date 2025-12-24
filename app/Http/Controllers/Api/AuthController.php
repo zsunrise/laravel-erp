@@ -13,6 +13,8 @@ class AuthController extends Controller
     /**
      * 用户登录接口
      *
+     * @bodyParam email string required 用户邮箱 Example: user@example.com
+     * @bodyParam password string required 用户密码 Example: password123
      * @param Request $request 请求对象，包含 email 和 password
      * @return \Illuminate\Http\JsonResponse 返回用户信息和认证令牌
      * @throws ValidationException 当凭证错误或账户被禁用时抛出异常

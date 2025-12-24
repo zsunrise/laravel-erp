@@ -22,6 +22,13 @@ class SalesOrderController extends Controller
     /**
      * 获取销售订单列表
      *
+     * @queryParam customer_id integer 客户ID Example: 1
+     * @queryParam warehouse_id integer 仓库ID Example: 1
+     * @queryParam status string 订单状态（draft/approved/shipping/completed/cancelled） Example: approved
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-12-31
+     * @queryParam search string 搜索关键词（按订单号/客户名称模糊匹配） Example: SO001
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 customer_id（客户ID）、warehouse_id（仓库ID）、status（状态）、start_date/end_date（日期范围）和 search（搜索关键词）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的销售订单列表，包含客户、仓库、货币和创建人信息
      */
@@ -66,6 +73,20 @@ class SalesOrderController extends Controller
     /**
      * 创建销售订单
      *
+     * @bodyParam customer_id integer required 客户ID Example: 1
+     * @bodyParam warehouse_id integer required 仓库ID Example: 1
+     * @bodyParam order_date date required 订单日期 Example: 2024-01-15
+     * @bodyParam delivery_date date 交货日期 Example: 2024-01-20
+     * @bodyParam currency_id integer 币种ID Example: 1
+     * @bodyParam discount_amount number 折扣金额 Example: 100
+     * @bodyParam remark string 备注 Example: 重要客户订单
+     * @bodyParam items array required 订单明细（至少一条） Example: 订单明细数组
+     * @bodyParam items.*.product_id integer required 产品ID Example: 1
+     * @bodyParam items.*.quantity integer required 数量（最小1） Example: 10
+     * @bodyParam items.*.unit_price number required 单价 Example: 100
+     * @bodyParam items.*.tax_rate number 税率（0-100） Example: 13
+     * @bodyParam items.*.discount_rate number 折扣率（0-100） Example: 5
+     * @bodyParam items.*.remark string 明细备注 Example: 优质产品
      * @param Request $request 请求对象，包含订单信息和明细项数组
      * @return \Illuminate\Http\JsonResponse 返回创建的订单信息，状态码 201，失败时返回错误消息
      */

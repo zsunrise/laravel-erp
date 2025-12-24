@@ -21,6 +21,11 @@ class ProductionPlanController extends Controller
     /**
      * 获取生产计划列表
      *
+     * @queryParam warehouse_id integer 仓库ID Example: 1
+     * @queryParam status string 计划状态（draft/approved/in_progress/completed/cancelled） Example: approved
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-12-31
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 warehouse_id（仓库ID）、status（状态）和 start_date/end_date（日期范围）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的生产计划列表，包含仓库、销售订单和创建人信息
      */
@@ -56,6 +61,21 @@ class ProductionPlanController extends Controller
     /**
      * 创建生产计划
      *
+     * @bodyParam sales_order_id integer 关联销售订单ID Example: 1
+     * @bodyParam plan_date date required 计划日期 Example: 2024-01-15
+     * @bodyParam start_date date required 开始日期 Example: 2024-01-15
+     * @bodyParam end_date date required 结束日期（必须晚于开始日期） Example: 2024-01-20
+     * @bodyParam warehouse_id integer required 仓库ID Example: 1
+     * @bodyParam remark string 备注 Example: 紧急生产计划
+     * @bodyParam items array required 明细项（至少一条） Example: 计划明细数组
+     * @bodyParam items.*.product_id integer required 产品ID Example: 1
+     * @bodyParam items.*.bom_id integer BOM ID Example: 1
+     * @bodyParam items.*.process_route_id integer 工艺路线ID Example: 1
+     * @bodyParam items.*.planned_quantity integer required 计划数量（最小1） Example: 100
+     * @bodyParam items.*.planned_start_date date required 计划开始日期 Example: 2024-01-15
+     * @bodyParam items.*.planned_end_date date required 计划结束日期（必须晚于计划开始日期） Example: 2024-01-20
+     * @bodyParam items.*.priority integer 优先级 Example: 1
+     * @bodyParam items.*.remark string 明细备注 Example: 优先生产
      * @param Request $request 请求对象，包含计划信息和明细项数组
      * @return \Illuminate\Http\JsonResponse 返回创建的计划信息，状态码 201，失败时返回错误消息
      */

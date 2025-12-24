@@ -15,6 +15,8 @@ class InventoryReportController extends Controller
     /**
      * 库存周转率报表
      *
+     * @queryParam start_date date 开始日期（默认本月第一天） Example: 2024-01-01
+     * @queryParam end_date date 结束日期（默认今天） Example: 2024-01-31
      * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
      * @return \Illuminate\Http\JsonResponse 返回产品的库存周转率和周转天数统计，按周转率降序排列
      */
@@ -56,6 +58,7 @@ class InventoryReportController extends Controller
     /**
      * 呆滞库存报表
      *
+     * @queryParam days integer 天数阈值（默认90天） Example: 90
      * @param Request $request 请求对象，支持 days（天数阈值，默认90天）
      * @return \Illuminate\Http\JsonResponse 返回超过指定天数未发生交易的产品库存信息，按未交易天数降序排列
      */
@@ -97,6 +100,7 @@ class InventoryReportController extends Controller
     /**
      * 库存估值报表
      *
+     * @queryParam warehouse_id integer 仓库ID Example: 1
      * @param Request $request 请求对象，支持 warehouse_id（仓库ID）
      * @return \Illuminate\Http\JsonResponse 返回按产品和仓库分组的库存估值数据（数量和总价值）
      */
@@ -139,6 +143,8 @@ class InventoryReportController extends Controller
     /**
      * 库存变动报表
      *
+     * @queryParam start_date date 开始日期（默认本月第一天） Example: 2024-01-01
+     * @queryParam end_date date 结束日期（默认今天） Example: 2024-01-31
      * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
      * @return \Illuminate\Http\JsonResponse 返回按产品分组的库存变动统计（入库数量/金额、出库数量/金额），按入库数量降序排列
      */

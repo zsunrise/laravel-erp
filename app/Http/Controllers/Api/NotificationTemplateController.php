@@ -12,6 +12,10 @@ class NotificationTemplateController extends Controller
     /**
      * 获取通知模板列表
      *
+     * @queryParam type string 模板类型（system/approval/order/inventory/financial） Example: system
+     * @queryParam channel string 发送渠道（system/email/sms/push） Example: email
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 type（类型）、channel（渠道）和 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的通知模板列表，包含创建人信息
      */
@@ -42,6 +46,14 @@ class NotificationTemplateController extends Controller
     /**
      * 创建通知模板
      *
+     * @bodyParam code string required 模板编码（唯一） Example: order_approved
+     * @bodyParam name string required 模板名称 Example: 订单审批通过通知
+     * @bodyParam type string required 模板类型（system/approval/order/inventory/financial） Example: order
+     * @bodyParam channel string required 发送渠道（system/email/sms/push） Example: email
+     * @bodyParam subject string 邮件主题 Example: 订单审批通过
+     * @bodyParam content string required 模板内容 Example: 您的订单{{order_no}}已审批通过
+     * @bodyParam variables array 模板变量定义 Example: 模板变量定义对象
+     * @bodyParam is_active boolean 是否激活 Example: true
      * @param Request $request 请求对象，包含模板信息（编码、名称、类型、渠道、内容等）
      * @return \Illuminate\Http\JsonResponse 返回创建的模板信息，状态码 201
      */
@@ -93,6 +105,14 @@ class NotificationTemplateController extends Controller
     /**
      * 更新通知模板
      *
+     * @bodyParam code string 模板编码（唯一，排除当前模板） Example: order_approved
+     * @bodyParam name string 模板名称 Example: 订单审批通过通知
+     * @bodyParam type string 模板类型（system/approval/order/inventory/financial） Example: order
+     * @bodyParam channel string 发送渠道（system/email/sms/push） Example: email
+     * @bodyParam subject string 邮件主题 Example: 订单审批通过
+     * @bodyParam content string 模板内容 Example: 您的订单{{order_no}}已审批通过
+     * @bodyParam variables array 模板变量定义 Example: 模板变量定义对象
+     * @bodyParam is_active boolean 是否激活 Example: true
      * @param Request $request 请求对象，包含要更新的模板字段
      * @param int $id 模板ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的模板信息

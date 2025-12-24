@@ -13,6 +13,11 @@ class ProcessRouteController extends Controller
     /**
      * 获取工艺路线列表
      *
+     * @queryParam product_id integer 产品ID Example: 1
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam is_default boolean 是否默认版本（1:是, 0:否） Example: 1
+     * @queryParam search string 搜索关键词（按版本号/产品名称/SKU模糊匹配） Example: V1.0
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 product_id（产品ID）、is_active（是否激活）、is_default（是否默认）和 search（搜索关键词）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的工艺路线列表，包含产品和创建人信息
      */
@@ -56,6 +61,24 @@ class ProcessRouteController extends Controller
     /**
      * 创建工艺路线
      *
+     * @bodyParam product_id integer required 产品ID Example: 1
+     * @bodyParam version string required 版本号 Example: V1.0
+     * @bodyParam effective_date date required 生效日期 Example: 2024-01-01
+     * @bodyParam expiry_date date 失效日期（必须晚于生效日期） Example: 2024-12-31
+     * @bodyParam is_default boolean 是否默认版本 Example: true
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam description string 描述 Example: 初始版本工艺路线
+     * @bodyParam steps array required 工序步骤（至少一个） Example: 工序步骤数组
+     * @bodyParam steps.*.step_name string required 工序名称 Example: 加工
+     * @bodyParam steps.*.step_code string 工序编码 Example: STEP001
+     * @bodyParam steps.*.sequence integer required 工序顺序（最小1） Example: 1
+     * @bodyParam steps.*.work_center string 工作中心 Example: 加工中心1
+     * @bodyParam steps.*.standard_time number 标准工时 Example: 2.5
+     * @bodyParam steps.*.setup_time number 准备时间 Example: 0.5
+     * @bodyParam steps.*.queue_time number 排队时间 Example: 0.2
+     * @bodyParam steps.*.move_time number 转移时间 Example: 0.1
+     * @bodyParam steps.*.description string 工序描述 Example: 主要加工工序
+     * @bodyParam steps.*.remark string 备注 Example: 关键工序
      * @param Request $request 请求对象，包含工艺路线信息和步骤数组
      * @return \Illuminate\Http\JsonResponse 返回创建的工艺路线信息，状态码 201
      */

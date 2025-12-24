@@ -13,6 +13,9 @@ class CustomReportController extends Controller
     /**
      * 获取自定义报表定义列表
      *
+     * @queryParam category string 报表分类（sales/purchase/inventory/financial/custom） Example: sales
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 category（分类）和 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的自定义报表定义列表，包含创建人信息，按创建时间降序排列
      */
@@ -38,6 +41,13 @@ class CustomReportController extends Controller
     /**
      * 创建自定义报表定义
      *
+     * @bodyParam name string required 报表名称 Example: 销售日报
+     * @bodyParam code string required 报表编码（唯一） Example: SALES_DAILY
+     * @bodyParam category string required 报表分类（sales/purchase/inventory/financial/custom） Example: sales
+     * @bodyParam description string 报表描述 Example: 每日销售统计报表
+     * @bodyParam query_config array required 查询配置 Example: 查询配置对象
+     * @bodyParam display_config array required 显示配置 Example: 显示配置对象
+     * @bodyParam is_active boolean 是否启用 Example: true
      * @param Request $request 请求对象，包含报表定义信息（名称、编码、分类、查询配置、显示配置等）
      * @return \Illuminate\Http\JsonResponse 返回创建的报表定义信息，状态码 201
      */
@@ -87,6 +97,13 @@ class CustomReportController extends Controller
     /**
      * 更新自定义报表定义
      *
+     * @bodyParam name string 报表名称 Example: 销售日报
+     * @bodyParam code string 报表编码（唯一，排除当前报表） Example: SALES_DAILY
+     * @bodyParam category string 报表分类（sales/purchase/inventory/financial/custom） Example: sales
+     * @bodyParam description string 报表描述 Example: 每日销售统计报表
+     * @bodyParam query_config array 查询配置 Example: 查询配置对象
+     * @bodyParam display_config array 显示配置 Example: 显示配置对象
+     * @bodyParam is_active boolean 是否启用 Example: true
      * @param Request $request 请求对象，包含要更新的报表定义字段
      * @param int $id 报表定义ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的报表定义信息

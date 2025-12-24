@@ -12,6 +12,8 @@ class UnitController extends Controller
     /**
      * 获取单位列表
      *
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 1000
      * @param Request $request 请求对象，支持 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的单位列表，按排序字段排序
      */

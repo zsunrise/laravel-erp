@@ -20,6 +20,10 @@ class GeneralLedgerController extends Controller
     /**
      * 获取总账列表
      *
+     * @queryParam account_id integer 科目ID Example: 1
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-12-31
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 account_id（科目ID）和 start_date/end_date（日期范围）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的总账列表，包含科目和凭证信息，按日期和ID降序排列
      */
@@ -50,6 +54,8 @@ class GeneralLedgerController extends Controller
     /**
      * 获取科目余额
      *
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-12-31
      * @param int $accountId 科目ID
      * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
      * @return \Illuminate\Http\JsonResponse 返回指定科目的余额信息

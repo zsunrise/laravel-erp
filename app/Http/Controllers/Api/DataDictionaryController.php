@@ -12,6 +12,12 @@ class DataDictionaryController extends Controller
     /**
      * 获取数据字典列表
      *
+     * @queryParam type string 字典类型 Example: order_status
+     * @queryParam code string 编码（模糊匹配） Example: pending
+     * @queryParam label string 标签（模糊匹配） Example: 待处理
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam group_by_type boolean 是否按类型分组（1:是, 0:否） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 type（类型）、code（编码）、label（标签）、is_active（是否激活）和 group_by_type（按类型分组）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的字典列表或按类型分组的字典数据
      */
@@ -59,6 +65,13 @@ class DataDictionaryController extends Controller
     /**
      * 创建数据字典项
      *
+     * @bodyParam type string required 字典类型 Example: order_status
+     * @bodyParam code string required 编码（同一类型下唯一） Example: pending
+     * @bodyParam label string required 标签 Example: 待处理
+     * @bodyParam value string required 值 Example: pending
+     * @bodyParam sort integer 排序值 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam description string 描述 Example: 订单待处理状态
      * @param Request $request 请求对象，包含字典项信息（类型、编码、标签、值等）
      * @return \Illuminate\Http\JsonResponse 返回创建的字典项信息，状态码 201，失败时返回错误消息
      */

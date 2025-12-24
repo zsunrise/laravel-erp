@@ -12,6 +12,9 @@ class PermissionController extends Controller
     /**
      * 获取权限列表
      *
+     * @queryParam group string 权限组 Example: 用户管理
+     * @queryParam search string 搜索关键词（按权限名称/标识模糊匹配） Example: 用户
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 group（权限组）和 search（搜索关键词）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的权限列表，包含角色信息
      */
@@ -42,6 +45,10 @@ class PermissionController extends Controller
     /**
      * 创建新权限
      *
+     * @bodyParam name string required 权限名称 Example: 用户管理
+     * @bodyParam slug string required 权限标识（唯一） Example: users.manage
+     * @bodyParam group string 权限组 Example: 用户管理
+     * @bodyParam description string 描述 Example: 管理用户信息
      * @param Request $request 请求对象，包含权限信息（名称、标识、分组等）
      * @return \Illuminate\Http\JsonResponse 返回创建的权限信息，状态码 201
      */
@@ -79,6 +86,10 @@ class PermissionController extends Controller
     /**
      * 更新权限信息
      *
+     * @bodyParam name string 权限名称 Example: 用户管理
+     * @bodyParam slug string 权限标识（唯一，排除当前权限） Example: users.manage
+     * @bodyParam group string 权限组 Example: 用户管理
+     * @bodyParam description string 描述 Example: 管理用户信息
      * @param Request $request 请求对象，包含要更新的权限字段
      * @param int $id 权限ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的权限信息

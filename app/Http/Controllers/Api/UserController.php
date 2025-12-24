@@ -13,6 +13,9 @@ class UserController extends Controller
     /**
      * 获取用户列表
      *
+     * @queryParam search string 搜索关键词（按用户名/邮箱/电话模糊匹配） Example: 张三
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 search（搜索关键词）和 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的用户列表，包含角色信息
      */
@@ -43,6 +46,12 @@ class UserController extends Controller
     /**
      * 创建新用户
      *
+     * @bodyParam name string required 用户名 Example: 张三
+     * @bodyParam email string required 邮箱（唯一） Example: zhangsan@example.com
+     * @bodyParam password string required 密码（至少8位） Example: password123
+     * @bodyParam phone string 电话 Example: 13800138000
+     * @bodyParam roles array 角色ID数组 Example: 1,2
+     * @bodyParam roles.* integer 角色ID（必须存在） Example: 1
      * @param Request $request 请求对象，包含用户信息和角色ID数组
      * @return \Illuminate\Http\JsonResponse 返回创建的用户信息，状态码 201
      */
@@ -89,6 +98,13 @@ class UserController extends Controller
     /**
      * 更新用户信息
      *
+     * @bodyParam name string 用户名 Example: 张三
+     * @bodyParam email string 邮箱（唯一，排除当前用户） Example: zhangsan@example.com
+     * @bodyParam password string 密码（至少8位，为空则不更新） Example: newpassword123
+     * @bodyParam phone string 电话 Example: 13800138000
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam roles array 角色ID数组 Example: 1,2
+     * @bodyParam roles.* integer 角色ID（必须存在） Example: 1
      * @param Request $request 请求对象，包含要更新的用户字段
      * @param int $id 用户ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的用户信息

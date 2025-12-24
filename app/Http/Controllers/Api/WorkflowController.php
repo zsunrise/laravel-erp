@@ -13,6 +13,9 @@ class WorkflowController extends Controller
     /**
      * 获取工作流列表
      *
+     * @queryParam type string 工作流类型（purchase_order/sales_order/expense/work_order/production_plan） Example: purchase_order
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 type（类型）和 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的工作流列表，包含创建人信息
      */
@@ -38,6 +41,22 @@ class WorkflowController extends Controller
     /**
      * 创建工作流
      *
+     * @bodyParam name string required 工作流名称 Example: 采购订单审批流程
+     * @bodyParam code string required 工作流编码（唯一） Example: PO_APPROVAL
+     * @bodyParam type string required 工作流类型（purchase_order/sales_order/expense/work_order/production_plan） Example: purchase_order
+     * @bodyParam description string 描述 Example: 采购订单审批流程
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam nodes array required 节点数组（至少一个） Example: 工作流节点数组
+     * @bodyParam nodes.*.node_name string required 节点名称 Example: 提交
+     * @bodyParam nodes.*.node_type string required 节点类型（start/approval/condition/end） Example: approval
+     * @bodyParam nodes.*.sequence integer required 节点顺序（最小1） Example: 1
+     * @bodyParam nodes.*.approval_type string 审批类型（single/all/any） Example: single
+     * @bodyParam nodes.*.approver_config array 审批人配置 Example: 审批人配置对象
+     * @bodyParam nodes.*.condition_config array 条件配置 Example: 条件配置对象
+     * @bodyParam nodes.*.next_nodes array 下一节点 Example: 2,3
+     * @bodyParam nodes.*.timeout_hours integer 超时时间（小时） Example: 24
+     * @bodyParam nodes.*.is_required boolean 是否必须 Example: true
+     * @bodyParam nodes.*.remark string 备注 Example: 重要节点
      * @param Request $request 请求对象，包含工作流信息和节点数组
      * @return \Illuminate\Http\JsonResponse 返回创建的工作流信息，状态码 201
      */

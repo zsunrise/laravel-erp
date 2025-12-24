@@ -22,6 +22,11 @@ class InventoryController extends Controller
     /**
      * 获取库存列表
      *
+     * @queryParam product_id integer 产品ID Example: 1
+     * @queryParam warehouse_id integer 仓库ID Example: 1
+     * @queryParam location_id integer 库位ID Example: 1
+     * @queryParam low_stock boolean 是否低库存（1:是, 0:否） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 product_id（产品ID）、warehouse_id（仓库ID）、location_id（库位ID）和 low_stock（低库存）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的库存列表，包含产品、仓库和库位信息
      */
@@ -71,6 +76,15 @@ class InventoryController extends Controller
     /**
      * 入库操作
      *
+     * @bodyParam product_id integer required 产品ID Example: 1
+     * @bodyParam warehouse_id integer required 仓库ID Example: 1
+     * @bodyParam location_id integer 库位ID Example: 1
+     * @bodyParam quantity integer required 入库数量（最小1） Example: 100
+     * @bodyParam unit_cost number 单位成本 Example: 50
+     * @bodyParam reference_type string 关联单据类型 Example: purchase_order
+     * @bodyParam reference_id integer 关联单据ID Example: 1
+     * @bodyParam reference_no string 关联单据号 Example: PO001
+     * @bodyParam remark string 备注 Example: 采购入库
      * @param Request $request 请求对象，包含产品ID、仓库ID、数量、单位成本等入库信息
      * @return \Illuminate\Http\JsonResponse 返回入库结果，状态码 201，失败时返回错误消息
      */

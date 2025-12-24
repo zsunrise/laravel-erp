@@ -22,6 +22,10 @@ class ProductionReportController extends Controller
     /**
      * 获取生产报工单列表
      *
+     * @queryParam work_order_id integer 工单ID Example: 1
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-01-31
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 work_order_id（工单ID）和 start_date/end_date（日期范围）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的生产报工单列表，包含工单、工单明细项和报工人信息，按报工日期降序排列
      */
@@ -52,6 +56,15 @@ class ProductionReportController extends Controller
     /**
      * 创建生产报工单
      *
+     * @bodyParam work_order_id integer required 工单ID Example: 1
+     * @bodyParam work_order_item_id integer 工单明细ID Example: 1
+     * @bodyParam report_date date required 报工日期 Example: 2024-01-15
+     * @bodyParam quantity integer required 报工数量（最小1） Example: 100
+     * @bodyParam qualified_quantity integer 合格数量 Example: 95
+     * @bodyParam defective_quantity integer 不合格数量 Example: 5
+     * @bodyParam work_hours number 工时 Example: 8
+     * @bodyParam overtime_hours number 加班工时 Example: 2
+     * @bodyParam remark string 备注 Example: 正常报工
      * @param Request $request 请求对象，包含报工信息（工单ID、报工日期、数量、合格数量、工时等）
      * @return \Illuminate\Http\JsonResponse 返回创建的报工单信息，状态码 201，失败时返回错误消息
      */

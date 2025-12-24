@@ -12,6 +12,8 @@ class CurrencyController extends Controller
     /**
      * 获取货币列表
      *
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 1000
      * @param Request $request 请求对象，支持 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的货币列表，默认按是否默认排序
      */

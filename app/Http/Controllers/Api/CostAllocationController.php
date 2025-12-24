@@ -13,6 +13,15 @@ class CostAllocationController extends Controller
     /**
      * 获取成本分配单列表
      *
+     * @queryParam allocation_no string 分配单号（模糊匹配） Example: CA20240115001
+     * @queryParam cost_type string 成本类型（material/labor/overhead） Example: material
+     * @queryParam status string 状态（draft/approved/completed/cancelled） Example: approved
+     * @queryParam reference_type string 关联业务类型 Example: work_order
+     * @queryParam reference_id integer 关联业务ID Example: 1
+     * @queryParam product_id integer 产品ID Example: 1
+     * @queryParam start_date date 开始日期 Example: 2024-01-01
+     * @queryParam end_date date 结束日期 Example: 2024-12-31
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 allocation_no（分配单号）、cost_type（成本类型）、status（状态）、reference_type/reference_id（关联信息）、product_id（产品ID）和 start_date/end_date（日期范围）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的成本分配单列表，包含产品、创建人和审批人信息
      */
@@ -72,6 +81,15 @@ class CostAllocationController extends Controller
     /**
      * 创建成本分配单
      *
+     * @bodyParam allocation_date date required 分配日期 Example: 2024-01-15
+     * @bodyParam cost_type string required 成本类型（material/labor/overhead） Example: material
+     * @bodyParam reference_type string 关联业务类型 Example: work_order
+     * @bodyParam reference_id integer 关联业务ID Example: 1
+     * @bodyParam reference_no string 关联业务编号 Example: WO001
+     * @bodyParam product_id integer 产品ID Example: 1
+     * @bodyParam total_amount number required 总金额（最小0） Example: 5000
+     * @bodyParam allocation_method string 分配方法（direct/proportion/quantity） Example: direct
+     * @bodyParam remark string 备注 Example: 材料成本分配
      * @param Request $request 请求对象，包含成本分配单信息（分配日期、成本类型、总金额、分配方法等）
      * @return \Illuminate\Http\JsonResponse 返回创建的成本分配单信息，状态码 201，失败时返回错误消息
      */

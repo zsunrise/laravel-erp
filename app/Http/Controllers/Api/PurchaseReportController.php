@@ -14,6 +14,8 @@ class PurchaseReportController extends Controller
     /**
      * 采购汇总报表
      *
+     * @queryParam start_date date 开始日期（默认本月第一天） Example: 2024-01-01
+     * @queryParam end_date date 结束日期（默认今天） Example: 2024-01-31
      * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
      * @return \Illuminate\Http\JsonResponse 返回按日期分组的采购数据统计和汇总信息（总金额、订单数、平均金额、供应商数）
      */
@@ -60,6 +62,8 @@ class PurchaseReportController extends Controller
     /**
      * 按供应商统计采购报表
      *
+     * @queryParam start_date date 开始日期（默认本月第一天） Example: 2024-01-01
+     * @queryParam end_date date 结束日期（默认今天） Example: 2024-01-31
      * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
      * @return \Illuminate\Http\JsonResponse 返回按供应商分组的采购统计（订单数、总金额、平均金额），按总金额降序排列
      */
@@ -87,6 +91,8 @@ class PurchaseReportController extends Controller
     /**
      * 按产品统计采购报表
      *
+     * @queryParam start_date date 开始日期（默认本月第一天） Example: 2024-01-01
+     * @queryParam end_date date 结束日期（默认今天） Example: 2024-01-31
      * @param Request $request 请求对象，支持 start_date（开始日期）和 end_date（结束日期）
      * @return \Illuminate\Http\JsonResponse 返回按产品分组的采购统计（总数量、总金额、平均价格），按总金额降序排列
      */
@@ -115,6 +121,9 @@ class PurchaseReportController extends Controller
     /**
      * 采购趋势报表
      *
+     * @queryParam start_date date 开始日期（默认最近6个月） Example: 2024-01-01
+     * @queryParam end_date date 结束日期（默认今天） Example: 2024-06-30
+     * @queryParam group_by string 分组方式（day/week/month，默认day） Example: month
      * @param Request $request 请求对象，支持 start_date（开始日期）、end_date（结束日期）和 group_by（分组方式：day/week/month）
      * @return \Illuminate\Http\JsonResponse 返回按时间段分组的采购趋势数据（订单数和总金额）
      */

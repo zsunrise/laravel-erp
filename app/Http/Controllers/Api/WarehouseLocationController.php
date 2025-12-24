@@ -12,6 +12,9 @@ class WarehouseLocationController extends Controller
     /**
      * 获取库位列表
      *
+     * @queryParam warehouse_id integer 仓库ID Example: 1
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 1000
      * @param Request $request 请求对象，支持 warehouse_id（仓库ID）和 is_active（是否激活）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的库位列表，按排序字段排序
      */
@@ -37,6 +40,11 @@ class WarehouseLocationController extends Controller
     /**
      * 创建库位
      *
+     * @bodyParam warehouse_id integer required 仓库ID Example: 1
+     * @bodyParam name string required 库位名称 Example: A区-01-01
+     * @bodyParam code string required 库位编码（同一仓库内唯一） Example: A-01-01
+     * @bodyParam sort integer 排序值 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
      * @param Request $request 请求对象，包含库位信息（仓库ID、名称、编码等）
      * @return \Illuminate\Http\JsonResponse 返回创建的库位信息，状态码 201，编码重复时返回错误消息
      */
@@ -87,6 +95,10 @@ class WarehouseLocationController extends Controller
     /**
      * 更新库位信息
      *
+     * @bodyParam name string 库位名称 Example: A区-01-01
+     * @bodyParam code string 库位编码（同一仓库内唯一，排除当前库位） Example: A-01-01
+     * @bodyParam sort integer 排序值 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
      * @param Request $request 请求对象，包含要更新的库位字段
      * @param int $id 库位ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的库位信息，编码重复时返回错误消息

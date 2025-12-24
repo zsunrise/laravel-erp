@@ -12,6 +12,9 @@ class SystemConfigController extends Controller
     /**
      * 获取系统配置列表
      *
+     * @queryParam group string 配置组 Example: system
+     * @queryParam search string 搜索关键词（按键名/描述模糊匹配） Example: 系统
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 group（配置组）和 search（搜索关键词）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的系统配置列表
      */
@@ -41,6 +44,11 @@ class SystemConfigController extends Controller
     /**
      * 创建系统配置
      *
+     * @bodyParam key string required 配置键名（唯一） Example: system.name
+     * @bodyParam value string 配置值 Example: ERP系统
+     * @bodyParam type string 值类型（string/number/boolean/json） Example: string
+     * @bodyParam group string 配置组 Example: system
+     * @bodyParam description string 描述 Example: 系统名称
      * @param Request $request 请求对象，包含配置信息（键、值、类型、分组等）
      * @return \Illuminate\Http\JsonResponse 返回创建的配置信息，状态码 201
      */
@@ -79,6 +87,11 @@ class SystemConfigController extends Controller
     /**
      * 更新系统配置
      *
+     * @bodyParam key string 配置键名（唯一，排除当前配置） Example: system.name
+     * @bodyParam value string 配置值 Example: ERP系统
+     * @bodyParam type string 值类型（string/number/boolean/json） Example: string
+     * @bodyParam group string 配置组 Example: system
+     * @bodyParam description string 描述 Example: 系统名称
      * @param Request $request 请求对象，包含要更新的配置字段
      * @param int $id 配置ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的配置信息

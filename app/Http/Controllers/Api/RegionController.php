@@ -12,6 +12,11 @@ class RegionController extends Controller
     /**
      * 获取区域列表
      *
+     * @queryParam parent_id integer 父区域ID（不传则查询顶级区域） Example: 1
+     * @queryParam level string 级别（省/市/区等） Example: 省
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam tree boolean 是否返回树形结构（1:是, 0:否） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 1000
      * @param Request $request 请求对象，支持 parent_id（父区域ID）、level（级别）、is_active（是否激活）和 tree（树形结构）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的区域列表或树形结构
      */

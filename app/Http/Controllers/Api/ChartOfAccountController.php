@@ -12,6 +12,12 @@ class ChartOfAccountController extends Controller
     /**
      * 获取会计科目列表
      *
+     * @queryParam type string 科目类型（asset/liability/equity/revenue/expense） Example: asset
+     * @queryParam category string 科目分类 Example: 流动资产
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam parent_id integer 父科目ID Example: 1
+     * @queryParam tree boolean 是否返回树形结构（1:是, 0:否） Example: 1
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 type（类型）、category（分类）、is_active（是否激活）、parent_id（父科目ID）和 tree（树形结构）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的科目列表或树形结构，包含父科目信息
      */
@@ -56,6 +62,16 @@ class ChartOfAccountController extends Controller
     /**
      * 创建会计科目
      *
+     * @bodyParam code string required 科目编码（唯一） Example: 1001
+     * @bodyParam name string required 科目名称 Example: 库存现金
+     * @bodyParam parent_id integer 父科目ID Example: 1
+     * @bodyParam type string required 科目类型（asset/liability/equity/revenue/expense） Example: asset
+     * @bodyParam category string required 科目分类 Example: 流动资产
+     * @bodyParam is_detail boolean 是否明细科目 Example: true
+     * @bodyParam level integer 科目层级（自动计算） Example: 1
+     * @bodyParam order integer 排序顺序 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam remark string 备注 Example: 主要科目
      * @param Request $request 请求对象，包含科目信息（编码、名称、类型、分类等）
      * @return \Illuminate\Http\JsonResponse 返回创建的科目信息，状态码 201
      */
@@ -108,6 +124,15 @@ class ChartOfAccountController extends Controller
     /**
      * 更新会计科目
      *
+     * @bodyParam code string 科目编码（唯一，排除当前科目） Example: 1001
+     * @bodyParam name string 科目名称 Example: 库存现金
+     * @bodyParam parent_id integer 父科目ID（不能是自己） Example: 1
+     * @bodyParam type string 科目类型（asset/liability/equity/revenue/expense） Example: asset
+     * @bodyParam category string 科目分类 Example: 流动资产
+     * @bodyParam is_detail boolean 是否明细科目 Example: true
+     * @bodyParam order integer 排序顺序 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam remark string 备注 Example: 主要科目
      * @param Request $request 请求对象，包含要更新的科目字段
      * @param int $id 科目ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的科目信息

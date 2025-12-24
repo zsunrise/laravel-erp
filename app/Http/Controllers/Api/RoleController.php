@@ -12,6 +12,9 @@ class RoleController extends Controller
     /**
      * 获取角色列表
      *
+     * @queryParam is_active boolean 是否激活（1:激活, 0:未激活） Example: 1
+     * @queryParam search string 搜索关键词（按角色名称/标识模糊匹配） Example: 管理员
+     * @queryParam per_page integer 每页数量 Example: 15
      * @param Request $request 请求对象，支持 is_active（是否激活）和 search（搜索关键词）筛选
      * @return \Illuminate\Http\JsonResponse 返回分页的角色列表，包含权限信息
      */
@@ -41,6 +44,12 @@ class RoleController extends Controller
     /**
      * 创建新角色
      *
+     * @bodyParam name string required 角色名称 Example: 管理员
+     * @bodyParam slug string required 角色标识（唯一） Example: admin
+     * @bodyParam description string 描述 Example: 系统管理员角色
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam permissions array 权限ID数组 Example: 1,2,3
+     * @bodyParam permissions.* integer 权限ID（必须存在） Example: 1
      * @param Request $request 请求对象，包含角色信息和权限ID数组
      * @return \Illuminate\Http\JsonResponse 返回创建的角色信息，状态码 201
      */
@@ -85,6 +94,12 @@ class RoleController extends Controller
     /**
      * 更新角色信息
      *
+     * @bodyParam name string 角色名称 Example: 管理员
+     * @bodyParam slug string 角色标识（唯一，排除当前角色） Example: admin
+     * @bodyParam description string 描述 Example: 系统管理员角色
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @bodyParam permissions array 权限ID数组 Example: 1,2,3
+     * @bodyParam permissions.* integer 权限ID（必须存在） Example: 1
      * @param Request $request 请求对象，包含要更新的角色字段和权限ID数组
      * @param int $id 角色ID
      * @return \Illuminate\Http\JsonResponse 返回更新后的角色信息

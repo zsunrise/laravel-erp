@@ -148,6 +148,16 @@ class NotificationController extends Controller
     /**
      * 发送通知
      *
+     * @bodyParam user_id integer required 目标用户ID Example: 1
+     * @bodyParam type string required 通知类型（system/approval/order/inventory/financial） Example: system
+     * @bodyParam title string required 标题 Example: 系统通知
+     * @bodyParam content string required 内容 Example: 您有一条新的消息
+     * @bodyParam channel string 发送渠道（system/email/sms/push） Example: system
+     * @bodyParam priority string 优先级（low/normal/high/urgent） Example: normal
+     * @bodyParam reference_type string 关联业务类型 Example: purchase_order
+     * @bodyParam reference_id integer 关联业务ID Example: 1
+     * @bodyParam reference_no string 关联业务编号 Example: PO001
+     * @bodyParam data array 额外数据 Example: 额外数据对象
      * @param Request $request 请求对象，包含通知信息（用户ID、类型、标题、内容等）
      * @return \Illuminate\Http\JsonResponse 返回创建的通知信息，状态码 201，失败时返回错误消息
      */
@@ -194,6 +204,12 @@ class NotificationController extends Controller
     /**
      * 使用模板发送通知
      *
+     * @bodyParam user_id integer required 目标用户ID Example: 1
+     * @bodyParam template_code string required 模板编码（必须存在） Example: order_approved
+     * @bodyParam data array required 模板变量数据 Example: 模板变量数据对象
+     * @bodyParam reference_type string 关联业务类型 Example: purchase_order
+     * @bodyParam reference_id integer 关联业务ID Example: 1
+     * @bodyParam reference_no string 关联业务编号 Example: PO001
      * @param Request $request 请求对象，包含用户ID、模板编码和模板数据
      * @return \Illuminate\Http\JsonResponse 返回创建的通知信息，状态码 201，失败时返回错误消息
      */
