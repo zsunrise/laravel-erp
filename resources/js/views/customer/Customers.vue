@@ -16,13 +16,13 @@
                     <el-input v-model="searchForm.search" placeholder="客户名称/编码/联系人/电话" clearable />
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable style="width: 150px">
                         <el-option label="启用" :value="1" />
                         <el-option label="禁用" :value="0" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="评级">
-                    <el-select v-model="searchForm.rating" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.rating" placeholder="全部" clearable style="width: 120px">
                         <el-option label="A级" value="A" />
                         <el-option label="B级" value="B" />
                         <el-option label="C级" value="C" />
@@ -266,9 +266,18 @@ const loadCustomers = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.is_active !== null && searchForm.is_active !== undefined) {
+            params.is_active = searchForm.is_active;
+        }
+        if (searchForm.rating) {
+            params.rating = searchForm.rating;
+        }
         const response = await api.get('/customers', { params });
         customers.value = response.data.data;
         pagination.total = response.data.total;

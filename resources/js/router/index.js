@@ -74,6 +74,12 @@ const routes = [
                 meta: { title: '地区管理', icon: 'Location' }
             },
             {
+                path: 'data-dictionaries',
+                name: 'DataDictionaries',
+                component: () => import('../views/basic/DataDictionaries.vue'),
+                meta: { title: '数据字典', icon: 'Document' }
+            },
+            {
                 path: 'suppliers',
                 name: 'Suppliers',
                 component: () => import('../views/supplier/Suppliers.vue'),

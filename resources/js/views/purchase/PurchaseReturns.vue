@@ -26,7 +26,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.status" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
                         <el-option label="待审核" value="pending" />
                         <el-option label="已审核" value="approved" />
                         <el-option label="已取消" value="cancelled" />
@@ -327,9 +327,18 @@ const loadReturns = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.return_no) {
+            params.return_no = searchForm.return_no;
+        }
+        if (searchForm.supplier_id) {
+            params.supplier_id = searchForm.supplier_id;
+        }
+        if (searchForm.status) {
+            params.status = searchForm.status;
+        }
         const response = await api.get('/purchase-returns', { params });
         returns.value = response.data.data;
         pagination.total = response.data.total;

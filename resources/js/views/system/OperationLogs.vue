@@ -23,7 +23,7 @@
                     <el-input v-model="searchForm.module" placeholder="模块名称" clearable />
                 </el-form-item>
                 <el-form-item label="请求方法">
-                    <el-select v-model="searchForm.method" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.method" placeholder="全部" clearable style="width: 120px">
                         <el-option label="GET" value="GET" />
                         <el-option label="POST" value="POST" />
                         <el-option label="PUT" value="PUT" />
@@ -31,7 +31,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="状态码">
-                    <el-select v-model="searchForm.status_code" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.status_code" placeholder="全部" clearable style="width: 120px">
                         <el-option label="200" :value="200" />
                         <el-option label="400" :value="400" />
                         <el-option label="401" :value="401" />
@@ -206,9 +206,30 @@ const loadLogs = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.user_id) {
+            params.user_id = searchForm.user_id;
+        }
+        if (searchForm.module) {
+            params.module = searchForm.module;
+        }
+        if (searchForm.method) {
+            params.method = searchForm.method;
+        }
+        if (searchForm.status_code) {
+            params.status_code = searchForm.status_code;
+        }
+        if (searchForm.date_from) {
+            params.date_from = searchForm.date_from;
+        }
+        if (searchForm.date_to) {
+            params.date_to = searchForm.date_to;
+        }
         const response = await api.get('/operation-logs', { params });
         logs.value = response.data.data;
         pagination.total = response.data.total;

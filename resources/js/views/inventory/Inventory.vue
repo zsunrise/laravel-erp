@@ -28,7 +28,7 @@
                     <el-input v-model="searchForm.search" placeholder="商品名称/SKU" clearable />
                 </el-form-item>
                 <el-form-item label="仓库">
-                    <el-select v-model="searchForm.warehouse_id" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.warehouse_id" placeholder="全部" clearable style="width: 200px">
                         <el-option
                             v-for="warehouse in warehouses"
                             :key="warehouse.id"
@@ -38,7 +38,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="库存状态">
-                    <el-select v-model="searchForm.stock_status" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.stock_status" placeholder="全部" clearable style="width: 150px">
                         <el-option label="充足" value="sufficient" />
                         <el-option label="不足" value="low" />
                         <el-option label="缺货" value="out" />
@@ -523,9 +523,18 @@ const loadInventory = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.warehouse_id) {
+            params.warehouse_id = searchForm.warehouse_id;
+        }
+        if (searchForm.stock_status) {
+            params.stock_status = searchForm.stock_status;
+        }
         const response = await api.get('/inventory', { params });
         inventory.value = response.data.data;
         pagination.total = response.data.total;

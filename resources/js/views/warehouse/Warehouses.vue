@@ -16,13 +16,13 @@
                     <el-input v-model="searchForm.search" placeholder="仓库名称/编码" clearable />
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable style="width: 150px">
                         <el-option label="启用" :value="1" />
                         <el-option label="禁用" :value="0" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="默认仓库">
-                    <el-select v-model="searchForm.is_default" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.is_default" placeholder="全部" clearable style="width: 150px">
                         <el-option label="是" :value="1" />
                         <el-option label="否" :value="0" />
                     </el-select>
@@ -286,9 +286,18 @@ const loadWarehouses = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.is_active !== null && searchForm.is_active !== undefined) {
+            params.is_active = searchForm.is_active;
+        }
+        if (searchForm.is_default !== null && searchForm.is_default !== undefined) {
+            params.is_default = searchForm.is_default;
+        }
         const response = await api.get('/warehouses', { params });
         warehouses.value = response.data.data;
         pagination.total = response.data.total;

@@ -118,7 +118,13 @@
                             <el-form :inline="true" :model="inventoryReportForm" class="search-form-modern">
                                 <el-form-item label="仓库">
                                     <el-select v-model="inventoryReportForm.warehouse_id" placeholder="全部" clearable>
-                                        <el-option label="全部仓库" :value="null" />
+                                        <el-option label="全部仓库" :value="''" />
+                                        <el-option
+                                            v-for="warehouse in warehouses"
+                                            :key="warehouse.id"
+                                            :label="warehouse.name"
+                                            :value="warehouse.id"
+                                        />
                                     </el-select>
                                 </el-form-item>
                                 <el-form-item>
@@ -199,6 +205,7 @@ const inventoryReportLoading = ref(false);
 const salesReportData = ref([]);
 const purchaseReportData = ref([]);
 const inventoryReportData = ref([]);
+const warehouses = ref([]);
 
 const salesChartRef = ref(null);
 const purchaseChartRef = ref(null);
@@ -236,7 +243,7 @@ const purchaseReportForm = reactive({
 });
 
 const inventoryReportForm = reactive({
-    warehouse_id: null
+    warehouse_id: ''
 });
 
 const financialReportForm = reactive({
@@ -254,7 +261,13 @@ const loadSalesReport = async () => {
         const response = await api.get('/sales-reports/summary', { params });
         if (response.data.success && response.data.data) {
             salesReportData.value = response.data.data.data || [];
-            Object.assign(salesStats, response.data.data.stats || {});
+            const stats = response.data.data.stats || {};
+            Object.assign(salesStats, {
+                total_amount: Number(parseFloat(stats.total_amount) || 0),
+                order_count: Number(parseInt(stats.order_count) || 0),
+                avg_amount: Number(parseFloat(stats.avg_amount) || 0),
+                customer_count: Number(parseInt(stats.customer_count) || 0)
+            });
         } else {
             salesReportData.value = [];
             Object.assign(salesStats, { total_amount: 0, order_count: 0, avg_amount: 0, customer_count: 0 });
@@ -367,7 +380,13 @@ const loadPurchaseReport = async () => {
         const response = await api.get('/purchase-reports/summary', { params });
         if (response.data.success && response.data.data) {
             purchaseReportData.value = response.data.data.data || [];
-            Object.assign(purchaseStats, response.data.data.stats || {});
+            const stats = response.data.data.stats || {};
+            Object.assign(purchaseStats, {
+                total_amount: Number(parseFloat(stats.total_amount) || 0),
+                order_count: Number(parseInt(stats.order_count) || 0),
+                avg_amount: Number(parseFloat(stats.avg_amount) || 0),
+                supplier_count: Number(parseInt(stats.supplier_count) || 0)
+            });
         } else {
             purchaseReportData.value = [];
             Object.assign(purchaseStats, { total_amount: 0, order_count: 0, avg_amount: 0, supplier_count: 0 });
@@ -472,7 +491,10 @@ const updatePurchaseChart = () => {
 const loadInventoryReport = async () => {
     inventoryReportLoading.value = true;
     try {
-        const params = { ...inventoryReportForm };
+        const params = {};
+        if (inventoryReportForm.warehouse_id) {
+            params.warehouse_id = inventoryReportForm.warehouse_id;
+        }
         const response = await api.get('/inventory-reports/valuation', { params });
         if (response.data.success && response.data.data) {
             inventoryReportData.value = response.data.data || [];
@@ -497,7 +519,13 @@ const loadFinancialReport = async () => {
         }
         const response = await api.get('/financial-reports/income-statement', { params });
         if (response.data.success && response.data.data && response.data.data.stats) {
-            Object.assign(financialStats, response.data.data.stats);
+            const stats = response.data.data.stats;
+            Object.assign(financialStats, {
+                revenue: Number(parseFloat(stats.revenue) || 0),
+                cost: Number(parseFloat(stats.cost) || 0),
+                profit: Number(parseFloat(stats.profit) || 0),
+                profit_rate: Number(parseFloat(stats.profit_rate) || 0)
+            });
         } else {
             Object.assign(financialStats, { revenue: 0, cost: 0, profit: 0, profit_rate: 0 });
         }
@@ -531,7 +559,7 @@ const handleInventoryReportSearch = () => {
 };
 
 const handleInventoryReportReset = () => {
-    inventoryReportForm.warehouse_id = null;
+    inventoryReportForm.warehouse_id = '';
     handleInventoryReportSearch();
 };
 
@@ -542,6 +570,16 @@ const handleFinancialReportSearch = () => {
 const handleFinancialReportReset = () => {
     financialReportForm.date_range = null;
     handleFinancialReportSearch();
+};
+
+const loadWarehouses = async () => {
+    try {
+        const response = await api.get('/warehouses', { params: { per_page: 1000, is_active: 1 } });
+        warehouses.value = response.data.data || [];
+    } catch (error) {
+        console.error('加载仓库列表失败:', error);
+        warehouses.value = [];
+    }
 };
 
 const handleExportExcel = async () => {
@@ -683,6 +721,7 @@ watch(activeTab, () => {
 });
 
 onMounted(() => {
+    loadWarehouses();
     loadSalesReport();
     loadPurchaseReport();
     loadInventoryReport();

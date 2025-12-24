@@ -137,7 +137,7 @@
                                     <el-input v-model="payableSearchForm.supplier" placeholder="供应商名称" clearable />
                                 </el-form-item>
                                 <el-form-item label="状态">
-                                    <el-select v-model="payableSearchForm.status" placeholder="全部" clearable>
+                                    <el-select v-model="payableSearchForm.status" placeholder="全部" clearable style="width: 150px">
                                         <el-option label="未结清" value="unpaid" />
                                         <el-option label="已结清" value="paid" />
                                     </el-select>
@@ -449,9 +449,12 @@ const loadVouchers = async () => {
     try {
         const params = {
             page: voucherPagination.page,
-            per_page: voucherPagination.per_page,
-            ...voucherSearchForm
+            per_page: voucherPagination.per_page
         };
+        // 只添加非空值参数
+        if (voucherSearchForm.voucher_no) {
+            params.voucher_no = voucherSearchForm.voucher_no;
+        }
         if (voucherSearchForm.date_range && voucherSearchForm.date_range.length == 2) {
             params.start_date = voucherSearchForm.date_range[0];
             params.end_date = voucherSearchForm.date_range[1];
@@ -492,7 +495,14 @@ const loadAccounts = async () => {
 const loadReceivables = async () => {
     receivableLoading.value = true;
     try {
-        const params = { ...receivableSearchForm };
+        const params = {};
+        // 只添加非空值参数
+        if (receivableSearchForm.customer) {
+            params.customer = receivableSearchForm.customer;
+        }
+        if (receivableSearchForm.status) {
+            params.status = receivableSearchForm.status;
+        }
         const response = await api.get('/accounts-receivable', { params });
         receivables.value = response.data.data;
     } catch (error) {
@@ -505,7 +515,14 @@ const loadReceivables = async () => {
 const loadPayables = async () => {
     payableLoading.value = true;
     try {
-        const params = { ...payableSearchForm };
+        const params = {};
+        // 只添加非空值参数
+        if (payableSearchForm.supplier) {
+            params.supplier = payableSearchForm.supplier;
+        }
+        if (payableSearchForm.status) {
+            params.status = payableSearchForm.status;
+        }
         const response = await api.get('/accounts-payable', { params });
         payables.value = response.data.data;
     } catch (error) {

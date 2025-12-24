@@ -152,6 +152,10 @@ const loadCurrencies = async () => {
             page: pagination.page,
             per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
         const response = await api.get('/currencies', { params });
         currencies.value = response.data.data || [];
         pagination.total = response.data.total || 0;

@@ -11,6 +11,16 @@
                 </div>
             </div>
 
+            <el-form :inline="true" :model="searchForm" class="search-form-modern">
+                <el-form-item label="搜索">
+                    <el-input v-model="searchForm.search" placeholder="角色名称/标识" clearable />
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="handleSearch">查询</el-button>
+                    <el-button @click="handleReset">重置</el-button>
+                </el-form-item>
+            </el-form>
+
             <div class="modern-table" style="margin: 0 24px;">
                 <el-table :data="roles" v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80" />
@@ -102,6 +112,10 @@ const permissionTreeRef = ref(null);
 const roles = ref([]);
 const permissionTree = ref([]);
 
+const searchForm = reactive({
+    search: ''
+});
+
 const form = reactive({
     id: null,
     name: '',
@@ -119,13 +133,26 @@ const rules = {
 const loadRoles = async () => {
     loading.value = true;
     try {
-        const response = await api.get('/roles');
+        const params = {};
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        const response = await api.get('/roles', { params });
         roles.value = response.data.data;
     } catch (error) {
         ElMessage.error('加载角色列表失败');
     } finally {
         loading.value = false;
     }
+};
+
+const handleSearch = () => {
+    loadRoles();
+};
+
+const handleReset = () => {
+    searchForm.search = '';
+    loadRoles();
 };
 
 const loadPermissions = async () => {

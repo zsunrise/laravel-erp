@@ -163,9 +163,15 @@ const loadConfigs = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.group) {
+            params.group = searchForm.group;
+        }
         const response = await api.get('/system-configs', { params });
         configs.value = response.data.data;
         pagination.total = response.data.total;

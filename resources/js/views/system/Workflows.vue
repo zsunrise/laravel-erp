@@ -18,7 +18,7 @@
                             <el-input v-model="searchForm.name" placeholder="流程名称" clearable />
                         </el-form-item>
                         <el-form-item label="流程类型">
-                            <el-select v-model="searchForm.type" placeholder="全部" clearable>
+                            <el-select v-model="searchForm.type" placeholder="全部" clearable style="width: 150px">
                                 <el-option label="采购订单" value="purchase_order" />
                                 <el-option label="销售订单" value="sales_order" />
                                 <el-option label="费用报销" value="expense" />
@@ -27,7 +27,7 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="状态">
-                            <el-select v-model="searchForm.is_active" placeholder="全部" clearable>
+                            <el-select v-model="searchForm.is_active" placeholder="全部" clearable style="width: 150px">
                                 <el-option label="启用" :value="1" />
                                 <el-option label="禁用" :value="0" />
                             </el-select>
@@ -124,7 +124,7 @@
                             <el-input v-model="instanceSearchForm.instance_no" placeholder="实例编号" clearable />
                         </el-form-item>
                         <el-form-item label="状态">
-                            <el-select v-model="instanceSearchForm.status" placeholder="全部" clearable>
+                            <el-select v-model="instanceSearchForm.status" placeholder="全部" clearable style="width: 150px">
                                 <el-option label="待审批" value="pending" />
                                 <el-option label="已通过" value="approved" />
                                 <el-option label="已拒绝" value="rejected" />
@@ -535,9 +535,18 @@ const loadWorkflows = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.name) {
+            params.name = searchForm.name;
+        }
+        if (searchForm.type) {
+            params.type = searchForm.type;
+        }
+        if (searchForm.is_active !== null && searchForm.is_active !== undefined) {
+            params.is_active = searchForm.is_active;
+        }
         const response = await api.get('/workflows', { params });
         workflows.value = response.data.data;
         pagination.total = response.data.total;
@@ -565,9 +574,15 @@ const loadInstances = async () => {
     try {
         const params = {
             page: instancePagination.page,
-            per_page: instancePagination.per_page,
-            ...instanceSearchForm
+            per_page: instancePagination.per_page
         };
+        // 只添加非空值参数
+        if (instanceSearchForm.workflow_id) {
+            params.workflow_id = instanceSearchForm.workflow_id;
+        }
+        if (instanceSearchForm.status) {
+            params.status = instanceSearchForm.status;
+        }
         const response = await api.get('/workflow-instances', { params });
         instances.value = response.data.data;
         instancePagination.total = response.data.total;

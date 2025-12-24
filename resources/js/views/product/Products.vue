@@ -16,7 +16,7 @@
                     <el-input v-model="searchForm.search" placeholder="商品名称/SKU/条码" clearable />
                 </el-form-item>
                 <el-form-item label="分类">
-                    <el-select v-model="searchForm.category_id" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.category_id" placeholder="全部" clearable style="width: 200px">
                         <el-option
                             v-for="category in categories"
                             :key="category.id"
@@ -199,9 +199,15 @@ const loadProducts = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.category_id) {
+            params.category_id = searchForm.category_id;
+        }
         const response = await api.get('/products', { params });
         products.value = response.data.data;
         pagination.total = response.data.total;

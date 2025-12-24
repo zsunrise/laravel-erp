@@ -2,18 +2,37 @@
     <div class="page-container">
         <div class="page-card">
             <div class="page-header">
-                <h2 class="page-title text-primary">计量单位管理</h2>
+                <h2 class="page-title text-primary">数据字典管理</h2>
                 <div class="page-actions">
                     <el-button type="primary" @click="handleAdd" class="interactive">
                         <Plus :size="16" style="margin-right: 6px;" />
-                        新增单位
+                        新增字典
                     </el-button>
                 </div>
             </div>
 
             <el-form :inline="true" :model="searchForm" class="search-form-modern">
-                <el-form-item>
-                    <el-input v-model="searchForm.search" placeholder="单位名称/编码" clearable />
+                <el-form-item label="类型">
+                    <el-select v-model="searchForm.type" filterable placeholder="全部" clearable style="width: 200px">
+                        <el-option
+                            v-for="type in types"
+                            :key="type"
+                            :label="type"
+                            :value="type"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="编码">
+                    <el-input v-model="searchForm.code" placeholder="编码" clearable />
+                </el-form-item>
+                <el-form-item label="标签">
+                    <el-input v-model="searchForm.label" placeholder="标签" clearable />
+                </el-form-item>
+                <el-form-item label="状态">
+                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable style="width: 150px">
+                        <el-option label="启用" :value="1" />
+                        <el-option label="禁用" :value="0" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="handleSearch">查询</el-button>
@@ -22,11 +41,12 @@
             </el-form>
 
             <div class="modern-table" style="margin: 0 24px;">
-                <el-table :data="units" v-loading="loading" style="width: 100%" border>
+                <el-table :data="dictionaries" v-loading="loading" style="width: 100%" border>
                 <el-table-column prop="id" label="ID" width="80" />
-                <el-table-column prop="name" label="单位名称" />
-                <el-table-column prop="code" label="单位编码" />
-                <el-table-column prop="symbol" label="单位符号" />
+                <el-table-column prop="type" label="类型" width="150" />
+                <el-table-column prop="code" label="编码" width="150" />
+                <el-table-column prop="label" label="标签" />
+                <el-table-column prop="value" label="值" />
                 <el-table-column prop="sort" label="排序" width="100" />
                 <el-table-column prop="is_active" label="状态" width="100">
                     <template #default="{ row }">
@@ -35,6 +55,7 @@
                         </el-tag>
                     </template>
                 </el-table-column>
+                <el-table-column prop="description" label="描述" show-overflow-tooltip />
                 <el-table-column label="操作" width="200" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
@@ -57,11 +78,11 @@
             </div>
         </div>
 
-        <!-- 单位表单对话框 -->
+        <!-- 字典表单对话框 -->
         <el-dialog
             v-model="dialogVisible"
             :title="dialogTitle"
-            width="600px"
+            width="700px"
             @close="handleDialogClose"
         >
             <el-form
@@ -70,20 +91,26 @@
                 :rules="rules"
                 label-width="100px"
             >
-                <el-form-item label="单位名称" prop="name">
-                    <el-input v-model="form.name" />
+                <el-form-item label="类型" prop="type">
+                    <el-input v-model="form.type" placeholder="例如：order_status, payment_method" />
                 </el-form-item>
-                <el-form-item label="单位编码" prop="code">
-                    <el-input v-model="form.code" />
+                <el-form-item label="编码" prop="code">
+                    <el-input v-model="form.code" placeholder="唯一编码" />
                 </el-form-item>
-                <el-form-item label="单位符号" prop="symbol">
-                    <el-input v-model="form.symbol" />
+                <el-form-item label="标签" prop="label">
+                    <el-input v-model="form.label" placeholder="显示名称" />
+                </el-form-item>
+                <el-form-item label="值" prop="value">
+                    <el-input v-model="form.value" placeholder="字典值" />
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input-number v-model="form.sort" :min="0" style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="状态" prop="is_active">
                     <el-switch v-model="form.is_active" />
+                </el-form-item>
+                <el-form-item label="描述" prop="description">
+                    <el-input v-model="form.description" type="textarea" :rows="3" placeholder="描述信息" />
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -102,13 +129,17 @@ import api from '../../services/api';
 
 const formRef = ref(null);
 const loading = ref(false);
-const units = ref([]);
+const dictionaries = ref([]);
+const types = ref([]);
 const dialogVisible = ref(false);
-const dialogTitle = ref('新增单位');
+const dialogTitle = ref('新增字典');
 const submitLoading = ref(false);
 
 const searchForm = reactive({
-    search: ''
+    type: null,
+    code: '',
+    label: '',
+    is_active: null
 });
 
 const pagination = reactive({
@@ -119,34 +150,55 @@ const pagination = reactive({
 
 const form = reactive({
     id: null,
-    name: '',
+    type: '',
     code: '',
-    symbol: '',
+    label: '',
+    value: '',
     sort: 0,
-    is_active: true
+    is_active: true,
+    description: ''
 });
 
 const rules = {
-    name: [{ required: true, message: '请输入单位名称', trigger: 'blur' }],
-    code: [{ required: true, message: '请输入单位编码', trigger: 'blur' }]
+    type: [{ required: true, message: '请输入类型', trigger: 'blur' }],
+    code: [{ required: true, message: '请输入编码', trigger: 'blur' }],
+    label: [{ required: true, message: '请输入标签', trigger: 'blur' }],
+    value: [{ required: true, message: '请输入值', trigger: 'blur' }]
 };
 
-const loadUnits = async () => {
+const loadTypes = async () => {
+    try {
+        const response = await api.get('/data-dictionaries/types/list');
+        types.value = response.data.data || [];
+    } catch (error) {
+        console.error('加载类型列表失败:', error);
+    }
+};
+
+const loadDictionaries = async () => {
     loading.value = true;
     try {
         const params = {
             page: pagination.page,
             per_page: pagination.per_page
         };
-        // 只添加非空值参数
-        if (searchForm.search) {
-            params.search = searchForm.search;
+        if (searchForm.type) {
+            params.type = searchForm.type;
         }
-        const response = await api.get('/units', { params });
-        units.value = response.data.data || [];
+        if (searchForm.code) {
+            params.code = searchForm.code;
+        }
+        if (searchForm.label) {
+            params.label = searchForm.label;
+        }
+        if (searchForm.is_active !== null) {
+            params.is_active = searchForm.is_active;
+        }
+        const response = await api.get('/data-dictionaries', { params });
+        dictionaries.value = response.data.data || [];
         pagination.total = response.data.total || 0;
     } catch (error) {
-        ElMessage.error('加载单位列表失败');
+        ElMessage.error('加载字典列表失败');
     } finally {
         loading.value = false;
     }
@@ -154,65 +206,73 @@ const loadUnits = async () => {
 
 const handleSearch = () => {
     pagination.page = 1;
-    loadUnits();
+    loadDictionaries();
 };
 
 const handleReset = () => {
-    searchForm.search = '';
+    searchForm.type = null;
+    searchForm.code = '';
+    searchForm.label = '';
+    searchForm.is_active = null;
     handleSearch();
 };
 
 const handleSizeChange = () => {
     pagination.page = 1;
-    loadUnits();
+    loadDictionaries();
 };
 
 const handlePageChange = () => {
-    loadUnits();
+    loadDictionaries();
 };
 
 const handleAdd = () => {
-    dialogTitle.value = '新增单位';
+    dialogTitle.value = '新增字典';
     Object.assign(form, {
         id: null,
-        name: '',
+        type: '',
         code: '',
-        symbol: '',
+        label: '',
+        value: '',
         sort: 0,
-        is_active: true
+        is_active: true,
+        description: ''
     });
     dialogVisible.value = true;
 };
 
 const handleEdit = async (row) => {
     try {
-        const response = await api.get(`/units/${row.id}`);
-        const unit = response.data.data;
-        dialogTitle.value = '编辑单位';
+        const response = await api.get(`/data-dictionaries/${row.id}`);
+        const dictionary = response.data.data;
+        dialogTitle.value = '编辑字典';
         Object.assign(form, {
-            id: unit.id,
-            name: unit.name,
-            code: unit.code,
-            symbol: unit.symbol || '',
-            sort: unit.sort,
-            is_active: unit.is_active
+            id: dictionary.id,
+            type: dictionary.type,
+            code: dictionary.code,
+            label: dictionary.label,
+            value: dictionary.value,
+            sort: dictionary.sort,
+            is_active: dictionary.is_active,
+            description: dictionary.description || ''
         });
         dialogVisible.value = true;
     } catch (error) {
-        ElMessage.error('加载单位信息失败');
+        ElMessage.error('加载字典信息失败');
     }
 };
 
 const handleDelete = async (row) => {
     try {
-        await ElMessageBox.confirm('确定要删除该单位吗？', '提示', {
+        await ElMessageBox.confirm('确定要删除该字典吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
         });
-        await api.delete(`/units/${row.id}`);
+        await api.delete(`/data-dictionaries/${row.id}`);
         ElMessage.success('删除成功');
-        loadUnits();
+        loadDictionaries();
+        loadTypes();
     } catch (error) {
         if (error !== 'cancel') {
             ElMessage.error(error.response?.data?.message || '删除失败');
@@ -228,14 +288,15 @@ const handleSubmit = async () => {
             submitLoading.value = true;
             try {
                 if (form.id) {
-                    await api.put(`/units/${form.id}`, form);
+                    await api.put(`/data-dictionaries/${form.id}`, form);
                     ElMessage.success('更新成功');
                 } else {
-                    await api.post('/units', form);
+                    await api.post('/data-dictionaries', form);
                     ElMessage.success('创建成功');
                 }
                 dialogVisible.value = false;
-                loadUnits();
+                loadDictionaries();
+                loadTypes();
             } catch (error) {
                 ElMessage.error(error.response?.data?.message || '操作失败');
             } finally {
@@ -250,7 +311,8 @@ const handleDialogClose = () => {
 };
 
 onMounted(() => {
-    loadUnits();
+    loadTypes();
+    loadDictionaries();
 });
 </script>
 

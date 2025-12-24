@@ -1,12 +1,15 @@
 <template>
-    <div class="sales-settlements-page">
-        <el-card>
-            <template #header>
-                <div class="card-header">
-                    <span>销售结算</span>
-                    <el-button type="primary" @click="handleAdd">新增结算</el-button>
+    <div class="page-container">
+        <div class="page-card">
+            <div class="page-header">
+                <h2 class="page-title text-primary">销售结算</h2>
+                <div class="page-actions">
+                    <el-button type="primary" @click="handleAdd" class="interactive">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        新增结算
+                    </el-button>
                 </div>
-            </template>
+            </div>
 
             <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="结算单号">
@@ -23,7 +26,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.status" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
                         <el-option label="待审核" value="pending" />
                         <el-option label="已审核" value="approved" />
                         <el-option label="已收款" value="paid" />
@@ -57,9 +60,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
-                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'">审核</el-button>
-                        <el-button type="warning" size="small" @click="handleReceive(row)" v-if="row.status == 'approved'">收款</el-button>
+                        <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null" class="interactive">查看</el-button>
+                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'" class="interactive">审核</el-button>
+                        <el-button type="warning" size="small" @click="handleReceive(row)" v-if="row.status == 'approved'" class="interactive">收款</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -76,10 +79,9 @@
                     @current-change="handlePageChange"
                 />
             </div>
-        </el-card>
-    </div>
+        </div>
 
-    <!-- 结算表单对话框 -->
+        <!-- 结算表单对话框 -->
         <el-dialog
             v-model="dialogVisible"
             title="新增销售结算"
@@ -235,11 +237,13 @@
                 </el-table>
             </div>
         </el-dialog>
+    </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const loading = ref(false);
@@ -336,9 +340,18 @@ const loadSettlements = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.settlement_no) {
+            params.settlement_no = searchForm.settlement_no;
+        }
+        if (searchForm.customer_id) {
+            params.customer_id = searchForm.customer_id;
+        }
+        if (searchForm.status) {
+            params.status = searchForm.status;
+        }
         const response = await api.get('/sales-settlements', { params });
         settlements.value = response.data.data;
         pagination.total = response.data.total;

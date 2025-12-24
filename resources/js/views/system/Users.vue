@@ -16,9 +16,9 @@
                     <el-input v-model="searchForm.search" placeholder="姓名/邮箱/手机" clearable />
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable>
-                        <el-option label="启用" :value="true" />
-                        <el-option label="禁用" :value="false" />
+                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable style="width: 150px">
+                        <el-option label="启用" :value="1" />
+                        <el-option label="禁用" :value="0" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -171,9 +171,15 @@ const loadUsers = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.is_active !== null && searchForm.is_active !== undefined) {
+            params.is_active = searchForm.is_active;
+        }
         const response = await api.get('/users', { params });
         users.value = response.data.data;
         pagination.total = response.data.total;

@@ -14,14 +14,14 @@
 
             <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.status" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
                         <el-option label="未读" value="unread" />
                         <el-option label="已读" value="read" />
                         <el-option label="已删除" value="deleted" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="类型">
-                    <el-select v-model="searchForm.type" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.type" placeholder="全部" clearable style="width: 150px">
                         <el-option label="系统消息" value="system" />
                         <el-option label="审批消息" value="approval" />
                         <el-option label="订单消息" value="order" />
@@ -30,7 +30,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="优先级">
-                    <el-select v-model="searchForm.priority" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.priority" placeholder="全部" clearable style="width: 150px">
                         <el-option label="低" value="low" />
                         <el-option label="普通" value="normal" />
                         <el-option label="高" value="high" />
@@ -313,9 +313,18 @@ const loadNotifications = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.status) {
+            params.status = searchForm.status;
+        }
+        if (searchForm.type) {
+            params.type = searchForm.type;
+        }
+        if (searchForm.priority) {
+            params.priority = searchForm.priority;
+        }
         const response = await api.get('/notifications', { params });
         notifications.value = response.data.data;
         pagination.total = response.data.total;

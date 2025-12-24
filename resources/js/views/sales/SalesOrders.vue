@@ -19,7 +19,7 @@
                     <el-input v-model="searchForm.customer" placeholder="客户名称" clearable />
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.status" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
                         <el-option label="待审核" value="pending" />
                         <el-option label="已审核" value="approved" />
                         <el-option label="已取消" value="cancelled" />
@@ -317,9 +317,18 @@ const loadOrders = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.order_no) {
+            params.order_no = searchForm.order_no;
+        }
+        if (searchForm.customer) {
+            params.customer = searchForm.customer;
+        }
+        if (searchForm.status) {
+            params.status = searchForm.status;
+        }
         if (searchForm.date_range && searchForm.date_range.length == 2) {
             params.start_date = searchForm.date_range[0];
             params.end_date = searchForm.date_range[1];

@@ -18,7 +18,7 @@
                             <el-input v-model="planSearchForm.plan_no" placeholder="计划号" clearable />
                         </el-form-item>
                         <el-form-item label="状态">
-                            <el-select v-model="planSearchForm.status" placeholder="全部" clearable>
+                            <el-select v-model="planSearchForm.status" placeholder="全部" clearable style="width: 150px">
                                 <el-option label="待开始" value="pending" />
                                 <el-option label="进行中" value="processing" />
                                 <el-option label="已完成" value="completed" />
@@ -86,7 +86,7 @@
                             <el-input v-model="workOrderSearchForm.work_order_no" placeholder="工单号" clearable />
                         </el-form-item>
                         <el-form-item label="状态">
-                            <el-select v-model="workOrderSearchForm.status" placeholder="全部" clearable>
+                            <el-select v-model="workOrderSearchForm.status" placeholder="全部" clearable style="width: 150px">
                                 <el-option label="待开始" value="pending" />
                                 <el-option label="进行中" value="processing" />
                                 <el-option label="已完成" value="completed" />
@@ -434,7 +434,7 @@
         <el-dialog
             v-model="workOrderDetailVisible"
             title="工单详情"
-            width="1200px"
+            width="1400px"
             :close-on-click-modal="false"
         >
             <div v-loading="workOrderDetailLoading">
@@ -455,7 +455,163 @@
                     <el-descriptions-item label="负责人">{{ currentWorkOrder.assigned_to_user?.name || '-' }}</el-descriptions-item>
                     <el-descriptions-item label="备注" :span="2">{{ currentWorkOrder.remark || '-' }}</el-descriptions-item>
                 </el-descriptions>
+
+                <el-divider content-position="left">操作</el-divider>
+                <div style="margin-bottom: 20px;">
+                    <el-button type="primary" @click="handleIssueMaterial" v-if="currentWorkOrder && ['approved', 'in_progress'].includes(currentWorkOrder.status)">
+                        生产领料
+                    </el-button>
+                    <el-button type="warning" @click="handleReturnMaterial" v-if="currentWorkOrder && ['approved', 'in_progress'].includes(currentWorkOrder.status)">
+                        生产退料
+                    </el-button>
+                    <el-button type="success" @click="handleAddReport" v-if="currentWorkOrder && ['approved', 'in_progress'].includes(currentWorkOrder.status)">
+                        生产报工
+                    </el-button>
+                    <el-button type="info" @click="handleViewMaterialIssues" v-if="currentWorkOrder">
+                        查看领料记录
+                    </el-button>
+                    <el-button type="info" @click="handleViewReports" v-if="currentWorkOrder">
+                        查看报工记录
+                    </el-button>
+                    <el-button type="primary" @click="handleCompleteWorkOrder" v-if="currentWorkOrder && currentWorkOrder.status === 'in_progress'">
+                        完成工单
+                    </el-button>
+                </div>
+
+                <el-tabs v-model="workOrderDetailTab" v-if="currentWorkOrder">
+                    <el-tab-pane label="领料记录" name="materialIssues">
+                        <el-table :data="materialIssues" border style="width: 100%; margin-top: 10px;">
+                            <el-table-column prop="issue_no" label="领料单号" width="180" />
+                            <el-table-column prop="issue_date" label="领料日期" width="120" />
+                            <el-table-column prop="type" label="类型" width="100">
+                                <template #default="{ row }">
+                                    <el-tag :type="row.type === 'issue' ? 'primary' : 'warning'">
+                                        {{ row.type === 'issue' ? '领料' : '退料' }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="明细" min-width="300">
+                                <template #default="{ row }">
+                                    <div v-for="item in row.items" :key="item.id" style="margin-bottom: 5px;">
+                                        {{ item.product?.name }} × {{ item.quantity }} {{ item.product?.unit?.name || '' }}
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="status" label="状态" width="100">
+                                <template #default="{ row }">
+                                    <el-tag :type="row.status === 'approved' ? 'success' : 'info'">
+                                        {{ row.status === 'approved' ? '已审核' : '待审核' }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-tab-pane>
+                    <el-tab-pane label="报工记录" name="reports">
+                        <el-table :data="productionReports" border style="width: 100%; margin-top: 10px;">
+                            <el-table-column prop="report_no" label="报工单号" width="180" />
+                            <el-table-column prop="report_date" label="报工日期" width="120" />
+                            <el-table-column prop="work_hours" label="工时" width="100" />
+                            <el-table-column prop="quantity" label="产量" width="100" />
+                            <el-table-column prop="qualified_quantity" label="合格数量" width="100" />
+                            <el-table-column prop="defect_quantity" label="不良数量" width="100" />
+                            <el-table-column prop="qualified_rate" label="合格率" width="100">
+                                <template #default="{ row }">
+                                    {{ row.qualified_rate ? (row.qualified_rate * 100).toFixed(2) + '%' : '-' }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="remark" label="备注" show-overflow-tooltip />
+                        </el-table>
+                    </el-tab-pane>
+                </el-tabs>
             </div>
+            <template #footer>
+                <el-button @click="workOrderDetailVisible = false">关闭</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 生产领料对话框 -->
+        <el-dialog
+            v-model="materialIssueDialogVisible"
+            title="生产领料"
+            width="800px"
+        >
+            <el-form ref="materialIssueFormRef" :model="materialIssueForm" label-width="120px">
+                <el-form-item label="物料明细" prop="items">
+                    <el-button type="primary" size="small" @click="handleAddMaterialItem">添加物料</el-button>
+                    <el-table :data="materialIssueForm.items" border style="margin-top: 10px;">
+                        <el-table-column label="物料" width="250">
+                            <template #default="{ row, $index }">
+                                <el-select v-model="row.product_id" filterable placeholder="请选择物料" @change="handleMaterialProductChange($index)" style="width: 100%">
+                                    <el-option
+                                        v-for="product in products"
+                                        :key="product.id"
+                                        :label="`${product.name} (${product.sku})`"
+                                        :value="product.id"
+                                    />
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="库位" width="200">
+                            <template #default="{ row, $index }">
+                                <el-select v-model="row.location_id" filterable placeholder="请选择库位（可选）" clearable style="width: 100%">
+                                    <el-option
+                                        v-for="location in getLocationsByWarehouse(currentWorkOrder?.warehouse_id)"
+                                        :key="location.id"
+                                        :label="location.name"
+                                        :value="location.id"
+                                    />
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="数量" width="150">
+                            <template #default="{ row, $index }">
+                                <el-input-number v-model="row.quantity" :min="1" style="width: 100%" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="100">
+                            <template #default="{ $index }">
+                                <el-button type="danger" size="small" @click="handleRemoveMaterialItem($index)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="materialIssueDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleSubmitMaterialIssue" :loading="materialIssueSubmitLoading">确定</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 生产报工对话框 -->
+        <el-dialog
+            v-model="productionReportDialogVisible"
+            title="生产报工"
+            width="700px"
+        >
+            <el-form ref="productionReportFormRef" :model="productionReportForm" :rules="productionReportRules" label-width="120px">
+                <el-form-item label="报工日期" prop="report_date">
+                    <el-date-picker v-model="productionReportForm.report_date" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%" />
+                </el-form-item>
+                <el-form-item label="工时" prop="work_hours">
+                    <el-input-number v-model="productionReportForm.work_hours" :min="0" :precision="2" style="width: 100%" />
+                </el-form-item>
+                <el-form-item label="产量" prop="quantity">
+                    <el-input-number v-model="productionReportForm.quantity" :min="0" style="width: 100%" />
+                </el-form-item>
+                <el-form-item label="合格数量" prop="qualified_quantity">
+                    <el-input-number v-model="productionReportForm.qualified_quantity" :min="0" style="width: 100%" />
+                </el-form-item>
+                <el-form-item label="不良数量" prop="defect_quantity">
+                    <el-input-number v-model="productionReportForm.defect_quantity" :min="0" style="width: 100%" />
+                </el-form-item>
+                <el-form-item label="备注" prop="remark">
+                    <el-input v-model="productionReportForm.remark" type="textarea" :rows="3" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="productionReportDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleSubmitProductionReport" :loading="productionReportSubmitLoading">确定</el-button>
+            </template>
         </el-dialog>
     </div>
 </template>
@@ -491,6 +647,32 @@ const processRoutes = ref([]);
 const users = ref([]);
 const currentPlan = ref(null);
 const currentWorkOrder = ref(null);
+const workOrderDetailTab = ref('materialIssues');
+const materialIssues = ref([]);
+const productionReports = ref([]);
+const materialIssueDialogVisible = ref(false);
+const materialIssueFormRef = ref(null);
+const materialIssueSubmitLoading = ref(false);
+const materialIssueForm = reactive({
+    items: []
+});
+const productionReportDialogVisible = ref(false);
+const productionReportFormRef = ref(null);
+const productionReportSubmitLoading = ref(false);
+const productionReportForm = reactive({
+    report_date: new Date().toISOString().split('T')[0],
+    work_hours: 0,
+    quantity: 0,
+    qualified_quantity: 0,
+    defect_quantity: 0,
+    remark: ''
+});
+const productionReportRules = {
+    report_date: [{ required: true, message: '请选择报工日期', trigger: 'change' }],
+    work_hours: [{ required: true, message: '请输入工时', trigger: 'blur' }],
+    quantity: [{ required: true, message: '请输入产量', trigger: 'blur' }]
+};
+const warehouseLocations = ref([]);
 
 const planSearchForm = reactive({
     plan_no: '',
@@ -623,9 +805,15 @@ const loadPlans = async () => {
     try {
         const params = {
             page: planPagination.page,
-            per_page: planPagination.per_page,
-            ...planSearchForm
+            per_page: planPagination.per_page
         };
+        // 只添加非空值参数
+        if (planSearchForm.plan_no) {
+            params.plan_no = planSearchForm.plan_no;
+        }
+        if (planSearchForm.status) {
+            params.status = planSearchForm.status;
+        }
         const response = await api.get('/production-plans', { params });
         plans.value = response.data.data;
         planPagination.total = response.data.total;
@@ -641,9 +829,15 @@ const loadWorkOrders = async () => {
     try {
         const params = {
             page: workOrderPagination.page,
-            per_page: workOrderPagination.per_page,
-            ...workOrderSearchForm
+            per_page: workOrderPagination.per_page
         };
+        // 只添加非空值参数
+        if (workOrderSearchForm.work_order_no) {
+            params.work_order_no = workOrderSearchForm.work_order_no;
+        }
+        if (workOrderSearchForm.status) {
+            params.status = workOrderSearchForm.status;
+        }
         const response = await api.get('/work-orders', { params });
         workOrders.value = response.data.data;
         workOrderPagination.total = response.data.total;
@@ -991,10 +1185,15 @@ const handleViewWorkOrder = async (row) => {
     workOrderDetailLoading.value = true;
     workOrderDetailVisible.value = true;
     currentWorkOrder.value = null;
+    materialIssues.value = [];
+    productionReports.value = [];
     
     try {
         const response = await api.get(`/work-orders/${row.id}`);
         currentWorkOrder.value = response.data.data;
+        // 自动加载领料记录和报工记录
+        await handleViewMaterialIssues();
+        await handleViewReports();
     } catch (error) {
         ElMessage.error('加载工单详情失败');
         workOrderDetailVisible.value = false;
@@ -1080,6 +1279,142 @@ const handleWorkOrderDialogClose = () => {
     workOrderFormRef.value?.resetFields();
 };
 
+const handleIssueMaterial = () => {
+    materialIssueForm.items = [];
+    materialIssueDialogVisible.value = true;
+};
+
+const handleReturnMaterial = () => {
+    materialIssueForm.items = [];
+    materialIssueDialogVisible.value = true;
+};
+
+const handleAddMaterialItem = () => {
+    materialIssueForm.items.push({
+        product_id: null,
+        location_id: null,
+        quantity: 1
+    });
+};
+
+const handleRemoveMaterialItem = (index) => {
+    materialIssueForm.items.splice(index, 1);
+};
+
+const handleMaterialProductChange = (index) => {
+    // 物料改变时的处理
+};
+
+const handleSubmitMaterialIssue = async () => {
+    if (materialIssueForm.items.length === 0) {
+        ElMessage.warning('请至少添加一个物料');
+        return;
+    }
+    
+    materialIssueSubmitLoading.value = true;
+    try {
+        await api.post(`/work-orders/${currentWorkOrder.value.id}/issue-material`, {
+            items: materialIssueForm.items
+        });
+        ElMessage.success('领料成功');
+        materialIssueDialogVisible.value = false;
+        handleViewMaterialIssues();
+        loadWorkOrders();
+    } catch (error) {
+        ElMessage.error(error.response?.data?.message || '领料失败');
+    } finally {
+        materialIssueSubmitLoading.value = false;
+    }
+};
+
+const handleViewMaterialIssues = async () => {
+    if (!currentWorkOrder.value) return;
+    try {
+        const response = await api.get(`/work-orders/${currentWorkOrder.value.id}/material-issues`);
+        materialIssues.value = response.data.data || [];
+        workOrderDetailTab.value = 'materialIssues';
+    } catch (error) {
+        ElMessage.error('加载领料记录失败');
+    }
+};
+
+const handleAddReport = () => {
+    productionReportForm.report_date = new Date().toISOString().split('T')[0];
+    productionReportForm.work_hours = 0;
+    productionReportForm.quantity = 0;
+    productionReportForm.qualified_quantity = 0;
+    productionReportForm.defect_quantity = 0;
+    productionReportForm.remark = '';
+    productionReportDialogVisible.value = true;
+};
+
+const handleSubmitProductionReport = async () => {
+    if (!productionReportFormRef.value) return;
+    
+    await productionReportFormRef.value.validate(async (valid) => {
+        if (valid) {
+            productionReportSubmitLoading.value = true;
+            try {
+                await api.post('/production-reports', {
+                    work_order_id: currentWorkOrder.value.id,
+                    ...productionReportForm
+                });
+                ElMessage.success('报工成功');
+                productionReportDialogVisible.value = false;
+                handleViewReports();
+                loadWorkOrders();
+            } catch (error) {
+                ElMessage.error(error.response?.data?.message || '报工失败');
+            } finally {
+                productionReportSubmitLoading.value = false;
+            }
+        }
+    });
+};
+
+const handleViewReports = async () => {
+    if (!currentWorkOrder.value) return;
+    try {
+        const response = await api.get(`/work-orders/${currentWorkOrder.value.id}/reports`);
+        productionReports.value = response.data.data || [];
+        workOrderDetailTab.value = 'reports';
+    } catch (error) {
+        ElMessage.error('加载报工记录失败');
+    }
+};
+
+const handleCompleteWorkOrder = async () => {
+    try {
+        await ElMessageBox.confirm('确定要完成该工单吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/work-orders/${currentWorkOrder.value.id}/complete`);
+        ElMessage.success('工单完成成功');
+        workOrderDetailVisible.value = false;
+        loadWorkOrders();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '完成失败');
+        }
+    }
+};
+
+const getLocationsByWarehouse = (warehouseId) => {
+    if (!warehouseId) return [];
+    return warehouseLocations.value.filter(loc => loc.warehouse_id === warehouseId);
+};
+
+const loadWarehouseLocations = async () => {
+    try {
+        const response = await api.get('/warehouse-locations', { params: { per_page: 1000 } });
+        warehouseLocations.value = response.data.data || [];
+    } catch (error) {
+        console.error('加载库位列表失败:', error);
+    }
+};
+
 onMounted(() => {
     loadPlans();
     loadWorkOrders();
@@ -1089,6 +1424,7 @@ onMounted(() => {
     loadBoms();
     loadProcessRoutes();
     loadUsers();
+    loadWarehouseLocations();
 });
 </script>
 

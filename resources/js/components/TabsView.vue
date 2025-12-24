@@ -176,6 +176,12 @@ defineExpose({
     border-bottom: 1px solid var(--color-border);
     height: 40px;
     overflow: hidden;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
 }
 
 .tabs-container {

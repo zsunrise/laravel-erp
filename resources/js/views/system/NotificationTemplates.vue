@@ -16,7 +16,7 @@
                     <el-input v-model="searchForm.search" placeholder="模板编码/名称" clearable />
                 </el-form-item>
                 <el-form-item label="类型">
-                    <el-select v-model="searchForm.type" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.type" placeholder="全部" clearable style="width: 150px">
                         <el-option label="系统消息" value="system" />
                         <el-option label="审批消息" value="approval" />
                         <el-option label="订单消息" value="order" />
@@ -25,7 +25,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="渠道">
-                    <el-select v-model="searchForm.channel" placeholder="全部" clearable>
+                    <el-select v-model="searchForm.channel" placeholder="全部" clearable style="width: 150px">
                         <el-option label="系统消息" value="system" />
                         <el-option label="邮件" value="email" />
                         <el-option label="短信" value="sms" />
@@ -33,9 +33,9 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="状态">
-                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable>
-                        <el-option label="启用" :value="true" />
-                        <el-option label="禁用" :value="false" />
+                    <el-select v-model="searchForm.is_active" placeholder="全部" clearable style="width: 150px">
+                        <el-option label="启用" :value="1" />
+                        <el-option label="禁用" :value="0" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -294,9 +294,21 @@ const loadTemplates = async () => {
     try {
         const params = {
             page: pagination.page,
-            per_page: pagination.per_page,
-            ...searchForm
+            per_page: pagination.per_page
         };
+        // 只添加非空值参数
+        if (searchForm.search) {
+            params.search = searchForm.search;
+        }
+        if (searchForm.type) {
+            params.type = searchForm.type;
+        }
+        if (searchForm.channel) {
+            params.channel = searchForm.channel;
+        }
+        if (searchForm.is_active !== null && searchForm.is_active !== undefined) {
+            params.is_active = searchForm.is_active;
+        }
         const response = await api.get('/notification-templates', { params });
         templates.value = response.data.data;
         pagination.total = response.data.total;

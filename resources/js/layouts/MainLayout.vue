@@ -31,7 +31,7 @@
                     <template #title>仪表盘</template>
                 </el-menu-item>
                 
-                <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('permissions.manage') || hasMenuPermission('workflows.manage')">
+                <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('permissions.manage') || hasMenuPermission('workflows.manage') || hasMenuPermission('system.config')">
                     <template #title>
                         <Settings :size="20" />
                         <span>系统管理</span>
@@ -40,6 +40,7 @@
                     <el-menu-item index="/roles" v-if="hasMenuPermission('roles.manage')">角色管理</el-menu-item>
                     <el-menu-item index="/permissions" v-if="hasMenuPermission('permissions.manage')">权限管理</el-menu-item>
                     <el-menu-item index="/workflows" v-if="hasMenuPermission('workflows.manage')">审批流程</el-menu-item>
+                    <el-menu-item index="/data-dictionaries" v-if="hasMenuPermission('system.config')">数据字典</el-menu-item>
                 </el-sub-menu>
 
                 <el-menu-item index="/products" class="menu-item">
@@ -135,7 +136,7 @@
                         <template #title>仪表盘</template>
                     </el-menu-item>
                     
-                    <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('permissions.manage') || hasMenuPermission('workflows.manage')">
+                    <el-sub-menu index="system" v-if="hasMenuPermission('users.manage') || hasMenuPermission('roles.manage') || hasMenuPermission('permissions.manage') || hasMenuPermission('workflows.manage') || hasMenuPermission('system.config')">
                         <template #title>
                             <Settings :size="20" />
                             <span>系统管理</span>
@@ -144,6 +145,7 @@
                         <el-menu-item index="/roles" v-if="hasMenuPermission('roles.manage')">角色管理</el-menu-item>
                         <el-menu-item index="/permissions" v-if="hasMenuPermission('permissions.manage')">权限管理</el-menu-item>
                         <el-menu-item index="/workflows" v-if="hasMenuPermission('workflows.manage')">审批流程</el-menu-item>
+                        <el-menu-item index="/data-dictionaries" v-if="hasMenuPermission('system.config')">数据字典</el-menu-item>
                     </el-sub-menu>
 
                     <el-menu-item index="/products" class="menu-item">
@@ -262,7 +264,7 @@
             </el-header>
 
             <!-- 标签页 - 移动端隐藏 -->
-            <TabsView v-if="!isMobile" />
+            <TabsView v-if="!isMobile" style="margin: 0; padding: 0;" />
 
             <el-main class="main-content">
                 <router-view />

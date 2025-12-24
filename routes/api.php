@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\SystemConfigController;
+use App\Http\Controllers\Api\DataDictionaryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\RegionController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\Api\AccountingVoucherController;
 use App\Http\Controllers\Api\GeneralLedgerController;
 use App\Http\Controllers\Api\AccountsReceivableController;
 use App\Http\Controllers\Api\AccountsPayableController;
+use App\Http\Controllers\Api\CostAllocationController;
 use App\Http\Controllers\Api\FinancialReportController;
 use App\Http\Controllers\Api\WorkflowController;
 use App\Http\Controllers\Api\WorkflowInstanceController;
@@ -52,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('permission:permissions.manage')->apiResource('permissions', PermissionController::class);
     Route::middleware('permission:system.config')->apiResource('system-configs', SystemConfigController::class);
     Route::middleware('permission:system.config')->get('system-configs/key/{key}', [SystemConfigController::class, 'getByKey']);
+    Route::middleware('permission:system.config')->apiResource('data-dictionaries', DataDictionaryController::class);
+    Route::middleware('permission:system.config')->get('data-dictionaries/type/{type}', [DataDictionaryController::class, 'getByType']);
+    Route::middleware('permission:system.config')->get('data-dictionaries/types/list', [DataDictionaryController::class, 'getTypes']);
 
     Route::middleware('permission:product-categories.manage')->apiResource('product-categories', ProductCategoryController::class);
     Route::get('regions', [RegionController::class, 'index']);
@@ -136,6 +141,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('accounts-receivable/age-analysis', [AccountsReceivableController::class, 'ageAnalysis']);
     Route::apiResource('accounts-payable', AccountsPayableController::class);
     Route::post('accounts-payable/{id}/make-payment', [AccountsPayableController::class, 'makePayment']);
+    Route::apiResource('cost-allocations', CostAllocationController::class);
+    Route::post('cost-allocations/{id}/approve', [CostAllocationController::class, 'approve']);
+    Route::post('cost-allocations/{id}/complete', [CostAllocationController::class, 'complete']);
     Route::get('financial-reports/balance-sheet', [FinancialReportController::class, 'balanceSheet']);
     Route::get('financial-reports/income-statement', [FinancialReportController::class, 'incomeStatement']);
     Route::apiResource('workflows', WorkflowController::class);
