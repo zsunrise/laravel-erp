@@ -76,9 +76,10 @@
                     @current-change="handlePageChange"
                 />
             </div>
-        </div>
+        </el-card>
+    </div>
 
-        <!-- 结算表单对话框 -->
+    <!-- 结算表单对话框 -->
         <el-dialog
             v-model="dialogVisible"
             title="新增销售结算"
@@ -234,13 +235,11 @@
                 </el-table>
             </div>
         </el-dialog>
-    </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { Plus } from 'lucide-vue-next';
 import api from '../../services/api';
 
 const loading = ref(false);
@@ -269,7 +268,7 @@ const searchForm = reactive({
 
 const pagination = reactive({
     page: 1,
-    per_page: 15,
+    per_page: 10,
     total: 0
 });
 

@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Role;
 use App\Models\Unit;
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -17,7 +19,10 @@ class ProductTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(RolePermissionSeeder::class);
         $this->user = User::factory()->create();
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $this->user->roles()->syncWithoutDetaching([$adminRole->id]);
         Sanctum::actingAs($this->user);
     }
 

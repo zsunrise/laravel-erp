@@ -504,13 +504,13 @@ const workOrderSearchForm = reactive({
 
 const planPagination = reactive({
     page: 1,
-    per_page: 15,
+    per_page: 10,
     total: 0
 });
 
 const workOrderPagination = reactive({
     page: 1,
-    per_page: 15,
+    per_page: 10,
     total: 0
 });
 
