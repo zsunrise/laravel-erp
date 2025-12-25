@@ -67,7 +67,11 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="creator.name" label="创建人" width="120" />
-                <el-table-column prop="created_at" label="创建时间" width="180" />
+                <el-table-column prop="created_at" label="创建时间" width="180">
+                    <template #default="{ row }">
+                        {{ formatDateTime(row.created_at) }}
+                    </template>
+                </el-table-column>
                 <el-table-column label="操作" width="250" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
@@ -167,7 +171,7 @@
                     </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="创建人">{{ currentTemplate.creator?.name || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="创建时间">{{ currentTemplate.created_at }}</el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ formatDateTime(currentTemplate.created_at) }}</el-descriptions-item>
                 <el-descriptions-item label="主题" v-if="currentTemplate.subject" :span="2">{{ currentTemplate.subject }}</el-descriptions-item>
                 <el-descriptions-item label="内容" :span="2">
                     <div style="white-space: pre-wrap;">{{ currentTemplate.content }}</div>
@@ -287,6 +291,19 @@ const getChannelText = (channel) => {
         'push': '推送'
     };
     return channelMap[channel] || channel;
+};
+
+const formatDateTime = (dateStr) => {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
 };
 
 const loadTemplates = async () => {

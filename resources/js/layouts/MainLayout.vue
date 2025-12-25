@@ -269,7 +269,7 @@
                     </template>
                 </div>
                 <div class="header-right">
-                    <el-badge :value="unreadCount" class="notification-badge interactive">
+                    <el-badge :value="unreadCount" class="notification-badge interactive" @click="handleNotificationClick">
                         <Bell :size="20" class="header-icon" />
                     </el-badge>
                     <el-dropdown @command="handleCommand">
@@ -355,6 +355,10 @@ const handleMenuSelect = () => {
 const hasMenuPermission = (permission) => {
     if (!permission) return true;
     return authStore.hasPermission(permission);
+};
+
+const handleNotificationClick = () => {
+    router.push('/notifications');
 };
 
 const handleCommand = async (command) => {

@@ -56,6 +56,12 @@ const routes = [
                 meta: { title: '操作日志', icon: 'FileText', permission: 'system.config' }
             },
             {
+                path: 'notifications',
+                name: 'Notifications',
+                component: () => import('../views/system/Notifications.vue'),
+                meta: { title: '消息通知', icon: 'Bell' }
+            },
+            {
                 path: 'products',
                 name: 'Products',
                 component: () => import('../views/product/Products.vue'),
