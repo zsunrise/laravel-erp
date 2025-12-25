@@ -19,10 +19,11 @@
                         </el-form-item>
                         <el-form-item label="状态">
                             <el-select v-model="planSearchForm.status" placeholder="全部" clearable style="width: 150px">
-                                <el-option label="待开始" value="pending" />
-                                <el-option label="进行中" value="processing" />
-                                <el-option label="已完成" value="completed" />
-                                <el-option label="已取消" value="cancelled" />
+                                <el-option label="草稿" :value="1" />
+                                <el-option label="已审核" :value="2" />
+                                <el-option label="进行中" :value="3" />
+                                <el-option label="已完成" :value="4" />
+                                <el-option label="已取消" :value="5" />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
@@ -41,15 +42,17 @@
                         <el-table-column prop="end_date" label="结束日期" width="120" />
                         <el-table-column prop="status" label="状态" width="100">
                             <template #default="{ row }">
-                                <el-tag :type="getPlanStatusType(row.status)">{{ row.status_text || getPlanStatusText(row.status) }}</el-tag>
+                                <el-tag :type="getPlanStatusType(row.status, row.is_pending_approval)">
+                                    {{ row.is_pending_approval ? '待审核' : (row.status_text || getPlanStatusText(row.status)) }}
+                                </el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column label="操作" width="250" fixed="right">
+                        <el-table-column label="操作" width="300" fixed="right">
                             <template #default="{ row }">
                                 <el-button type="primary" size="small" @click="handleViewPlan(row)" :loading="planViewLoadingId === row.id" :disabled="planViewLoadingId !== null">查看</el-button>
-                                <el-button type="warning" size="small" @click="handleEditPlan(row)" v-if="row.status == 'draft'">编辑</el-button>
-                                <el-button type="success" size="small" @click="handleApprovePlan(row)" v-if="row.status == 'draft'">审批</el-button>
-                                <el-button type="danger" size="small" @click="handleDeletePlan(row)" v-if="row.status == 'draft'">删除</el-button>
+                                <el-button type="warning" size="small" @click="handleEditPlan(row)" v-if="row.status == 1">编辑</el-button>
+                                <el-button type="success" size="small" @click="handleSubmitPlanForApproval(row)" v-if="row.status == 1 && !row.is_pending_approval">提交审核</el-button>
+                                <el-button type="danger" size="small" @click="handleDeletePlan(row)" v-if="row.status == 1">删除</el-button>
                             </template>
                         </el-table-column>
                         </el-table>
@@ -87,10 +90,12 @@
                         </el-form-item>
                         <el-form-item label="状态">
                             <el-select v-model="workOrderSearchForm.status" placeholder="全部" clearable style="width: 150px">
-                                <el-option label="待开始" value="pending" />
-                                <el-option label="进行中" value="processing" />
-                                <el-option label="已完成" value="completed" />
-                                <el-option label="已暂停" value="paused" />
+                                <el-option label="草稿" :value="1" />
+                                <el-option label="已审核" :value="2" />
+                                <el-option label="已领料" :value="3" />
+                                <el-option label="进行中" :value="4" />
+                                <el-option label="已完成" :value="5" />
+                                <el-option label="已取消" :value="6" />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
@@ -109,15 +114,17 @@
                         <el-table-column prop="planned_end_date" label="计划结束日期" width="120" />
                         <el-table-column prop="status" label="状态" width="100">
                             <template #default="{ row }">
-                                <el-tag :type="getWorkOrderStatusType(row.status)">{{ row.status_text || getWorkOrderStatusText(row.status) }}</el-tag>
+                                <el-tag :type="getWorkOrderStatusType(row.status, row.is_pending_approval)">
+                                    {{ row.is_pending_approval ? '待审核' : (row.status_text || getWorkOrderStatusText(row.status)) }}
+                                </el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column label="操作" width="250" fixed="right">
+                        <el-table-column label="操作" width="300" fixed="right">
                             <template #default="{ row }">
                                 <el-button type="primary" size="small" @click="handleViewWorkOrder(row)" :loading="workOrderViewLoadingId === row.id" :disabled="workOrderViewLoadingId !== null">查看</el-button>
-                                <el-button type="warning" size="small" @click="handleEditWorkOrder(row)" v-if="row.status == 'draft'">编辑</el-button>
-                                <el-button type="success" size="small" @click="handleApproveWorkOrder(row)" v-if="row.status == 'draft'">审批</el-button>
-                                <el-button type="danger" size="small" @click="handleDeleteWorkOrder(row)" v-if="row.status == 'draft'">删除</el-button>
+                                <el-button type="warning" size="small" @click="handleEditWorkOrder(row)" v-if="row.status == 1">编辑</el-button>
+                                <el-button type="success" size="small" @click="handleSubmitWorkOrderForApproval(row)" v-if="row.status == 1 && !row.is_pending_approval">提交审核</el-button>
+                                <el-button type="danger" size="small" @click="handleDeleteWorkOrder(row)" v-if="row.status == 1">删除</el-button>
                             </template>
                         </el-table-column>
                         </el-table>
@@ -397,8 +404,8 @@
                     <el-descriptions-item label="计划日期">{{ currentPlan.plan_date }}</el-descriptions-item>
                     <el-descriptions-item label="仓库">{{ currentPlan.warehouse?.name || '-' }}</el-descriptions-item>
                     <el-descriptions-item label="状态">
-                        <el-tag :type="getPlanStatusType(currentPlan.status)">
-                            {{ currentPlan.status_text || getPlanStatusText(currentPlan.status) }}
+                        <el-tag :type="getPlanStatusType(currentPlan.status, currentPlan.is_pending_approval)">
+                            {{ currentPlan.is_pending_approval ? '待审核' : (currentPlan.status_text || getPlanStatusText(currentPlan.status)) }}
                         </el-tag>
                     </el-descriptions-item>
                     <el-descriptions-item label="开始日期">{{ currentPlan.start_date || '-' }}</el-descriptions-item>
@@ -418,15 +425,22 @@
                     <el-table-column prop="bom.version" label="BOM版本" width="120" />
                     <el-table-column prop="processRoute.version" label="工艺路线版本" width="150" />
                     <el-table-column prop="planned_quantity" label="计划数量" width="120" align="right" />
+                    <el-table-column prop="completed_quantity" label="完成数量" width="120" align="right" />
                     <el-table-column prop="planned_start_date" label="计划开始日期" width="150" />
                     <el-table-column prop="planned_end_date" label="计划结束日期" width="150" />
                     <el-table-column prop="priority" label="优先级" width="100" align="center" />
                     <el-table-column prop="remark" label="备注" min-width="200" show-overflow-tooltip />
+                    <el-table-column label="操作" width="120" fixed="right">
+                        <template #default="{ row }">
+                            <el-button type="primary" size="small" @click="handleCreateWorkOrderFromPlanItem(row)" v-if="currentPlan.status == 2 || currentPlan.status == 3">生成工单</el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
                 </div>
             </div>
             <template #footer>
                 <el-button @click="planDetailVisible = false">关闭</el-button>
+                <el-button type="primary" @click="handleCreateWorkOrdersFromPlan" v-if="currentPlan && (currentPlan.status == 2 || currentPlan.status == 3)">批量生成工单</el-button>
             </template>
         </el-dialog>
 
@@ -448,8 +462,8 @@
                     <el-descriptions-item label="开始日期">{{ currentWorkOrder.start_date }}</el-descriptions-item>
                     <el-descriptions-item label="结束日期">{{ currentWorkOrder.end_date || '-' }}</el-descriptions-item>
                     <el-descriptions-item label="状态">
-                        <el-tag :type="getWorkOrderStatusType(currentWorkOrder.status)">
-                            {{ currentWorkOrder.status_text || getWorkOrderStatusText(currentWorkOrder.status) }}
+                        <el-tag :type="getWorkOrderStatusType(currentWorkOrder.status, currentWorkOrder.is_pending_approval)">
+                            {{ currentWorkOrder.is_pending_approval ? '待审核' : (currentWorkOrder.status_text || getWorkOrderStatusText(currentWorkOrder.status)) }}
                         </el-tag>
                     </el-descriptions-item>
                     <el-descriptions-item label="负责人">{{ currentWorkOrder.assigned_to_user?.name || '-' }}</el-descriptions-item>
@@ -458,13 +472,13 @@
 
                 <el-divider content-position="left">操作</el-divider>
                 <div style="margin-bottom: 20px;">
-                    <el-button type="primary" @click="handleIssueMaterial" v-if="currentWorkOrder && ['approved', 'in_progress'].includes(currentWorkOrder.status)">
+                    <el-button type="primary" @click="handleIssueMaterial" v-if="currentWorkOrder && [2, 3, 4].includes(currentWorkOrder.status)">
                         生产领料
                     </el-button>
-                    <el-button type="warning" @click="handleReturnMaterial" v-if="currentWorkOrder && ['approved', 'in_progress'].includes(currentWorkOrder.status)">
+                    <el-button type="warning" @click="handleReturnMaterial" v-if="currentWorkOrder && [2, 3, 4].includes(currentWorkOrder.status)">
                         生产退料
                     </el-button>
-                    <el-button type="success" @click="handleAddReport" v-if="currentWorkOrder && ['approved', 'in_progress'].includes(currentWorkOrder.status)">
+                    <el-button type="success" @click="handleAddReport" v-if="currentWorkOrder && [3, 4].includes(currentWorkOrder.status)">
                         生产报工
                     </el-button>
                     <el-button type="info" @click="handleViewMaterialIssues" v-if="currentWorkOrder">
@@ -473,7 +487,7 @@
                     <el-button type="info" @click="handleViewReports" v-if="currentWorkOrder">
                         查看报工记录
                     </el-button>
-                    <el-button type="primary" @click="handleCompleteWorkOrder" v-if="currentWorkOrder && currentWorkOrder.status === 'in_progress'">
+                    <el-button type="primary" @click="handleCompleteWorkOrder" v-if="currentWorkOrder && currentWorkOrder.status === 4">
                         完成工单
                     </el-button>
                 </div>
@@ -745,48 +759,54 @@ const workOrderRules = {
 const planDialogTitle = ref('新增生产计划');
 const workOrderDialogTitle = ref('新增工单');
 
-const getPlanStatusType = (status) => {
+const getPlanStatusType = (status, isPendingApproval = false) => {
+    if (isPendingApproval) {
+        return 'warning';  // 待审核
+    }
     const statusMap = {
-        'draft': 'info',
-        'approved': 'success',
-        'in_progress': 'warning',
-        'completed': 'success',
-        'cancelled': 'danger'
+        1: 'info',      // 草稿
+        2: 'success',   // 已审核
+        3: 'warning',   // 进行中
+        4: 'success',   // 已完成
+        5: 'danger'     // 已取消
     };
     return statusMap[status] || 'info';
 };
 
 const getPlanStatusText = (status) => {
     const statusMap = {
-        'draft': '草稿',
-        'approved': '已审批',
-        'in_progress': '进行中',
-        'completed': '已完成',
-        'cancelled': '已取消'
+        1: '草稿',
+        2: '已审核',
+        3: '进行中',
+        4: '已完成',
+        5: '已取消'
     };
     return statusMap[status] || status;
 };
 
-const getWorkOrderStatusType = (status) => {
+const getWorkOrderStatusType = (status, isPendingApproval = false) => {
+    if (isPendingApproval) {
+        return 'warning';  // 待审核
+    }
     const statusMap = {
-        'draft': 'info',
-        'approved': 'success',
-        'material_issued': 'warning',
-        'in_progress': 'warning',
-        'completed': 'success',
-        'cancelled': 'danger'
+        1: 'info',      // 草稿
+        2: 'success',   // 已审核
+        3: 'warning',   // 已领料
+        4: 'warning',   // 进行中
+        5: 'success',   // 已完成
+        6: 'danger'     // 已取消
     };
     return statusMap[status] || 'info';
 };
 
 const getWorkOrderStatusText = (status) => {
     const statusMap = {
-        'draft': '草稿',
-        'approved': '已审批',
-        'material_issued': '已领料',
-        'in_progress': '进行中',
-        'completed': '已完成',
-        'cancelled': '已取消'
+        1: '草稿',
+        2: '已审核',
+        3: '已领料',
+        4: '进行中',
+        5: '已完成',
+        6: '已取消'
     };
     return statusMap[status] || status;
 };
@@ -962,7 +982,7 @@ const handleEditPlan = async (row) => {
     try {
         const response = await api.get(`/production-plans/${row.id}`);
         const plan = response.data.data;
-        if (plan.status != 'draft') {
+        if (plan.status != 1) {
             ElMessage.warning('只能编辑草稿状态的计划');
             return;
         }
@@ -1035,22 +1055,23 @@ const handleDeletePlan = async (row) => {
     }
 };
 
-const handleApprovePlan = async (row) => {
+const handleSubmitPlanForApproval = async (row) => {
     try {
-        await ElMessageBox.confirm('确定要审批该生产计划吗？', '提示', {
+        await ElMessageBox.confirm('确定要提交该生产计划审核吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
         });
-        await api.post(`/production-plans/${row.id}/approve`);
-        ElMessage.success('审批成功');
+        await api.post(`/production-plans/${row.id}/submit`);
+        ElMessage.success('提交成功');
         loadPlans();
     } catch (error) {
         if (error !== 'cancel') {
-            ElMessage.error(error.response?.data?.message || '审批失败');
+            ElMessage.error(error.response?.data?.message || '提交失败');
         }
     }
 };
+
 
 const handleAddPlanItem = () => {
     planForm.items.push({
@@ -1151,7 +1172,7 @@ const handleEditWorkOrder = async (row) => {
     try {
         const response = await api.get(`/work-orders/${row.id}`);
         const workOrder = response.data.data;
-        if (workOrder.status != 'draft') {
+        if (workOrder.status != 1) {
             ElMessage.warning('只能编辑草稿状态的工单');
             return;
         }
@@ -1221,22 +1242,23 @@ const handleDeleteWorkOrder = async (row) => {
     }
 };
 
-const handleApproveWorkOrder = async (row) => {
+const handleSubmitWorkOrderForApproval = async (row) => {
     try {
-        await ElMessageBox.confirm('确定要审批该工单吗？', '提示', {
+        await ElMessageBox.confirm('确定要提交该工单审核吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
         });
-        await api.post(`/work-orders/${row.id}/approve`);
-        ElMessage.success('审批成功');
+        await api.post(`/work-orders/${row.id}/submit`);
+        ElMessage.success('提交成功');
         loadWorkOrders();
     } catch (error) {
         if (error !== 'cancel') {
-            ElMessage.error(error.response?.data?.message || '审批失败');
+            ElMessage.error(error.response?.data?.message || '提交失败');
         }
     }
 };
+
 
 const handleWorkOrderProductChange = () => {
     // 产品改变时的处理
@@ -1422,6 +1444,88 @@ const loadWarehouseLocations = async () => {
         warehouseLocations.value = response.data.data || [];
     } catch (error) {
         console.error('加载库位列表失败:', error);
+    }
+};
+
+const handleCreateWorkOrderFromPlanItem = async (planItem) => {
+    try {
+        await ElMessageBox.confirm(`确定要为产品 "${planItem.product?.name}" 生成工单吗？`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        
+        const workOrderData = {
+            production_plan_id: currentPlan.value.id,
+            production_plan_item_id: planItem.id,
+            product_id: planItem.product_id,
+            bom_id: planItem.bom_id,
+            process_route_id: planItem.process_route_id,
+            warehouse_id: currentPlan.value.warehouse_id,
+            quantity: planItem.planned_quantity - (planItem.completed_quantity || 0),
+            start_date: planItem.planned_start_date,
+            planned_end_date: planItem.planned_end_date,
+            remark: `从生产计划 ${currentPlan.value.plan_no} 生成`
+        };
+        
+        await api.post('/work-orders', workOrderData);
+        ElMessage.success('工单生成成功');
+        planDetailVisible.value = false;
+        loadPlans();
+        loadWorkOrders();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '生成工单失败');
+        }
+    }
+};
+
+const handleCreateWorkOrdersFromPlan = async () => {
+    if (!currentPlan.value || !currentPlan.value.items || currentPlan.value.items.length === 0) {
+        ElMessage.warning('该生产计划没有明细项');
+        return;
+    }
+    
+    try {
+        await ElMessageBox.confirm(`确定要为生产计划 "${currentPlan.value.plan_no}" 的所有明细项生成工单吗？`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        
+        const workOrdersToCreate = currentPlan.value.items
+            .filter(item => (item.planned_quantity || 0) > (item.completed_quantity || 0))
+            .map(item => ({
+                production_plan_id: currentPlan.value.id,
+                production_plan_item_id: item.id,
+                product_id: item.product_id,
+                bom_id: item.bom_id,
+                process_route_id: item.process_route_id,
+                warehouse_id: currentPlan.value.warehouse_id,
+                quantity: item.planned_quantity - (item.completed_quantity || 0),
+                start_date: item.planned_start_date,
+                planned_end_date: item.planned_end_date,
+                remark: `从生产计划 ${currentPlan.value.plan_no} 生成`
+            }));
+        
+        if (workOrdersToCreate.length === 0) {
+            ElMessage.warning('所有明细项已完成，无需生成工单');
+            return;
+        }
+        
+        // 批量创建工作单
+        for (const workOrderData of workOrdersToCreate) {
+            await api.post('/work-orders', workOrderData);
+        }
+        
+        ElMessage.success(`成功生成 ${workOrdersToCreate.length} 个工单`);
+        planDetailVisible.value = false;
+        loadPlans();
+        loadWorkOrders();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '生成工单失败');
+        }
     }
 };
 

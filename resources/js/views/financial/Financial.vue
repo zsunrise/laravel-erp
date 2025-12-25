@@ -17,6 +17,17 @@
                         <el-form-item label="凭证号">
                             <el-input v-model="voucherSearchForm.voucher_no" placeholder="凭证号" clearable />
                         </el-form-item>
+                        <el-form-item label="状态">
+                            <el-select v-model="voucherSearchForm.status" placeholder="全部" clearable style="width: 150px">
+                                <el-option label="草稿" :value="1" />
+                                <el-option label="待审核" :value="2" />
+                                <el-option label="审核中" :value="3" />
+                                <el-option label="已审核" :value="4" />
+                                <el-option label="已拒绝" :value="5" />
+                                <el-option label="已过账" :value="6" />
+                                <el-option label="已取消" :value="7" />
+                            </el-select>
+                        </el-form-item>
                         <el-form-item label="日期">
                             <el-date-picker
                                 v-model="voucherSearchForm.date_range"
@@ -49,19 +60,22 @@
                         <el-table-column prop="total_credit" label="贷方金额" width="120">
                             <template #default="{ row }">¥{{ row.total_credit || 0 }}</template>
                         </el-table-column>
-                        <el-table-column prop="status" label="状态" width="100">
+                        <el-table-column prop="status" label="状态" width="120">
                             <template #default="{ row }">
-                                <el-tag :type="row.status == 'posted' ? 'success' : 'warning'">
-                                    {{ row.status == 'posted' ? '已过账' : '草稿' }}
+                                <el-tag :type="getVoucherStatusType(row.status)">
+                                    {{ getVoucherStatusText(row.status) }}
                                 </el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column label="操作" width="250" fixed="right">
+                        <el-table-column label="操作" width="350" fixed="right">
                             <template #default="{ row }">
                                 <el-button type="primary" size="small" @click="handleViewVoucher(row)" :loading="voucherViewLoadingId === row.id" :disabled="voucherViewLoadingId !== null">查看</el-button>
-                                <el-button type="warning" size="small" @click="handleEditVoucher(row)" v-if="row.status == 'draft'">编辑</el-button>
-                                <el-button type="success" size="small" @click="handlePostVoucher(row)" v-if="row.status == 'draft'">过账</el-button>
-                                <el-button type="danger" size="small" @click="handleDeleteVoucher(row)" v-if="row.status == 'draft'">删除</el-button>
+                                <el-button type="warning" size="small" @click="handleEditVoucher(row)" v-if="row.status == 1 || row.status == 5">编辑</el-button>
+                                <el-button type="info" size="small" @click="handleSubmitVoucherForApproval(row)" v-if="row.status == 1 || row.status == 5">提交审批</el-button>
+                                <el-button type="primary" size="small" @click="handleStartApproval(row)" v-if="row.status == 2">启动审批</el-button>
+                                <el-button type="success" size="small" @click="handlePostVoucher(row)" v-if="row.status == 4">过账</el-button>
+                                <el-button type="danger" size="small" @click="handleDeleteVoucher(row)" v-if="row.status == 1 || row.status == 5">删除</el-button>
+                                <el-button type="danger" size="small" @click="handleCancelVoucher(row)" v-if="row.status != 6 && row.status != 7">取消</el-button>
                             </template>
                         </el-table-column>
                         </el-table>
@@ -444,16 +458,16 @@
                 <el-descriptions-item label="凭证日期">{{ currentVoucher.voucher_date }}</el-descriptions-item>
                 <el-descriptions-item label="凭证类型">{{ getVoucherTypeText(currentVoucher.type) }}</el-descriptions-item>
                 <el-descriptions-item label="状态">
-                    <el-tag :type="currentVoucher.status == 'posted' ? 'success' : 'warning'">
-                        {{ currentVoucher.status == 'posted' ? '已过账' : '草稿' }}
+                    <el-tag :type="getVoucherStatusType(currentVoucher.status)">
+                        {{ getVoucherStatusText(currentVoucher.status) }}
                     </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="借方总额">¥{{ currentVoucher.total_debit || 0 }}</el-descriptions-item>
                 <el-descriptions-item label="贷方总额">¥{{ currentVoucher.total_credit || 0 }}</el-descriptions-item>
                 <el-descriptions-item label="附件数">{{ currentVoucher.attachment_count || 0 }}</el-descriptions-item>
                 <el-descriptions-item label="创建人">{{ currentVoucher.creator?.name || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="过账人" v-if="currentVoucher.status == 'posted'">{{ currentVoucher.poster?.name || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="过账时间" v-if="currentVoucher.status == 'posted'">{{ currentVoucher.posted_at || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="过账人" v-if="currentVoucher.status == 6">{{ currentVoucher.poster?.name || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="过账时间" v-if="currentVoucher.status == 6">{{ currentVoucher.posted_at || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ currentVoucher.remark || '-' }}</el-descriptions-item>
             </el-descriptions>
                 <el-table :data="currentVoucher?.items || []" style="margin-top: 20px;" border v-if="currentVoucher">
@@ -475,6 +489,36 @@
                     <el-table-column prop="reference_no" label="关联编号" width="120" />
                 </el-table>
             </div>
+        </el-dialog>
+
+        <!-- 工作流选择对话框 -->
+        <el-dialog
+            v-model="workflowDialogVisible"
+            title="选择审批工作流"
+            width="600px"
+            :close-on-click-modal="false"
+        >
+            <el-form>
+                <el-form-item label="选择工作流" required>
+                    <el-select v-model="selectedWorkflowId" placeholder="请选择工作流" style="width: 100%">
+                        <el-option
+                            v-for="workflow in workflows"
+                            :key="workflow.id"
+                            :label="workflow.name"
+                            :value="workflow.id"
+                        >
+                            <div>
+                                <div>{{ workflow.name }}</div>
+                                <div style="font-size: 12px; color: #999;">{{ workflow.description || '无描述' }}</div>
+                            </div>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="workflowDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleConfirmStartApproval">确定</el-button>
+            </template>
         </el-dialog>
 
         <!-- 应收账款详情对话框 -->
@@ -625,6 +669,7 @@ const paymentFormRef = ref(null);
 
 const voucherSearchForm = reactive({
     voucher_no: '',
+    status: null,
     date_range: null
 });
 
@@ -677,6 +722,50 @@ const getVoucherTypeText = (type) => {
         'closing': '结账凭证'
     };
     return typeMap[type] || type;
+};
+
+const getVoucherStatusText = (status) => {
+    const statusMap = {
+        1: '草稿',
+        2: '待审核',
+        3: '审核中',
+        4: '已审核',
+        5: '已拒绝',
+        6: '已过账',
+        7: '已取消'
+    };
+    // 兼容旧数据（字符串状态）
+    if (typeof status === 'string') {
+        const stringMap = {
+            'draft': '草稿',
+            'pending': '待审核',
+            'under_review': '审核中',
+            'approved': '已审核',
+            'rejected': '已拒绝',
+            'posted': '已过账',
+            'cancelled': '已取消'
+        };
+        return stringMap[status] || status;
+    }
+    return statusMap[status] || '未知';
+};
+
+const getVoucherStatusType = (status) => {
+    // 兼容旧数据（字符串状态）
+    if (typeof status === 'string') {
+        if (status === 'posted') return 'success';
+        if (status === 'approved') return 'success';
+        if (status === 'rejected') return 'danger';
+        if (status === 'cancelled') return 'info';
+        if (status === 'pending' || status === 'under_review') return 'warning';
+        return 'warning';
+    }
+    // 整数状态
+    if (status === 6 || status === 4) return 'success'; // 已过账、已审核
+    if (status === 5) return 'danger'; // 已拒绝
+    if (status === 7) return 'info'; // 已取消
+    if (status === 2 || status === 3) return 'warning'; // 待审核、审核中
+    return 'warning'; // 草稿
 };
 
 const getAccountTypeText = (type) => {
@@ -738,6 +827,9 @@ const loadVouchers = async () => {
         // 只添加非空值参数
         if (voucherSearchForm.voucher_no) {
             params.voucher_no = voucherSearchForm.voucher_no;
+        }
+        if (voucherSearchForm.status !== null && voucherSearchForm.status !== undefined) {
+            params.status = voucherSearchForm.status;
         }
         if (voucherSearchForm.date_range && voucherSearchForm.date_range.length == 2) {
             params.start_date = voucherSearchForm.date_range[0];
@@ -893,6 +985,7 @@ const handleVoucherSearch = () => {
 
 const handleVoucherReset = () => {
     voucherSearchForm.voucher_no = '';
+    voucherSearchForm.status = null;
     voucherSearchForm.date_range = null;
     handleVoucherSearch();
 };
@@ -1121,8 +1214,9 @@ const handleEditVoucher = async (row) => {
     try {
         const response = await api.get(`/accounting-vouchers/${row.id}`);
         const voucher = response.data.data;
-        if (voucher.status != 'draft') {
-            ElMessage.warning('只能编辑草稿状态的凭证');
+        // 状态1=草稿，5=已拒绝
+        if (voucher.status != 1 && voucher.status != 5) {
+            ElMessage.warning('只能编辑草稿或已拒绝状态的凭证');
             return;
         }
         voucherDialogTitle.value = '编辑凭证';
@@ -1288,7 +1382,91 @@ const handlePostVoucher = async (row) => {
         loadVouchers();
     } catch (error) {
         if (error !== 'cancel') {
-            ElMessage.error('过账失败');
+            ElMessage.error(error.response?.data?.message || '过账失败');
+        }
+    }
+};
+
+// 提交审批
+const handleSubmitVoucherForApproval = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要提交该凭证审批吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/accounting-vouchers/${row.id}/submit`);
+        ElMessage.success('提交审批成功');
+        loadVouchers();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '提交审批失败');
+        }
+    }
+};
+
+// 工作流列表
+const workflows = ref([]);
+const workflowDialogVisible = ref(false);
+const currentVoucherForApproval = ref(null);
+const selectedWorkflowId = ref(null);
+
+// 加载工作流列表
+const loadWorkflows = async () => {
+    try {
+        const response = await api.get('/workflows', {
+            params: { type: 'accounting_voucher', is_active: 1, per_page: 100 }
+        });
+        workflows.value = response.data.data || [];
+    } catch (error) {
+        console.error('加载工作流列表失败:', error);
+    }
+};
+
+// 启动审批流程
+const handleStartApproval = async (row) => {
+    currentVoucherForApproval.value = row;
+    selectedWorkflowId.value = null;
+    await loadWorkflows();
+    if (workflows.value.length === 0) {
+        ElMessage.warning('没有可用的审批工作流，请先配置工作流');
+        return;
+    }
+    workflowDialogVisible.value = true;
+};
+
+// 确认启动审批
+const handleConfirmStartApproval = async () => {
+    if (!selectedWorkflowId.value) {
+        ElMessage.warning('请选择工作流');
+        return;
+    }
+    try {
+        await api.post(`/accounting-vouchers/${currentVoucherForApproval.value.id}/start-approval`, {
+            workflow_id: selectedWorkflowId.value
+        });
+        ElMessage.success('审批流程已启动');
+        workflowDialogVisible.value = false;
+        loadVouchers();
+    } catch (error) {
+        ElMessage.error(error.response?.data?.message || '启动审批流程失败');
+    }
+};
+
+// 取消凭证
+const handleCancelVoucher = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要取消该凭证吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/accounting-vouchers/${row.id}/cancel`);
+        ElMessage.success('凭证已取消');
+        loadVouchers();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '取消凭证失败');
         }
     }
 };

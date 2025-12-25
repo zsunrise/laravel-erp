@@ -145,6 +145,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('permission:production-reports.manage')->apiResource('production-reports', ProductionReportController::class);
     Route::middleware('permission:chart-of-accounts.manage')->apiResource('chart-of-accounts', ChartOfAccountController::class);
     Route::middleware('permission:accounting-vouchers.manage')->apiResource('accounting-vouchers', AccountingVoucherController::class);
+    Route::middleware('permission:accounting-vouchers.manage')->post('accounting-vouchers/{id}/submit', [AccountingVoucherController::class, 'submit']);
+    Route::middleware('permission:accounting-vouchers.approve')->post('accounting-vouchers/{id}/start-approval', [AccountingVoucherController::class, 'startApproval']);
+    Route::middleware('permission:accounting-vouchers.manage')->post('accounting-vouchers/{id}/cancel', [AccountingVoucherController::class, 'cancel']);
     Route::middleware('permission:accounting-vouchers.post')->post('accounting-vouchers/{id}/post', [AccountingVoucherController::class, 'post']);
     Route::middleware('permission:general-ledger.view')->get('general-ledger', [GeneralLedgerController::class, 'index']);
     Route::middleware('permission:general-ledger.view')->get('general-ledger/account/{id}/balance', [GeneralLedgerController::class, 'accountBalance']);

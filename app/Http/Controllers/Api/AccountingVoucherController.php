@@ -6,16 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\AccountingVoucher;
 use App\Services\FinancialService;
+use App\Services\ApprovalService;
+use App\Constants\AccountingVoucherStatus;
 use Illuminate\Http\Request;
 
 class AccountingVoucherController extends Controller
 {
     protected $financialService;
+    protected $approvalService;
 
-    public function __construct(FinancialService $financialService)
+    public function __construct(FinancialService $financialService, ApprovalService $approvalService)
     {
-        // 注入财务服务
+        // 注入财务服务和审批服务
         $this->financialService = $financialService;
+        $this->approvalService = $approvalService;
     }
 
     /**
@@ -34,7 +38,7 @@ class AccountingVoucherController extends Controller
         // 构建查询，预加载创建人和过账人信息
         $query = AccountingVoucher::with(['creator', 'poster']);
 
-        // 按状态筛选（draft/posted）
+        // 按状态筛选（支持整数状态值）
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
@@ -133,9 +137,9 @@ class AccountingVoucherController extends Controller
         // 根据ID查询凭证
         $voucher = AccountingVoucher::findOrFail($id);
 
-        // 检查状态：只能修改草稿状态的凭证
-        if ($voucher->status != 'draft') {
-            return response()->json(['message' => '只能修改草稿状态的凭证'], 400);
+        // 检查状态：只能修改草稿或已拒绝状态的凭证
+        if ($voucher->status != AccountingVoucherStatus::DRAFT && $voucher->status != AccountingVoucherStatus::REJECTED) {
+            return response()->json(['message' => '只能修改草稿或已拒绝状态的凭证'], 400);
         }
 
         $validated = $request->validate([
@@ -200,9 +204,9 @@ class AccountingVoucherController extends Controller
         // 根据ID查询凭证
         $voucher = AccountingVoucher::findOrFail($id);
 
-        // 检查状态：只能删除草稿状态的凭证
-        if ($voucher->status != 'draft') {
-            return response()->json(['message' => '只能删除草稿状态的凭证'], 400);
+        // 检查状态：只能删除草稿或已拒绝状态的凭证
+        if ($voucher->status != AccountingVoucherStatus::DRAFT && $voucher->status != AccountingVoucherStatus::REJECTED) {
+            return response()->json(['message' => '只能删除草稿或已拒绝状态的凭证'], 400);
         }
 
         // 删除凭证记录
@@ -210,6 +214,109 @@ class AccountingVoucherController extends Controller
 
         // 返回删除成功消息
         return response()->json(['message' => '凭证删除成功']);
+    }
+
+    /**
+     * 提交审批（会计凭证）
+     *
+     * @param int $id 凭证ID
+     * @return \Illuminate\Http\JsonResponse 返回提交后的凭证信息，失败时返回错误消息
+     */
+    public function submit($id)
+    {
+        try {
+            $voucher = AccountingVoucher::findOrFail($id);
+
+            // 检查状态：只有草稿或已拒绝状态的凭证才能提交审批
+            if ($voucher->status != AccountingVoucherStatus::DRAFT && $voucher->status != AccountingVoucherStatus::REJECTED) {
+                return response()->json(['message' => '只能提交草稿或已拒绝状态的凭证'], 400);
+            }
+
+            // 检查借贷是否平衡
+            if (!$voucher->isBalanced()) {
+                return response()->json(['message' => '凭证借贷不平衡，无法提交审批'], 400);
+            }
+
+            // 更新状态为待审核
+            $voucher->update([
+                'status' => AccountingVoucherStatus::PENDING,
+            ]);
+
+            return ApiResponse::success($voucher->load(['items.account', 'creator']), '凭证已提交审批');
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 启动审批流程（会计凭证）
+     *
+     * @bodyParam workflow_id integer required 工作流ID Example: 1
+     * @param Request $request 请求对象，包含工作流ID
+     * @param int $id 凭证ID
+     * @return \Illuminate\Http\JsonResponse 返回启动的审批流程实例，失败时返回错误消息
+     */
+    public function startApproval(Request $request, $id)
+    {
+        try {
+            $voucher = AccountingVoucher::findOrFail($id);
+
+            // 检查状态：只有待审核状态的凭证才能启动审批流程
+            if ($voucher->status != AccountingVoucherStatus::PENDING) {
+                return response()->json(['message' => '只能启动待审核状态的凭证的审批流程'], 400);
+            }
+
+            $validated = $request->validate([
+                'workflow_id' => 'required|exists:workflows,id',
+            ]);
+
+            // 启动工作流
+            $instance = $this->approvalService->startWorkflow(
+                $validated['workflow_id'],
+                AccountingVoucher::class,
+                $voucher->id,
+                $voucher->voucher_no
+            );
+
+            // 更新凭证状态为审核中
+            $voucher->update([
+                'status' => AccountingVoucherStatus::UNDER_REVIEW,
+            ]);
+
+            return ApiResponse::success([
+                'voucher' => $voucher->load(['items.account', 'creator']),
+                'workflow_instance' => $instance,
+            ], '审批流程已启动');
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 取消凭证
+     *
+     * @param int $id 凭证ID
+     * @return \Illuminate\Http\JsonResponse 返回取消后的凭证信息，失败时返回错误消息
+     */
+    public function cancel($id)
+    {
+        try {
+            $voucher = AccountingVoucher::findOrFail($id);
+
+            // 检查状态：已过账的凭证不能取消
+            if ($voucher->status == AccountingVoucherStatus::POSTED) {
+                return response()->json(['message' => '已过账的凭证不能取消'], 400);
+            }
+
+            // 更新状态为已取消
+            $voucher->update([
+                'status' => AccountingVoucherStatus::CANCELLED,
+            ]);
+
+            return ApiResponse::success($voucher->load(['items.account', 'creator']), '凭证已取消');
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 
     /**

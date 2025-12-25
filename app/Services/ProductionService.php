@@ -87,16 +87,20 @@ class ProductionService
                         $plan->id,
                         $plan->plan_no
                     );
-                    // 启动工作流后，状态转为 pending，等待工作流审批完成
+                    // 启动工作流后，保持草稿状态，等待工作流审批完成
                     // 工作流审批完成后会自动更新计划状态为 approved
-                    $plan->update(['status' => ProductionPlanStatus::APPROVED]); // pending 在生产计划中不存在，直接设为 approved
+                    // 状态保持为 DRAFT，表示已提交但待审批
                 } catch (\Exception $e) {
                     // 如果启动工作流失败，直接转为 approved 状态
                     $plan->update(['status' => ProductionPlanStatus::APPROVED]);
                 }
             } else {
                 // 如果没有工作流，直接转为 approved 状态
-                $plan->update(['status' => ProductionPlanStatus::APPROVED]);
+                $plan->update([
+                    'status' => ProductionPlanStatus::APPROVED,
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                ]);
             }
 
             return $plan->load(['warehouse', 'items.product', 'items.bom', 'items.processRoute']);
@@ -190,16 +194,24 @@ class ProductionService
                         $workOrder->id,
                         $workOrder->work_order_no
                     );
-                    // 启动工作流后，状态转为 pending，等待工作流审批完成
+                    // 启动工作流后，保持草稿状态，等待工作流审批完成
                     // 工作流审批完成后会自动更新工单状态为 approved
-                    $workOrder->update(['status' => WorkOrderStatus::APPROVED]); // pending 在工单中不存在，直接设为 approved
+                    // 状态保持为 DRAFT，表示已提交但待审批
                 } catch (\Exception $e) {
                     // 如果启动工作流失败，直接转为 approved 状态
-                    $workOrder->update(['status' => WorkOrderStatus::APPROVED]);
+                    $workOrder->update([
+                        'status' => WorkOrderStatus::APPROVED,
+                        'approved_by' => auth()->id(),
+                        'approved_at' => now(),
+                    ]);
                 }
             } else {
                 // 如果没有工作流，直接转为 approved 状态
-                $workOrder->update(['status' => WorkOrderStatus::APPROVED]);
+                $workOrder->update([
+                    'status' => WorkOrderStatus::APPROVED,
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                ]);
             }
 
             return $workOrder->load(['product', 'bom', 'processRoute', 'warehouse', 'items']);

@@ -434,11 +434,11 @@ const handleEdit = async (row) => {
             items: bom.items.map(item => ({
                 component_product_id: item.component_product_id,
                 component_product: item.component_product,
-                quantity: item.quantity,
+                quantity: typeof item.quantity === 'string' ? parseFloat(item.quantity) || 0 : (item.quantity || 0),
                 unit_id: item.unit_id,
                 unit: item.unit,
-                loss_rate: item.loss_rate || 0,
-                sequence: item.sequence || 0,
+                loss_rate: typeof item.loss_rate === 'string' ? parseFloat(item.loss_rate) || 0 : (item.loss_rate || 0),
+                sequence: typeof item.sequence === 'string' ? parseInt(item.sequence) || 0 : (item.sequence || 0),
                 position: item.position || '',
                 remark: item.remark || ''
             }))
@@ -556,10 +556,10 @@ const handleSubmit = async () => {
                     ...form,
                     items: form.items.map(item => ({
                         component_product_id: item.component_product_id,
-                        quantity: item.quantity,
+                        quantity: typeof item.quantity === 'string' ? parseFloat(item.quantity) || 0 : (item.quantity || 0),
                         unit_id: item.unit_id,
-                        loss_rate: item.loss_rate || 0,
-                        sequence: item.sequence || 0,
+                        loss_rate: typeof item.loss_rate === 'string' ? parseFloat(item.loss_rate) || 0 : (item.loss_rate || 0),
+                        sequence: typeof item.sequence === 'string' ? parseInt(item.sequence) || 0 : (item.sequence || 0),
                         position: item.position || '',
                         remark: item.remark || ''
                     }))

@@ -8,6 +8,7 @@ use App\Models\GeneralLedger;
 use App\Models\AccountsReceivable;
 use App\Models\AccountsPayable;
 use App\Models\ChartOfAccount;
+use App\Constants\AccountingVoucherStatus;
 use Illuminate\Support\Facades\DB;
 
 class FinancialService
@@ -20,7 +21,7 @@ class FinancialService
                 'voucher_date' => $data['voucher_date'],
                 'type' => $data['type'] ?? 'general',
                 'attachment_count' => $data['attachment_count'] ?? 0,
-                'status' => 'draft',
+                'status' => AccountingVoucherStatus::DRAFT,
                 'created_by' => auth()->id(),
                 'remark' => $data['remark'] ?? null,
             ]);
@@ -59,8 +60,9 @@ class FinancialService
     {
         $voucher = AccountingVoucher::with('items')->findOrFail($voucherId);
 
-        if ($voucher->status != 'draft') {
-            throw new \Exception('凭证状态不允许过账');
+        // 只有已审核状态的凭证才能过账
+        if ($voucher->status != AccountingVoucherStatus::APPROVED) {
+            throw new \Exception('凭证状态不允许过账，只有已审核状态的凭证才能过账');
         }
 
         if (!$voucher->isBalanced()) {
@@ -100,7 +102,7 @@ class FinancialService
             }
 
             $voucher->update([
-                'status' => 'posted',
+                'status' => AccountingVoucherStatus::POSTED,
                 'posted_by' => auth()->id(),
                 'posted_at' => now(),
             ]);

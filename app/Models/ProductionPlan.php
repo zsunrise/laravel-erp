@@ -79,6 +79,11 @@ class ProductionPlan extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    public function workflowInstances()
+    {
+        return $this->morphMany(\App\Models\WorkflowInstance::class, 'reference', 'reference_type', 'reference_id');
+    }
+
     /**
      * 获取状态类名
      */

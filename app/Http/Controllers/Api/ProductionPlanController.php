@@ -55,7 +55,24 @@ class ProductionPlanController extends Controller
         }
 
         // 按计划日期倒序排列，返回分页结果
-        return response()->json($query->orderBy('plan_date', 'desc')->paginate($request->get('per_page', 15)));
+        $paginator = $query->orderBy('plan_date', 'desc')->paginate($request->get('per_page', 15));
+        
+        // 为每个计划添加待审核标识
+        $paginator->getCollection()->transform(function ($plan) {
+            // 如果状态是草稿，检查是否有待审批的工作流实例
+            if ($plan->status == \App\Constants\ProductionPlanStatus::DRAFT) {
+                $hasPendingWorkflow = \App\Models\WorkflowInstance::where('reference_type', \App\Models\ProductionPlan::class)
+                    ->where('reference_id', $plan->id)
+                    ->where('status', \App\Constants\WorkflowStatus::PENDING)
+                    ->exists();
+                $plan->is_pending_approval = $hasPendingWorkflow;
+            } else {
+                $plan->is_pending_approval = false;
+            }
+            return $plan;
+        });
+        
+        return response()->json($paginator);
     }
 
     /**
@@ -122,6 +139,17 @@ class ProductionPlanController extends Controller
         // 根据ID查询生产计划，预加载关联数据
         $plan = ProductionPlan::with(['warehouse', 'salesOrder', 'creator', 'approver', 'items.product', 'items.bom', 'items.processRoute'])
             ->findOrFail($id);
+        
+        // 检查是否有待审批的工作流实例
+        if ($plan->status == \App\Constants\ProductionPlanStatus::DRAFT) {
+            $plan->is_pending_approval = \App\Models\WorkflowInstance::where('reference_type', \App\Models\ProductionPlan::class)
+                ->where('reference_id', $plan->id)
+                ->where('status', \App\Constants\WorkflowStatus::PENDING)
+                ->exists();
+        } else {
+            $plan->is_pending_approval = false;
+        }
+        
         // 返回标准化成功响应
         return ApiResponse::success($plan, '获取成功');
     }

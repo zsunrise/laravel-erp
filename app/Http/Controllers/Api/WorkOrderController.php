@@ -68,7 +68,24 @@ class WorkOrderController extends Controller
         }
 
         // 按开始日期倒序排列，返回分页结果
-        return response()->json($query->orderBy('start_date', 'desc')->paginate($request->get('per_page', 15)));
+        $paginator = $query->orderBy('start_date', 'desc')->paginate($request->get('per_page', 15));
+        
+        // 为每个工单添加待审核标识
+        $paginator->getCollection()->transform(function ($workOrder) {
+            // 如果状态是草稿，检查是否有待审批的工作流实例
+            if ($workOrder->status == \App\Constants\WorkOrderStatus::DRAFT) {
+                $hasPendingWorkflow = \App\Models\WorkflowInstance::where('reference_type', \App\Models\WorkOrder::class)
+                    ->where('reference_id', $workOrder->id)
+                    ->where('status', \App\Constants\WorkflowStatus::PENDING)
+                    ->exists();
+                $workOrder->is_pending_approval = $hasPendingWorkflow;
+            } else {
+                $workOrder->is_pending_approval = false;
+            }
+            return $workOrder;
+        });
+        
+        return response()->json($paginator);
     }
 
     /**
@@ -130,6 +147,17 @@ class WorkOrderController extends Controller
             'items.processRouteStep', 'items.assignedTo',       // 工序明细
             'materialIssues.items.product', 'reports.reporter'  // 领料单和报工单
         ])->findOrFail($id); // 找不到则抛出404异常
+        
+        // 检查是否有待审批的工作流实例
+        if ($workOrder->status == \App\Constants\WorkOrderStatus::DRAFT) {
+            $workOrder->is_pending_approval = \App\Models\WorkflowInstance::where('reference_type', \App\Models\WorkOrder::class)
+                ->where('reference_id', $workOrder->id)
+                ->where('status', \App\Constants\WorkflowStatus::PENDING)
+                ->exists();
+        } else {
+            $workOrder->is_pending_approval = false;
+        }
+        
         // 返回标准化成功响应
         return ApiResponse::success($workOrder, '获取成功');
     }

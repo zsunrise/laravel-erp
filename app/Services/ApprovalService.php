@@ -10,8 +10,10 @@ use App\Models\PurchaseOrder;
 use App\Models\SalesOrder;
 use App\Models\ProductionPlan;
 use App\Models\WorkOrder;
+use App\Models\AccountingVoucher;
 use App\Constants\OrderStatus;
 use App\Constants\WorkflowStatus;
+use App\Constants\AccountingVoucherStatus;
 use Illuminate\Support\Facades\DB;
 
 class ApprovalService
@@ -186,13 +188,13 @@ class ApprovalService
             if ($plan) {
                 if ($workflowStatus === WorkflowStatus::APPROVED) {
                     $plan->update([
-                        'status' => 'approved',
+                        'status' => \App\Constants\ProductionPlanStatus::APPROVED,
                         'approved_by' => $lastApproval ? $lastApproval->approver_id : null,
                         'approved_at' => now(),
                     ]);
                 } elseif ($workflowStatus === WorkflowStatus::REJECTED) {
                     // 被拒绝时，将计划状态改回 draft，允许重新提交
-                    $plan->update(['status' => 'draft']);
+                    $plan->update(['status' => \App\Constants\ProductionPlanStatus::DRAFT]);
                 }
             }
         }
@@ -202,13 +204,27 @@ class ApprovalService
             if ($workOrder) {
                 if ($workflowStatus === WorkflowStatus::APPROVED) {
                     $workOrder->update([
-                        'status' => 'approved',
+                        'status' => \App\Constants\WorkOrderStatus::APPROVED,
                         'approved_by' => $lastApproval ? $lastApproval->approver_id : null,
                         'approved_at' => now(),
                     ]);
                 } elseif ($workflowStatus === WorkflowStatus::REJECTED) {
                     // 被拒绝时，将工单状态改回 draft，允许重新提交
-                    $workOrder->update(['status' => 'draft']);
+                    $workOrder->update(['status' => \App\Constants\WorkOrderStatus::DRAFT]);
+                }
+            }
+        }
+        // 处理会计凭证
+        elseif ($instance->reference_type === AccountingVoucher::class) {
+            $voucher = AccountingVoucher::find($instance->reference_id);
+            if ($voucher) {
+                if ($workflowStatus === WorkflowStatus::APPROVED) {
+                    $voucher->update([
+                        'status' => AccountingVoucherStatus::APPROVED,
+                    ]);
+                } elseif ($workflowStatus === WorkflowStatus::REJECTED) {
+                    // 被拒绝时，将凭证状态改为已拒绝，允许修改后重新提交
+                    $voucher->update(['status' => AccountingVoucherStatus::REJECTED]);
                 }
             }
         }
