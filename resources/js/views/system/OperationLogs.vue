@@ -75,7 +75,11 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="ip" label="IP地址" width="130" />
-                <el-table-column prop="created_at" label="操作时间" width="180" />
+                <el-table-column prop="created_at" label="操作时间" width="180">
+                    <template #default="{ row }">
+                        {{ formatDateTime(row.created_at) }}
+                    </template>
+                </el-table-column>
                 <el-table-column label="操作" width="100" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null">查看</el-button>
@@ -101,7 +105,7 @@
         <el-dialog
             v-model="detailVisible"
             title="日志详情"
-            width="900px"
+            width="1000px"
             :close-on-click-modal="false"
         >
             <div v-loading="detailLoading">
@@ -113,19 +117,25 @@
                 <el-descriptions-item label="请求方法">
                     <el-tag :type="getMethodTagType(currentLog.method)" size="small">{{ currentLog.method }}</el-tag>
                 </el-descriptions-item>
-                <el-descriptions-item label="请求路径">{{ currentLog.path || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="请求路径" :span="2">
+                    <div style="word-break: break-all; white-space: normal;">{{ currentLog.path || '-' }}</div>
+                </el-descriptions-item>
                 <el-descriptions-item label="状态码">
                     <el-tag :type="getStatusTagType(currentLog.status_code)" size="small">{{ currentLog.status_code }}</el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="IP地址">{{ currentLog.ip || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="用户代理">{{ currentLog.user_agent || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="操作时间">{{ currentLog.created_at }}</el-descriptions-item>
-                <el-descriptions-item label="操作说明" :span="2">{{ currentLog.message || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="用户代理" :span="2">
+                    <div style="word-break: break-all; white-space: normal;">{{ currentLog.user_agent || '-' }}</div>
+                </el-descriptions-item>
+                <el-descriptions-item label="操作时间">{{ formatDateTime(currentLog.created_at) }}</el-descriptions-item>
+                <el-descriptions-item label="操作说明" :span="2">
+                    <div style="word-break: break-all; white-space: normal;">{{ currentLog.message || '-' }}</div>
+                </el-descriptions-item>
                 <el-descriptions-item label="请求数据" :span="2">
-                    <pre style="max-height: 200px; overflow: auto; background: #f5f5f5; padding: 10px; border-radius: 4px;">{{ formatJson(currentLog.request_data) }}</pre>
+                    <pre class="log-data-pre">{{ formatJson(currentLog.request_data) }}</pre>
                 </el-descriptions-item>
                 <el-descriptions-item label="响应数据" :span="2">
-                    <pre style="max-height: 200px; overflow: auto; background: #f5f5f5; padding: 10px; border-radius: 4px;">{{ formatJson(currentLog.response_data) }}</pre>
+                    <pre class="log-data-pre">{{ formatJson(currentLog.response_data) }}</pre>
                 </el-descriptions-item>
                 </el-descriptions>
             </div>
@@ -183,11 +193,53 @@ const getStatusTagType = (statusCode) => {
 
 const formatJson = (data) => {
     if (!data) return '-';
+    
+    // 如果是字符串，尝试解析
+    let parsed = data;
+    if (typeof data === 'string') {
+        try {
+            parsed = JSON.parse(data);
+        } catch (e) {
+            // 如果解析失败，检查是否包含截断标记
+            if (data.includes('（数据过大已截断') || data.includes('（数据过大已截断）')) {
+                return data; // 直接返回，保持原有格式
+            }
+            return data; // 返回原始字符串
+        }
+    }
+    
+    // 格式化 JSON
     try {
-        const parsed = typeof data == 'string' ? JSON.parse(data) : data;
         return JSON.stringify(parsed, null, 2);
     } catch (e) {
-        return data;
+        return typeof data === 'string' ? data : String(data);
+    }
+};
+
+const formatDateTime = (dateTime) => {
+    if (!dateTime) return '-';
+    
+    try {
+        // 如果是 ISO 8601 格式或标准日期时间格式，直接格式化
+        const date = new Date(dateTime);
+        
+        // 检查日期是否有效
+        if (isNaN(date.getTime())) {
+            return dateTime; // 如果无法解析，返回原值
+        }
+        
+        // 格式化为 YYYY-MM-DD HH:mm:ss
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    } catch (e) {
+        // 如果已经是格式化好的字符串，直接返回
+        return dateTime;
     }
 };
 
@@ -305,6 +357,41 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 使用全局样式类 */
+/* 日志数据样式 - 自动换行 */
+.log-data-pre {
+    max-height: 300px;
+    overflow: auto;
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    border: 1px solid #e0e0e0;
+}
+
+/* 滚动条样式 */
+.log-data-pre::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.log-data-pre::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.log-data-pre::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.log-data-pre::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
 </style>
 

@@ -236,12 +236,12 @@
                     <el-table-column prop="product.name" label="商品名称" />
                     <el-table-column prop="quantity" label="数量" width="100" />
                     <el-table-column prop="unit_price" label="单价" width="120">
-                        <template #default="{ row }">¥{{ row.unit_price }}</template>
+                        <template #default="{ row }">¥{{ row.unit_price || 0 }}</template>
                     </el-table-column>
                     <el-table-column prop="tax_rate" label="税率(%)" width="100" />
-                    <el-table-column label="小计" width="120">
+                    <el-table-column prop="subtotal" label="小计" width="120">
                         <template #default="{ row }">
-                            ¥{{ (row.quantity * row.unit_price * (1 + (row.tax_rate || 0) / 100)).toFixed(2) }}
+                            ¥{{ (row.subtotal || 0).toFixed(2) }}
                         </template>
                     </el-table-column>
                     <el-table-column prop="remark" label="备注" />

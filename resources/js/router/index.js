@@ -50,6 +50,12 @@ const routes = [
                 meta: { title: '消息模板', icon: 'MessageSquare', permission: 'system.config' }
             },
             {
+                path: 'operation-logs',
+                name: 'OperationLogs',
+                component: () => import('../views/system/OperationLogs.vue'),
+                meta: { title: '操作日志', icon: 'FileText', permission: 'system.config' }
+            },
+            {
                 path: 'products',
                 name: 'Products',
                 component: () => import('../views/product/Products.vue'),

@@ -121,18 +121,21 @@
                         <template #default="{ row }">{{ (row.quantity || 0) - (row.shipped_quantity || 0) }}</template>
                     </el-table-column>
                     <el-table-column prop="unit_price" label="单价" width="120">
-                        <template #default="{ row }">¥{{ row.unit_price }}</template>
+                        <template #default="{ row }">¥{{ row.unit_price || 0 }}</template>
                     </el-table-column>
-                    <el-table-column prop="total_price" label="小计" width="120">
-                        <template #default="{ row }">¥{{ row.total_price }}</template>
+                    <el-table-column prop="subtotal" label="小计" width="120">
+                        <template #default="{ row }">
+                            ¥{{ row.subtotal ? Number(row.subtotal).toFixed(2) : (row.quantity && row.unit_price ? (row.quantity * row.unit_price * (1 - (row.discount_rate || 0) / 100)).toFixed(2) : '0.00') }}
+                        </template>
                     </el-table-column>
                 </el-table>
             </div>
             <template #footer v-if="currentOrder">
+                <el-button @click="detailVisible = false">关闭</el-button>
                 <el-button v-if="currentOrder.status == 3 || currentOrder.status == 4" type="success" @click="handleShip(currentOrder)">出库</el-button>
                 <el-button v-if="currentOrder.status == 1" type="info" @click="handleSubmit(currentOrder)">提交审核</el-button>
                 <el-button v-if="currentOrder.status == 2" type="success" @click="handleApprove(currentOrder)">审核</el-button>
-                <el-button v-if="currentOrder.status != 5 && currentOrder.status != 6" type="danger" @click="handleCancel(currentOrder)">取消</el-button>
+                <el-button v-if="currentOrder.status != 5 && currentOrder.status != 6" type="danger" @click="handleCancelOrder(currentOrder)">取消订单</el-button>
             </template>
         </el-dialog>
 
@@ -493,6 +496,10 @@ const handleCancel = async (row) => {
             ElMessage.error(error.response?.data?.message || '取消失败');
         }
     }
+};
+
+const handleCancelOrder = async (order) => {
+    await handleCancel(order);
 };
 
 const handleDelete = async (row) => {

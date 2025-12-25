@@ -54,7 +54,7 @@ class LogOperation
 
         // 获取响应信息
         $statusCode = $response->getStatusCode();
-        $responseData = $this->getResponseData($response);
+        $responseData = $this->getResponseData($response, $path, $method);
 
         // 异步记录日志（避免影响响应速度）
         try {
@@ -119,29 +119,38 @@ class LogOperation
             }
         }
 
-        // 限制数据大小（避免记录过大的数据）
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE);
-        if (strlen($json) > 5000) {
-            return substr($json, 0, 5000) . '...（数据过大已截断）';
-        }
-
+        // 编码为 JSON（不截断）
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         return $json ?: null;
     }
 
     /**
      * 获取响应数据
      */
-    protected function getResponseData($response): ?string
+    protected function getResponseData($response, string $path, string $method): ?string
     {
         try {
             $content = $response->getContent();
             
-            // 只记录 JSON 响应，且限制大小
-            if (is_string($content) && strlen($content) > 2000) {
-                return substr($content, 0, 2000) . '...（数据过大已截断）';
+            if (!$content || !is_string($content)) {
+                return null;
             }
 
-            return $content ?: null;
+            // 检查是否为 JSON 响应
+            $contentType = $response->headers->get('Content-Type', '');
+            if (strpos($contentType, 'application/json') === false) {
+                return null; // 非 JSON 响应不记录
+            }
+
+            // 尝试解析 JSON 并格式化
+            $jsonData = json_decode($content, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // 格式化 JSON，便于阅读
+                return json_encode($jsonData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            }
+
+            // 如果不是有效的 JSON，返回原始内容
+            return $content;
         } catch (\Exception $e) {
             return null;
         }
