@@ -13,7 +13,6 @@
 /.fleet
 /README.md
 /TASKS.md
-/PERFORMANCE_OPTIMIZATION.md
 .phpunit.result.cache
 npm-debug.log
 yarn-error.log
