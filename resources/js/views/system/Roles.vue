@@ -157,8 +157,35 @@ const handleReset = () => {
 
 const loadPermissions = async () => {
     try {
-        const response = await api.get('/permissions');
-        permissionTree.value = response.data.data || [];
+        const params = { per_page: 1000 };
+        const response = await api.get('/permissions', { params });
+        let permissions = [];
+
+        if (response.data.pagination) {
+            permissions = response.data.data || [];
+        } else if (Array.isArray(response.data.data)) {
+            permissions = response.data.data;
+        } else {
+            permissions = response.data.data || [];
+        }
+
+        const groupsMap = {};
+        permissions.forEach(p => {
+            const groupName = p.group || '未分组';
+            if (!groupsMap[groupName]) {
+                groupsMap[groupName] = {
+                    id: `group-${groupName}`,
+                    name: groupName,
+                    children: []
+                };
+            }
+            groupsMap[groupName].children.push({
+                id: p.id,
+                name: `${p.name} (${p.slug})`
+            });
+        });
+
+        permissionTree.value = Object.values(groupsMap);
     } catch (error) {
         console.error('加载权限列表失败:', error);
     }
@@ -220,7 +247,8 @@ const handleSubmit = async () => {
         if (valid) {
             try {
                 if (permissionTreeRef.value) {
-                    form.permissions = permissionTreeRef.value.getCheckedKeys();
+                    const checkedKeys = permissionTreeRef.value.getCheckedKeys(true);
+                    form.permissions = checkedKeys.filter(key => !String(key).startsWith('group-'));
                 }
                 if (form.id) {
                     await api.put(`/roles/${form.id}`, form);

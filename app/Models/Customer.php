@@ -17,6 +17,7 @@ class Customer extends Model
         'contact_phone',
         'email',
         'region_id',
+        'owner_id',
         'address',
         'tax_number',
         'bank_name',
@@ -37,6 +38,11 @@ class Customer extends Model
     public function region()
     {
         return $this->belongsTo(Region::class);
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
     }
 
     public function salesOrders()

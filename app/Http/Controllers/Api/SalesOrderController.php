@@ -9,6 +9,7 @@ use App\Models\SalesReturn;
 use App\Models\SalesSettlement;
 use App\Services\SalesService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SalesOrderController extends Controller
 {
@@ -35,6 +36,11 @@ class SalesOrderController extends Controller
     public function index(Request $request)
     {
         $query = SalesOrder::with(['customer', 'warehouse', 'currency', 'creator']);
+
+        $user = $request->user();
+        if ($user && !$user->isAdmin()) {
+            $query->where('created_by', $user->id);
+        }
 
         if ($request->has('customer_id')) {
             $query->where('customer_id', $request->customer_id);
@@ -127,6 +133,11 @@ class SalesOrderController extends Controller
     {
         $order = SalesOrder::with(['customer', 'warehouse', 'currency', 'creator', 'approver', 'items.product'])
             ->findOrFail($id);
+
+        $user = request()->user();
+        if ($user && !$user->isAdmin() && $order->created_by !== $user->id) {
+            return response()->json(['message' => '无权访问该订单'], 403);
+        }
         return ApiResponse::success($order, '获取成功');
     }
 
@@ -174,6 +185,11 @@ class SalesOrderController extends Controller
     {
         $order = SalesOrder::findOrFail($id);
 
+        $user = request()->user();
+        if ($user && !$user->isAdmin() && $order->created_by !== $user->id) {
+            return response()->json(['message' => '无权删除该订单'], 403);
+        }
+
         if ($order->status != 'draft') {
             return response()->json(['message' => '只能删除草稿状态的订单'], 400);
         }
@@ -194,6 +210,11 @@ class SalesOrderController extends Controller
         try {
             // 调用服务层提交审核，将状态从 draft 转为 pending，并启动审批流程
             $order = $this->salesService->submitForApproval($id);
+
+            $user = request()->user();
+            if ($user && !$user->isAdmin() && $order->created_by !== $user->id) {
+                return response()->json(['message' => '无权操作该订单'], 403);
+            }
             // 提交成功返回订单信息
             return response()->json($order);
         } catch (\Exception $e) {
@@ -212,6 +233,11 @@ class SalesOrderController extends Controller
     {
         try {
             $order = $this->salesService->approveOrder($id);
+
+            $user = request()->user();
+            if ($user && !$user->isAdmin() && $order->created_by !== $user->id) {
+                return response()->json(['message' => '无权操作该订单'], 403);
+            }
             return response()->json($order);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -235,6 +261,11 @@ class SalesOrderController extends Controller
 
         try {
             $order = $this->salesService->shipGoods($id, $validated['items']);
+
+            $user = request()->user();
+            if ($user && !$user->isAdmin() && $order->created_by !== $user->id) {
+                return response()->json(['message' => '无权操作该订单'], 403);
+            }
             return response()->json($order);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -251,6 +282,11 @@ class SalesOrderController extends Controller
     {
         try {
             $order = $this->salesService->cancelOrder($id);
+
+            $user = request()->user();
+            if ($user && !$user->isAdmin() && $order->created_by !== $user->id) {
+                return response()->json(['message' => '无权操作该订单'], 403);
+            }
             return response()->json($order);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);

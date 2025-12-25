@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
@@ -23,6 +24,11 @@ class CustomerController extends Controller
     {
         // 构建查询，预加载区域信息
         $query = Customer::with(['region']);
+
+        $user = $request->user();
+        if ($user && !$user->isAdmin()) {
+            $query->where('owner_id', $user->id);
+        }
 
         // 按激活状态筛选
         if ($request->has('is_active')) {
@@ -92,7 +98,9 @@ class CustomerController extends Controller
         ]);
 
         // 创建客户记录
-        $customer = Customer::create($validated);
+        $customer = Customer::create($validated + [
+            'owner_id' => $request->user()->id,
+        ]);
 
         // 返回新建客户信息（包含区域）
         return response()->json($customer->load('region'), 201);
@@ -107,7 +115,12 @@ class CustomerController extends Controller
     public function show($id)
     {
         // 根据ID查询客户，预加载区域信息，找不到则抛出404
-        $customer = Customer::with(['region'])->findOrFail($id);
+        $customer = Customer::with(['region', 'owner'])->findOrFail($id);
+
+        $user = request()->user();
+        if ($user && !$user->isAdmin() && $customer->owner_id !== $user->id) {
+            return response()->json(['message' => '无权访问该客户'], 403);
+        }
         // 返回标准化成功响应
         return ApiResponse::success($customer, '获取成功');
     }
@@ -138,6 +151,11 @@ class CustomerController extends Controller
     {
         // 根据ID查询客户，找不到则抛出404
         $customer = Customer::findOrFail($id);
+
+        $user = $request->user();
+        if ($user && !$user->isAdmin() && $customer->owner_id !== $user->id) {
+            return response()->json(['message' => '无权操作该客户'], 403);
+        }
 
         // 验证更新参数（编码唯一性排除当前记录）
         $validated = $request->validate([
@@ -175,6 +193,11 @@ class CustomerController extends Controller
     {
         // 根据ID查询客户
         $customer = Customer::findOrFail($id);
+
+        $user = request()->user();
+        if ($user && !$user->isAdmin() && $customer->owner_id !== $user->id) {
+            return response()->json(['message' => '无权删除该客户'], 403);
+        }
 
         // 检查是否有关联的销售订单，有则不允许删除
         if ($customer->salesOrders()->count() > 0) {

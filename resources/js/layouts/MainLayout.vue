@@ -45,7 +45,7 @@
                     <el-menu-item index="/operation-logs" v-if="hasMenuPermission('system.config')">操作日志</el-menu-item>
                 </el-sub-menu>
 
-                <el-menu-item index="/products" class="menu-item">
+                <el-menu-item index="/products" class="menu-item" v-if="hasMenuPermission('products.manage')">
                     <Package :size="20" />
                     <template #title>商品管理</template>
                 </el-menu-item>
@@ -61,61 +61,61 @@
                     <el-menu-item index="/regions">地区管理</el-menu-item>
                 </el-sub-menu>
 
-                <el-sub-menu index="partner">
+                <el-sub-menu index="partner" v-if="hasMenuPermission('suppliers.manage') || hasMenuPermission('customers.manage')">
                     <template #title>
                         <Users :size="20" />
                         <span>合作伙伴</span>
                     </template>
-                    <el-menu-item index="/suppliers">供应商管理</el-menu-item>
-                    <el-menu-item index="/customers">客户管理</el-menu-item>
+                    <el-menu-item index="/suppliers" v-if="hasMenuPermission('suppliers.manage')">供应商管理</el-menu-item>
+                    <el-menu-item index="/customers" v-if="hasMenuPermission('customers.manage')">客户管理</el-menu-item>
                 </el-sub-menu>
 
-                <el-menu-item index="/warehouses" class="menu-item">
+                <el-menu-item index="/warehouses" class="menu-item" v-if="hasMenuPermission('warehouses.manage')">
                     <Warehouse :size="20" />
                     <template #title>仓库管理</template>
                 </el-menu-item>
 
-                <el-menu-item index="/inventory" class="menu-item">
+                <el-menu-item index="/inventory" class="menu-item" v-if="hasMenuPermission('inventory.view')">
                     <Boxes :size="20" />
                     <template #title>库存管理</template>
                 </el-menu-item>
 
-                <el-sub-menu index="purchase">
+                <el-sub-menu index="purchase" v-if="hasMenuPermission('purchase-orders.manage') || hasMenuPermission('purchase-returns.manage') || hasMenuPermission('purchase-settlements.manage')">
                     <template #title>
                         <ShoppingCart :size="20" />
                         <span>采购管理</span>
                     </template>
-                    <el-menu-item index="/purchase-orders">采购订单</el-menu-item>
-                    <el-menu-item index="/purchase-returns">采购退货</el-menu-item>
-                    <el-menu-item index="/purchase-settlements">采购结算</el-menu-item>
+                    <el-menu-item index="/purchase-orders" v-if="hasMenuPermission('purchase-orders.manage')">采购订单</el-menu-item>
+                    <el-menu-item index="/purchase-returns" v-if="hasMenuPermission('purchase-returns.manage')">采购退货</el-menu-item>
+                    <el-menu-item index="/purchase-settlements" v-if="hasMenuPermission('purchase-settlements.manage')">采购结算</el-menu-item>
                 </el-sub-menu>
 
-                <el-sub-menu index="sales">
+                <el-sub-menu index="sales" v-if="hasMenuPermission('sales-orders.manage') || hasMenuPermission('sales-returns.manage') || hasMenuPermission('sales-settlements.manage')">
                     <template #title>
                         <ShoppingBag :size="20" />
                         <span>销售管理</span>
                     </template>
-                    <el-menu-item index="/sales-orders">销售订单</el-menu-item>
-                    <el-menu-item index="/sales-returns">销售退货</el-menu-item>
-                    <el-menu-item index="/sales-settlements">销售结算</el-menu-item>
+                    <el-menu-item index="/sales-orders" v-if="hasMenuPermission('sales-orders.manage')">销售订单</el-menu-item>
+                    <el-menu-item index="/sales-returns" v-if="hasMenuPermission('sales-returns.manage')">销售退货</el-menu-item>
+                    <el-menu-item index="/sales-settlements" v-if="hasMenuPermission('sales-settlements.manage')">销售结算</el-menu-item>
                 </el-sub-menu>
 
-                <el-menu-item index="/boms" class="menu-item">
+                <el-menu-item index="/boms" class="menu-item" v-if="hasMenuPermission('boms.manage')">
                     <FileText :size="20" />
                     <template #title>BOM管理</template>
                 </el-menu-item>
 
-                <el-menu-item index="/production" class="menu-item">
+                <el-menu-item index="/production" class="menu-item" v-if="hasMenuPermission('work-orders.manage')">
                     <Cog :size="20" />
                     <template #title>生产管理</template>
                 </el-menu-item>
 
-                <el-menu-item index="/financial" class="menu-item">
+                <el-menu-item index="/financial" class="menu-item" v-if="hasAnyMenuPermission(['general-ledger.view', 'accounts-receivable.manage', 'accounts-payable.manage'])">
                     <DollarSign :size="20" />
                     <template #title>财务管理</template>
                 </el-menu-item>
 
-                <el-menu-item index="/reports" class="menu-item">
+                <el-menu-item index="/reports" class="menu-item" v-if="hasAnyMenuPermission(['sales-reports.view', 'purchase-reports.view', 'inventory-reports.view', 'financial-reports.view'])">
                     <BarChart3 :size="20" />
                     <template #title>报表分析</template>
                 </el-menu-item>
@@ -163,7 +163,7 @@
                         <el-menu-item index="/operation-logs" v-if="hasMenuPermission('system.config')">操作日志</el-menu-item>
                     </el-sub-menu>
 
-                    <el-menu-item index="/products" class="menu-item">
+                    <el-menu-item index="/products" class="menu-item" v-if="hasMenuPermission('products.manage')">
                         <Package :size="20" />
                         <template #title>商品管理</template>
                     </el-menu-item>
@@ -179,61 +179,61 @@
                         <el-menu-item index="/regions">地区管理</el-menu-item>
                     </el-sub-menu>
 
-                    <el-sub-menu index="partner">
+                    <el-sub-menu index="partner" v-if="hasMenuPermission('suppliers.manage') || hasMenuPermission('customers.manage')">
                         <template #title>
                             <Users :size="20" />
                             <span>合作伙伴</span>
                         </template>
-                        <el-menu-item index="/suppliers">供应商管理</el-menu-item>
-                        <el-menu-item index="/customers">客户管理</el-menu-item>
+                        <el-menu-item index="/suppliers" v-if="hasMenuPermission('suppliers.manage')">供应商管理</el-menu-item>
+                        <el-menu-item index="/customers" v-if="hasMenuPermission('customers.manage')">客户管理</el-menu-item>
                     </el-sub-menu>
 
-                    <el-menu-item index="/warehouses" class="menu-item">
+                    <el-menu-item index="/warehouses" class="menu-item" v-if="hasMenuPermission('warehouses.manage')">
                         <Warehouse :size="20" />
                         <template #title>仓库管理</template>
                     </el-menu-item>
 
-                    <el-menu-item index="/inventory" class="menu-item">
+                    <el-menu-item index="/inventory" class="menu-item" v-if="hasMenuPermission('inventory.view')">
                         <Boxes :size="20" />
                         <template #title>库存管理</template>
                     </el-menu-item>
 
-                    <el-sub-menu index="purchase">
+                    <el-sub-menu index="purchase" v-if="hasMenuPermission('purchase-orders.manage') || hasMenuPermission('purchase-returns.manage') || hasMenuPermission('purchase-settlements.manage')">
                         <template #title>
                             <ShoppingCart :size="20" />
                             <span>采购管理</span>
                         </template>
-                        <el-menu-item index="/purchase-orders">采购订单</el-menu-item>
-                        <el-menu-item index="/purchase-returns">采购退货</el-menu-item>
-                        <el-menu-item index="/purchase-settlements">采购结算</el-menu-item>
+                        <el-menu-item index="/purchase-orders" v-if="hasMenuPermission('purchase-orders.manage')">采购订单</el-menu-item>
+                        <el-menu-item index="/purchase-returns" v-if="hasMenuPermission('purchase-returns.manage')">采购退货</el-menu-item>
+                        <el-menu-item index="/purchase-settlements" v-if="hasMenuPermission('purchase-settlements.manage')">采购结算</el-menu-item>
                     </el-sub-menu>
 
-                    <el-sub-menu index="sales">
+                    <el-sub-menu index="sales" v-if="hasMenuPermission('sales-orders.manage') || hasMenuPermission('sales-returns.manage') || hasMenuPermission('sales-settlements.manage')">
                         <template #title>
                             <ShoppingBag :size="20" />
                             <span>销售管理</span>
                         </template>
-                        <el-menu-item index="/sales-orders">销售订单</el-menu-item>
-                        <el-menu-item index="/sales-returns">销售退货</el-menu-item>
-                        <el-menu-item index="/sales-settlements">销售结算</el-menu-item>
+                        <el-menu-item index="/sales-orders" v-if="hasMenuPermission('sales-orders.manage')">销售订单</el-menu-item>
+                        <el-menu-item index="/sales-returns" v-if="hasMenuPermission('sales-returns.manage')">销售退货</el-menu-item>
+                        <el-menu-item index="/sales-settlements" v-if="hasMenuPermission('sales-settlements.manage')">销售结算</el-menu-item>
                     </el-sub-menu>
 
-                    <el-menu-item index="/boms" class="menu-item">
+                    <el-menu-item index="/boms" class="menu-item" v-if="hasMenuPermission('boms.manage')">
                         <FileText :size="20" />
                         <template #title>BOM管理</template>
                     </el-menu-item>
 
-                    <el-menu-item index="/production" class="menu-item">
+                    <el-menu-item index="/production" class="menu-item" v-if="hasMenuPermission('work-orders.manage')">
                         <Cog :size="20" />
                         <template #title>生产管理</template>
                     </el-menu-item>
 
-                    <el-menu-item index="/financial" class="menu-item">
+                    <el-menu-item index="/financial" class="menu-item" v-if="hasAnyMenuPermission(['general-ledger.view', 'accounts-receivable.manage', 'accounts-payable.manage'])">
                         <DollarSign :size="20" />
                         <template #title>财务管理</template>
                     </el-menu-item>
 
-                    <el-menu-item index="/reports" class="menu-item">
+                    <el-menu-item index="/reports" class="menu-item" v-if="hasAnyMenuPermission(['sales-reports.view', 'purchase-reports.view', 'inventory-reports.view', 'financial-reports.view'])">
                         <BarChart3 :size="20" />
                         <template #title>报表分析</template>
                     </el-menu-item>
@@ -355,6 +355,13 @@ const handleMenuSelect = () => {
 const hasMenuPermission = (permission) => {
     if (!permission) return true;
     return authStore.hasPermission(permission);
+};
+
+const hasAnyMenuPermission = (permissions) => {
+    if (!permissions || !Array.isArray(permissions) || permissions.length === 0) {
+        return true;
+    }
+    return authStore.hasAnyPermission(permissions);
 };
 
 const handleNotificationClick = () => {

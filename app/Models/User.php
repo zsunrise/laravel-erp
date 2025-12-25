@@ -54,6 +54,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function isAdmin()
+    {
+        return $this->hasRole('admin');
+    }
+
     public function hasRole($role)
     {
         if (is_string($role)) {
