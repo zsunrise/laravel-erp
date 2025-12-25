@@ -195,7 +195,26 @@ class WorkOrderController extends Controller
     }
 
     /**
-     * 审批工单
+     * 提交工单审核
+     *
+     * @param int $id 工单ID
+     * @return \Illuminate\Http\JsonResponse 返回提交后的工单信息，失败时返回错误消息
+     */
+    public function submit($id)
+    {
+        try {
+            // 调用服务层提交审核，将状态从 draft 转为 pending，并启动审批流程
+            $workOrder = $this->productionService->submitWorkOrderForApproval($id);
+            // 提交成功返回工单信息
+            return response()->json($workOrder);
+        } catch (\Exception $e) {
+            // 提交失败返回错误消息
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 审批工单（直接审批，不通过工作流）
      *
      * @param int $id 工单ID
      * @return \Illuminate\Http\JsonResponse 返回审批后的工单信息，失败时返回错误消息
@@ -203,7 +222,7 @@ class WorkOrderController extends Controller
     public function approve($id)
     {
         try {
-            // 调用服务层审批工单，将状态从 draft 更新为 approved
+            // 调用服务层审批工单，将状态从 draft/pending 更新为 approved
             $workOrder = $this->productionService->approveWorkOrder($id);
             // 审批成功返回工单信息
             return response()->json($workOrder);

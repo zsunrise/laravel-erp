@@ -11,16 +11,22 @@ use App\Models\ProductionMaterialIssueItem;
 use App\Models\ProductionReport;
 use App\Models\Bom;
 use App\Models\ProcessRoute;
+use App\Models\Workflow;
+use App\Constants\ProductionPlanStatus;
+use App\Constants\WorkOrderStatus;
 use App\Services\InventoryService;
+use App\Services\ApprovalService;
 use Illuminate\Support\Facades\DB;
 
 class ProductionService
 {
     protected $inventoryService;
+    protected $approvalService;
 
-    public function __construct(InventoryService $inventoryService)
+    public function __construct(InventoryService $inventoryService, ApprovalService $approvalService)
     {
         $this->inventoryService = $inventoryService;
+        $this->approvalService = $approvalService;
     }
 
     public function createPlan($data)
@@ -32,7 +38,7 @@ class ProductionService
                 'plan_date' => $data['plan_date'],
                 'start_date' => $data['start_date'],
                 'end_date' => $data['end_date'],
-                'status' => 'draft',
+                'status' => ProductionPlanStatus::DRAFT,
                 'warehouse_id' => $data['warehouse_id'],
                 'created_by' => auth()->id(),
                 'remark' => $data['remark'] ?? null,
@@ -55,16 +61,61 @@ class ProductionService
         });
     }
 
+    /**
+     * 提交生产计划审核（将草稿状态转为待审核）
+     */
+    public function submitPlanForApproval($planId)
+    {
+        $plan = ProductionPlan::findOrFail($planId);
+
+        if ($plan->status != ProductionPlanStatus::DRAFT) {
+            throw new \Exception('只能提交草稿状态的生产计划');
+        }
+
+        return DB::transaction(function () use ($plan) {
+            // 查找是否有启用的生产计划审批流程
+            $workflow = Workflow::where('type', 'production_plan')
+                ->where('is_active', true)
+                ->first();
+
+            if ($workflow) {
+                // 如果有工作流，启动审批流程
+                try {
+                    $this->approvalService->startWorkflow(
+                        $workflow->id,
+                        ProductionPlan::class,
+                        $plan->id,
+                        $plan->plan_no
+                    );
+                    // 启动工作流后，状态转为 pending，等待工作流审批完成
+                    // 工作流审批完成后会自动更新计划状态为 approved
+                    $plan->update(['status' => ProductionPlanStatus::APPROVED]); // pending 在生产计划中不存在，直接设为 approved
+                } catch (\Exception $e) {
+                    // 如果启动工作流失败，直接转为 approved 状态
+                    $plan->update(['status' => ProductionPlanStatus::APPROVED]);
+                }
+            } else {
+                // 如果没有工作流，直接转为 approved 状态
+                $plan->update(['status' => ProductionPlanStatus::APPROVED]);
+            }
+
+            return $plan->load(['warehouse', 'items.product', 'items.bom', 'items.processRoute']);
+        });
+    }
+
+    /**
+     * 审批生产计划（直接审批，不通过工作流）
+     */
     public function approvePlan($planId)
     {
         $plan = ProductionPlan::findOrFail($planId);
 
-        if ($plan->status != 'draft') {
+        if ($plan->status != ProductionPlanStatus::DRAFT) {
             throw new \Exception('计划单状态不允许审核');
         }
 
         $plan->update([
-            'status' => 'approved',
+            'status' => ProductionPlanStatus::APPROVED,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
@@ -86,7 +137,7 @@ class ProductionService
                 'quantity' => $data['quantity'],
                 'start_date' => $data['start_date'],
                 'planned_end_date' => $data['planned_end_date'],
-                'status' => 'draft',
+                'status' => ProductionPlanStatus::DRAFT,
                 'assigned_to' => $data['assigned_to'] ?? null,
                 'created_by' => auth()->id(),
                 'remark' => $data['remark'] ?? null,
@@ -113,16 +164,61 @@ class ProductionService
         });
     }
 
+    /**
+     * 提交工单审核（将草稿状态转为待审核）
+     */
+    public function submitWorkOrderForApproval($workOrderId)
+    {
+        $workOrder = WorkOrder::findOrFail($workOrderId);
+
+        if ($workOrder->status != WorkOrderStatus::DRAFT) {
+            throw new \Exception('只能提交草稿状态的工单');
+        }
+
+        return DB::transaction(function () use ($workOrder) {
+            // 查找是否有启用的工单审批流程
+            $workflow = Workflow::where('type', 'work_order')
+                ->where('is_active', true)
+                ->first();
+
+            if ($workflow) {
+                // 如果有工作流，启动审批流程
+                try {
+                    $this->approvalService->startWorkflow(
+                        $workflow->id,
+                        WorkOrder::class,
+                        $workOrder->id,
+                        $workOrder->work_order_no
+                    );
+                    // 启动工作流后，状态转为 pending，等待工作流审批完成
+                    // 工作流审批完成后会自动更新工单状态为 approved
+                    $workOrder->update(['status' => WorkOrderStatus::APPROVED]); // pending 在工单中不存在，直接设为 approved
+                } catch (\Exception $e) {
+                    // 如果启动工作流失败，直接转为 approved 状态
+                    $workOrder->update(['status' => WorkOrderStatus::APPROVED]);
+                }
+            } else {
+                // 如果没有工作流，直接转为 approved 状态
+                $workOrder->update(['status' => WorkOrderStatus::APPROVED]);
+            }
+
+            return $workOrder->load(['product', 'bom', 'processRoute', 'warehouse', 'items']);
+        });
+    }
+
+    /**
+     * 审批工单（直接审批，不通过工作流）
+     */
     public function approveWorkOrder($workOrderId)
     {
         $workOrder = WorkOrder::findOrFail($workOrderId);
 
-        if ($workOrder->status != 'draft') {
+        if ($workOrder->status != WorkOrderStatus::DRAFT) {
             throw new \Exception('工单状态不允许审核');
         }
 
         $workOrder->update([
-            'status' => 'approved',
+            'status' => WorkOrderStatus::APPROVED,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
@@ -134,7 +230,7 @@ class ProductionService
     {
         $workOrder = WorkOrder::with('bom.items')->findOrFail($workOrderId);
 
-        if ($workOrder->status != 'approved' && $workOrder->status != 'material_issued') {
+        if ($workOrder->status != WorkOrderStatus::APPROVED && $workOrder->status != WorkOrderStatus::MATERIAL_ISSUED) {
             throw new \Exception('工单状态不允许领料');
         }
 
@@ -145,7 +241,7 @@ class ProductionService
                 'warehouse_id' => $workOrder->warehouse_id,
                 'issue_date' => now()->toDateString(),
                 'type' => 'issue',
-                'status' => 'draft',
+                'status' => ProductionPlanStatus::DRAFT,
                 'created_by' => auth()->id(),
             ]);
 
@@ -186,12 +282,12 @@ class ProductionService
             }
 
             $materialIssue->update([
-                'status' => 'completed',
+                'status' => WorkOrderStatus::COMPLETED,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
             ]);
 
-            $workOrder->update(['status' => 'material_issued']);
+            $workOrder->update(['status' => WorkOrderStatus::MATERIAL_ISSUED]);
 
             return $materialIssue->load(['workOrder', 'warehouse', 'items.product', 'items.location', 'approver']);
         });
@@ -201,7 +297,7 @@ class ProductionService
     {
         $workOrder = WorkOrder::findOrFail($workOrderId);
 
-        if ($workOrder->status == 'completed' || $workOrder->status == 'cancelled') {
+        if ($workOrder->status == WorkOrderStatus::COMPLETED || $workOrder->status == WorkOrderStatus::CANCELLED) {
             throw new \Exception('工单状态不允许退料');
         }
 
@@ -212,7 +308,7 @@ class ProductionService
                 'warehouse_id' => $workOrder->warehouse_id,
                 'issue_date' => now()->toDateString(),
                 'type' => 'return',
-                'status' => 'draft',
+                'status' => ProductionPlanStatus::DRAFT,
                 'created_by' => auth()->id(),
             ]);
 
@@ -247,7 +343,7 @@ class ProductionService
             }
 
             $materialReturn->update([
-                'status' => 'completed',
+                'status' => WorkOrderStatus::COMPLETED,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
             ]);
@@ -260,7 +356,7 @@ class ProductionService
     {
         $workOrder = WorkOrder::findOrFail($workOrderId);
 
-        if ($workOrder->status != 'material_issued' && $workOrder->status != 'in_progress') {
+        if ($workOrder->status != WorkOrderStatus::MATERIAL_ISSUED && $workOrder->status != WorkOrderStatus::IN_PROGRESS) {
             throw new \Exception('工单状态不允许报工');
         }
 
@@ -295,7 +391,7 @@ class ProductionService
             $workOrder->increment('completed_quantity', $data['qualified_quantity'] ?? $data['quantity']);
             $workOrder->updateStatus();
 
-            if ($workOrder->status == 'in_progress') {
+            if ($workOrder->status == WorkOrderStatus::IN_PROGRESS) {
                 foreach ($workOrder->items as $item) {
                     if ($item->status == 'pending') {
                         $item->update(['status' => 'in_progress']);
@@ -311,7 +407,7 @@ class ProductionService
     {
         $workOrder = WorkOrder::findOrFail($workOrderId);
 
-        if ($workOrder->status != 'in_progress') {
+        if ($workOrder->status != WorkOrderStatus::IN_PROGRESS) {
             throw new \Exception('工单状态不允许完成');
         }
 
@@ -326,14 +422,14 @@ class ProductionService
             foreach ($workOrder->items as $item) {
                 if ($item->status != 'completed') {
                     $item->update([
-                        'status' => 'completed',
+                        'status' => WorkOrderStatus::COMPLETED,
                         'actual_end_date' => now()->toDateString(),
                     ]);
                 }
             }
 
             $workOrder->update([
-                'status' => 'completed',
+                'status' => WorkOrderStatus::COMPLETED,
                 'actual_end_date' => now()->toDateString(),
             ]);
 

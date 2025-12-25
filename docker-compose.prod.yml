@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PHP 应用服务（生产环境）
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: laravel-erp-app-prod
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/production.ini:/usr/local/etc/php/conf.d/production.ini
+    networks:
+      - laravel-erp-network
+    depends_on:
+      - db
+      - redis
+
+  # Nginx Web 服务器（生产环境）
+  nginx:
+    image: nginx:alpine
+    container_name: laravel-erp-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/production.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    networks:
+      - laravel-erp-network
+    depends_on:
+      - app
+
+  # MySQL 数据库（生产环境）
+  db:
+    image: mysql:8.0
+    container_name: laravel-erp-mysql-prod
+    restart: always
+    environment:
+      MYSQL_DATABASE: laravel_erp
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./docker/mysql/production.cnf:/etc/mysql/conf.d/production.cnf
+    networks:
+      - laravel-erp-network
+
+  # Redis 缓存（生产环境）
+  redis:
+    image: redis:alpine
+    container_name: laravel-erp-redis-prod
+    restart: always
+    volumes:
+      - redisdata:/data
+    networks:
+      - laravel-erp-network
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+networks:
+  laravel-erp-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+  redisdata:
+    driver: local
+

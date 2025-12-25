@@ -37,7 +37,11 @@ class ProductCategoryController extends Controller
         // 如果请求树形结构，返回过殾后的树形数据
         if ($request->has('tree')) {
             $categories = ProductCategory::whereNull('parent_id')
-                ->with('children')       // 递归加载子分类
+                ->with(['children' => function ($query) {
+                    $query->orderBy('sort');
+                }, 'children.children' => function ($query) {
+                    $query->orderBy('sort');
+                }])
                 ->orderBy('sort')        // 按排序字段排序
                 ->get();
             return response()->json($categories);

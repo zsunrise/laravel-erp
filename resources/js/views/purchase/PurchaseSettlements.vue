@@ -27,9 +27,11 @@
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
-                        <el-option label="待审核" value="pending" />
-                        <el-option label="已审核" value="approved" />
-                        <el-option label="已付款" value="paid" />
+                        <el-option label="草稿" :value="1" />
+                        <el-option label="待审核" :value="2" />
+                        <el-option label="已审核" :value="3" />
+                        <el-option label="已付款" :value="4" />
+                        <el-option label="已取消" :value="6" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -310,20 +312,24 @@ const totalAmount = computed(() => {
 
 const getStatusType = (status) => {
     const statusMap = {
-        'pending': 'warning',
-        'approved': 'success',
-        'paid': 'info'
+        1: 'info',      // 草稿
+        2: 'warning',   // 待审核
+        3: 'success',   // 已审核
+        4: 'success',   // 已付款
+        6: 'danger'     // 已取消
     };
     return statusMap[status] || 'info';
 };
 
 const getStatusText = (status) => {
     const statusMap = {
-        'pending': '待审核',
-        'approved': '已审核',
-        'paid': '已付款'
+        1: '草稿',
+        2: '待审核',
+        3: '已审核',
+        4: '已付款',
+        6: '已取消'
     };
-    return statusMap[status] || status;
+    return statusMap[status] || '未知';
 };
 
 const getReferencesByType = (type) => {

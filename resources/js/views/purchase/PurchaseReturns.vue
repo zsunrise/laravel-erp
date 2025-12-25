@@ -27,9 +27,11 @@
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
-                        <el-option label="待审核" value="pending" />
-                        <el-option label="已审核" value="approved" />
-                        <el-option label="已取消" value="cancelled" />
+                        <el-option label="草稿" :value="1" />
+                        <el-option label="待审核" :value="2" />
+                        <el-option label="已审核" :value="3" />
+                        <el-option label="已完成" :value="5" />
+                        <el-option label="已取消" :value="6" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -53,10 +55,13 @@
                         <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="200" fixed="right">
+                <el-table-column label="操作" width="280" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
-                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'">审核</el-button>
+                        <el-button type="warning" size="small" @click="handleEdit(row)" v-if="row.status == 1 || row.status == 'draft'">编辑</el-button>
+                        <el-button type="danger" size="small" @click="handleDelete(row)" v-if="row.status == 1 || row.status == 'draft'">删除</el-button>
+                        <el-button type="info" size="small" @click="handleSubmit(row)" v-if="row.status == 1 || row.status == 'draft'">提交审核</el-button>
+                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 2 || row.status == 'pending'">审核</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -78,7 +83,7 @@
         <!-- 退货表单对话框 -->
         <el-dialog
             v-model="dialogVisible"
-            title="新增采购退货"
+            :title="dialogTitle"
             width="1200px"
             @close="handleDialogClose"
         >
@@ -203,7 +208,7 @@
             </el-form>
             <template #footer>
                 <el-button @click="dialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
+                <el-button type="primary" @click="handleFormSubmit" :loading="submitLoading">确定</el-button>
             </template>
         </el-dialog>
 
@@ -265,6 +270,12 @@ const currencies = ref([]);
 const products = ref([]);
 const purchaseOrders = ref([]);
 const currentReturn = ref(null);
+const isEdit = ref(false);
+const editingId = ref(null);
+
+const dialogTitle = computed(() => {
+    return isEdit.value ? '编辑采购退货' : '新增采购退货';
+});
 
 const searchForm = reactive({
     return_no: '',
@@ -306,20 +317,25 @@ const totalAmount = computed(() => {
 
 const getStatusType = (status) => {
     const statusMap = {
-        'pending': 'warning',
-        'approved': 'success',
-        'cancelled': 'danger'
+        1: 'info',      // 草稿
+        2: 'warning',   // 待审核
+        3: 'success',   // 已审核
+        5: 'success',   // 已完成
+        6: 'danger'     // 已取消
     };
     return statusMap[status] || 'info';
 };
 
 const getStatusText = (status) => {
     const statusMap = {
-        'pending': '待审核',
-        'approved': '已审核',
-        'cancelled': '已取消'
+        1: '草稿',
+        2: '待审核',
+        3: '已审核',
+        5: '已完成',
+        6: '已取消'
     };
-    return statusMap[status] || status;
+    // 兼容字符串状态（向后兼容）
+    return statusMap[status] || '未知';
 };
 
 const loadReturns = async () => {
@@ -391,7 +407,13 @@ const loadProducts = async () => {
 
 const loadPurchaseOrders = async () => {
     try {
-        const response = await api.get('/purchase-orders', { params: { per_page: 1000, status: 'approved' } });
+        // 加载可退货的订单：已审核(3)、部分入库(4)、已完成(5)
+        const response = await api.get('/purchase-orders', { 
+            params: { 
+                per_page: 1000, 
+                status: ['approved', 'partial', 'completed'] 
+            } 
+        });
         purchaseOrders.value = response.data.data;
     } catch (error) {
         console.error('加载采购订单列表失败:', error);
@@ -411,6 +433,8 @@ const handleReset = () => {
 };
 
 const handleAdd = () => {
+    isEdit.value = false;
+    editingId.value = null;
     Object.assign(form, {
         purchase_order_id: null,
         supplier_id: null,
@@ -421,6 +445,68 @@ const handleAdd = () => {
         items: []
     });
     dialogVisible.value = true;
+};
+
+const handleEdit = async (row) => {
+    isEdit.value = true;
+    editingId.value = row.id;
+    try {
+        const response = await api.get(`/purchase-returns/${row.id}`);
+        const returnData = response.data.data;
+        Object.assign(form, {
+            purchase_order_id: returnData.purchase_order_id,
+            supplier_id: returnData.supplier_id,
+            warehouse_id: returnData.warehouse_id,
+            return_date: returnData.return_date,
+            currency_id: returnData.currency_id,
+            remark: returnData.remark || '',
+            items: returnData.items.map(item => ({
+                product_id: item.product_id,
+                product: item.product,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                tax_rate: item.tax_rate || 0,
+                remark: item.remark || ''
+            }))
+        });
+        dialogVisible.value = true;
+    } catch (error) {
+        ElMessage.error('加载退货单数据失败');
+    }
+};
+
+const handleDelete = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要删除该退货单吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.delete(`/purchase-returns/${row.id}`);
+        ElMessage.success('删除成功');
+        loadReturns();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '删除失败');
+        }
+    }
+};
+
+const handleSubmit = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要提交该退货单审核吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/purchase-returns/${row.id}/submit`);
+        ElMessage.success('提交成功');
+        loadReturns();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '提交失败');
+        }
+    }
 };
 
 const handleView = async (row) => {
@@ -519,7 +605,7 @@ const handleItemChange = () => {
     // 触发计算
 };
 
-const handleSubmit = async () => {
+const handleFormSubmit = async () => {
     if (!formRef.value) return;
     
     await formRef.value.validate(async (valid) => {
@@ -543,8 +629,14 @@ const handleSubmit = async () => {
                         remark: item.remark || null
                     }))
                 };
-                await api.post('/purchase-returns', data);
-                ElMessage.success('创建成功');
+                
+                if (isEdit.value && editingId.value) {
+                    await api.put(`/purchase-returns/${editingId.value}`, data);
+                    ElMessage.success('更新成功');
+                } else {
+                    await api.post('/purchase-returns', data);
+                    ElMessage.success('创建成功');
+                }
                 dialogVisible.value = false;
                 loadReturns();
             } catch (error) {

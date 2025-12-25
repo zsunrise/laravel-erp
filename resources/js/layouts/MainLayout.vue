@@ -48,6 +48,17 @@
                     <template #title>商品管理</template>
                 </el-menu-item>
 
+                <el-sub-menu index="basic">
+                    <template #title>
+                        <Folder :size="20" />
+                        <span>基础数据</span>
+                    </template>
+                    <el-menu-item index="/product-categories" v-if="hasMenuPermission('product-categories.manage')">商品分类</el-menu-item>
+                    <el-menu-item index="/units">计量单位</el-menu-item>
+                    <el-menu-item index="/currencies">币种管理</el-menu-item>
+                    <el-menu-item index="/regions">地区管理</el-menu-item>
+                </el-sub-menu>
+
                 <el-sub-menu index="partner">
                     <template #title>
                         <Users :size="20" />
@@ -152,6 +163,17 @@
                         <Package :size="20" />
                         <template #title>商品管理</template>
                     </el-menu-item>
+
+                    <el-sub-menu index="basic">
+                        <template #title>
+                            <Folder :size="20" />
+                            <span>基础数据</span>
+                        </template>
+                        <el-menu-item index="/product-categories" v-if="hasMenuPermission('product-categories.manage')">商品分类</el-menu-item>
+                        <el-menu-item index="/units">计量单位</el-menu-item>
+                        <el-menu-item index="/currencies">币种管理</el-menu-item>
+                        <el-menu-item index="/regions">地区管理</el-menu-item>
+                    </el-sub-menu>
 
                     <el-sub-menu index="partner">
                         <template #title>
@@ -282,7 +304,7 @@ import TabsView from '../components/TabsView.vue';
 import { 
     Gauge, Settings, Package, Users, Warehouse, Boxes, 
     ShoppingCart, ShoppingBag, FileText, Cog, DollarSign, 
-    BarChart3, Menu, X, Bell, ChevronDown 
+    BarChart3, Menu, X, Bell, ChevronDown, Folder
 } from 'lucide-vue-next';
 
 const route = useRoute();

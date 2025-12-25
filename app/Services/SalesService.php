@@ -7,16 +7,21 @@ use App\Models\SalesOrderItem;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
 use App\Models\SalesSettlement;
+use App\Models\Workflow;
+use App\Constants\OrderStatus;
 use App\Services\InventoryService;
+use App\Services\ApprovalService;
 use Illuminate\Support\Facades\DB;
 
 class SalesService
 {
     protected $inventoryService;
+    protected $approvalService;
 
-    public function __construct(InventoryService $inventoryService)
+    public function __construct(InventoryService $inventoryService, ApprovalService $approvalService)
     {
         $this->inventoryService = $inventoryService;
+        $this->approvalService = $approvalService;
     }
 
     public function createOrder($data)
@@ -66,7 +71,7 @@ class SalesService
     {
         $order = SalesOrder::findOrFail($orderId);
 
-        if ($order->status != 'draft') {
+        if ($order->status != OrderStatus::DRAFT) {
             throw new \Exception('只能修改草稿状态的订单');
         }
 
@@ -112,16 +117,61 @@ class SalesService
         });
     }
 
+    /**
+     * 提交订单审核（将草稿状态转为待审核）
+     */
+    public function submitForApproval($orderId)
+    {
+        $order = SalesOrder::findOrFail($orderId);
+
+        if ($order->status != OrderStatus::DRAFT) {
+            throw new \Exception('只能提交草稿状态的订单');
+        }
+
+        return DB::transaction(function () use ($order) {
+            // 查找是否有启用的销售订单审批流程
+            $workflow = Workflow::where('type', 'sales_order')
+                ->where('is_active', true)
+                ->first();
+
+            if ($workflow) {
+                // 如果有工作流，启动审批流程
+                try {
+                    $this->approvalService->startWorkflow(
+                        $workflow->id,
+                        SalesOrder::class,
+                        $order->id,
+                        $order->order_no
+                    );
+                    // 启动工作流后，状态转为 pending，等待工作流审批完成
+                    // 工作流审批完成后会自动更新订单状态为 approved
+                    $order->update(['status' => OrderStatus::PENDING]);
+                } catch (\Exception $e) {
+                    // 如果启动工作流失败，直接转为 pending 状态
+                    $order->update(['status' => OrderStatus::PENDING]);
+                }
+            } else {
+                // 如果没有工作流，直接转为 pending 状态
+                $order->update(['status' => OrderStatus::PENDING]);
+            }
+
+            return $order->load(['customer', 'warehouse', 'items.product']);
+        });
+    }
+
+    /**
+     * 审批订单（直接审批，不通过工作流）
+     */
     public function approveOrder($orderId)
     {
         $order = SalesOrder::findOrFail($orderId);
 
-        if ($order->status != 'draft' && $order->status != 'pending') {
+        if ($order->status != OrderStatus::DRAFT && $order->status != OrderStatus::PENDING) {
             throw new \Exception('订单状态不允许审核');
         }
 
         $order->update([
-            'status' => 'approved',
+            'status' => OrderStatus::APPROVED,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
@@ -133,7 +183,7 @@ class SalesService
     {
         $order = SalesOrder::findOrFail($orderId);
 
-        if ($order->status != 'approved' && $order->status != 'partial') {
+        if ($order->status != OrderStatus::APPROVED && $order->status != OrderStatus::PARTIAL) {
             throw new \Exception('订单状态不允许发货');
         }
 
@@ -186,7 +236,7 @@ class SalesService
                 'customer_id' => $data['customer_id'],
                 'warehouse_id' => $data['warehouse_id'],
                 'return_date' => $data['return_date'],
-                'status' => 'draft',
+                'status' => OrderStatus::DRAFT,
                 'currency_id' => $data['currency_id'] ?? null,
                 'created_by' => auth()->id(),
                 'remark' => $data['remark'] ?? null,
@@ -219,11 +269,56 @@ class SalesService
         });
     }
 
+    /**
+     * 提交销售退货单审核（将草稿状态转为待审核）
+     */
+    public function submitForApprovalReturn($returnId)
+    {
+        $return = SalesReturn::findOrFail($returnId);
+
+        if ($return->status != OrderStatus::DRAFT) {
+            throw new \Exception('只能提交草稿状态的退货单');
+        }
+
+        return DB::transaction(function () use ($return) {
+            // 查找是否有启用的销售退货审批流程
+            $workflow = Workflow::where('type', 'sales_return')
+                ->where('is_active', true)
+                ->first();
+
+            if ($workflow) {
+                // 如果有工作流，启动审批流程
+                try {
+                    $this->approvalService->startWorkflow(
+                        $workflow->id,
+                        SalesReturn::class,
+                        $return->id,
+                        $return->return_no
+                    );
+                    // 启动工作流后，状态转为 pending，等待工作流审批完成
+                    // 工作流审批完成后会自动更新退货单状态为 approved
+                    $return->update(['status' => OrderStatus::PENDING]);
+                } catch (\Exception $e) {
+                    // 如果启动工作流失败，直接转为 pending 状态
+                    $return->update(['status' => OrderStatus::PENDING]);
+                }
+            } else {
+                // 如果没有工作流，直接转为 pending 状态
+                $return->update(['status' => OrderStatus::PENDING]);
+            }
+
+            return $return->load(['customer', 'warehouse', 'items.product']);
+        });
+    }
+
+    /**
+     * 审批销售退货单（直接审批，不通过工作流）
+     */
     public function approveReturn($returnId)
     {
         $return = SalesReturn::findOrFail($returnId);
 
-        if ($return->status != 'draft' && $return->status != 'pending') {
+        if ($return->status != OrderStatus::DRAFT && $return->status != OrderStatus::PENDING) {
             throw new \Exception('退货单状态不允许审核');
         }
 
@@ -251,7 +346,7 @@ class SalesService
             }
 
             $return->update([
-                'status' => 'completed',
+                'status' => OrderStatus::COMPLETED,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
             ]);
@@ -260,15 +355,35 @@ class SalesService
         });
     }
 
+    /**
+     * 取消销售退货单
+     */
+    public function cancelReturn($returnId)
+    {
+        $return = SalesReturn::findOrFail($returnId);
+
+        if ($return->status == OrderStatus::COMPLETED) {
+            throw new \Exception('已完成的退货单不能取消');
+        }
+
+        if ($return->status == OrderStatus::CANCELLED) {
+            throw new \Exception('退货单已经取消');
+        }
+
+        $return->update(['status' => OrderStatus::CANCELLED]);
+
+        return $return->load(['customer', 'warehouse', 'items.product']);
+    }
+
     public function cancelOrder($orderId)
     {
         $order = SalesOrder::findOrFail($orderId);
 
-        if ($order->status == 'completed') {
+        if ($order->status == OrderStatus::COMPLETED) {
             throw new \Exception('已完成的订单不能取消');
         }
 
-        $order->update(['status' => 'cancelled']);
+        $order->update(['status' => OrderStatus::CANCELLED]);
 
         return $order;
     }
@@ -280,7 +395,7 @@ class SalesService
                 'settlement_no' => 'SS' . date('YmdHis') . rand(1000, 9999),
                 'customer_id' => $data['customer_id'],
                 'settlement_date' => $data['settlement_date'],
-                'status' => 'draft',
+                'status' => OrderStatus::DRAFT,
                 'currency_id' => $data['currency_id'] ?? null,
                 'created_by' => auth()->id(),
                 'remark' => $data['remark'] ?? null,

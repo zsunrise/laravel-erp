@@ -199,7 +199,71 @@ Laravel ERP 是一个基于 Laravel 9 和 Vue 3 开发的企业资源规划系�
 
 ## 🚀 快速开始
 
-### 环境要求
+### 方式一：使用 Docker（推荐）
+
+使用 Docker 可以快速启动完整的开发环境，无需手动安装 PHP、MySQL、Redis 等。
+
+#### 环境要求
+
+- Docker >= 20.10
+- Docker Compose >= 2.0
+
+#### 安装步骤
+
+```bash
+# 1. 克隆项目
+git clone <repository-url>
+cd laravel-erp
+
+# 2. 复制环境配置文件
+cp .env.example .env
+
+# 3. 编辑 .env 文件，配置数据库连接
+# DB_HOST=db
+# DB_DATABASE=laravel_erp
+# DB_USERNAME=laravel_user
+# DB_PASSWORD=password
+
+# 4. 启动所有服务
+docker-compose up -d
+
+# 5. 进入应用容器安装依赖
+docker-compose exec app composer install
+docker-compose exec app npm install
+
+# 6. 生成应用密钥
+docker-compose exec app php artisan key:generate
+
+# 7. 运行数据库迁移和填充
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan db:seed
+```
+
+访问 `http://localhost:8000` 即可使用系统。
+
+**常用 Docker 命令：**
+
+```bash
+# 查看运行状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f app
+
+# 停止所有服务
+docker-compose down
+
+# 进入应用容器
+docker-compose exec app bash
+```
+
+更多 Docker 使用说明请参考 [docker/README.md](./docker/README.md)。
+
+---
+
+### 方式二：传统安装
+
+#### 环境要求
 
 - PHP >= 8.0.2
 - Composer >= 2.0
@@ -207,7 +271,7 @@ Laravel ERP 是一个基于 Laravel 9 和 Vue 3 开发的企业资源规划系�
 - MySQL >= 5.7 或 MariaDB >= 10.3
 - Nginx 或 Apache
 
-### 安装步骤
+#### 安装步骤
 
 #### 1. 克隆项目
 
@@ -268,6 +332,8 @@ npm run dev
 ```
 
 访问 `http://localhost:8000` 即可使用系统。
+
+---
 
 ### 默认账户
 

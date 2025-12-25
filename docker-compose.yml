@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # PHP 应用服务
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-erp-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - laravel-erp-network
+    depends_on:
+      - db
+      - redis
+
+  # Nginx Web 服务器
+  nginx:
+    image: nginx:alpine
+    container_name: laravel-erp-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - laravel-erp-network
+    depends_on:
+      - app
+
+  # MySQL 数据库
+  db:
+    image: mysql:8.0
+    container_name: laravel-erp-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: laravel_erp
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: password
+      MYSQL_USER: laravel_user
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - laravel-erp-network
+
+  # Redis 缓存
+  redis:
+    image: redis:alpine
+    container_name: laravel-erp-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - laravel-erp-network
+    command: redis-server --appendonly yes
+
+  # Node.js 服务（用于前端开发，可选）
+  # node:
+  #   image: node:18-alpine
+  #   container_name: laravel-erp-node
+  #   restart: unless-stopped
+  #   working_dir: /var/www/html
+  #   volumes:
+  #     - ./:/var/www/html
+  #     - /var/www/html/node_modules
+  #   ports:
+  #     - "5173:5173"
+  #   networks:
+  #     - laravel-erp-network
+  #   command: npm run dev
+  #   depends_on:
+  #     - app
+
+networks:
+  laravel-erp-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+  redisdata:
+    driver: local
+

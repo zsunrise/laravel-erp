@@ -44,6 +44,16 @@ use App\Models\Currency;
 use App\Models\Region;
 use App\Models\Warehouse;
 use App\Models\User;
+use App\Constants\OrderStatus;
+use App\Constants\WorkOrderStatus;
+use App\Constants\ProductionPlanStatus;
+use App\Constants\WorkflowStatus;
+use App\Constants\ApprovalRecordStatus;
+use App\Constants\AccountingVoucherStatus;
+use App\Constants\AccountsReceivableStatus;
+use App\Constants\AccountsPayableStatus;
+use App\Constants\WorkOrderItemStatus;
+use App\Constants\ProductionMaterialIssueStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -207,7 +217,7 @@ class BusinessDataSeeder extends Seeder
                 'warehouse_id' => $warehouse->id,
                 'order_date' => now()->subDays(20),
                 'expected_date' => now()->subDays(10),
-                'status' => 'completed',
+                'status' => OrderStatus::COMPLETED,
                 'currency_id' => $currency->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -245,7 +255,7 @@ class BusinessDataSeeder extends Seeder
                 'supplier_id' => $supplier->id,
                 'warehouse_id' => $warehouse->id,
                 'return_date' => now()->subDays(5),
-                'status' => 'approved',
+                'status' => OrderStatus::APPROVED,
                 'currency_id' => $currency->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -270,7 +280,7 @@ class BusinessDataSeeder extends Seeder
                 'settlement_no' => 'PS' . date('Ymd') . '001',
                 'supplier_id' => $supplier->id,
                 'settlement_date' => now()->subDays(3),
-                'status' => 'approved',
+                'status' => OrderStatus::APPROVED,
                 'currency_id' => $currency->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -309,7 +319,7 @@ class BusinessDataSeeder extends Seeder
                 'warehouse_id' => $warehouse->id,
                 'order_date' => now()->subDays(15),
                 'delivery_date' => now()->subDays(5),
-                'status' => 'completed',
+                'status' => OrderStatus::COMPLETED,
                 'currency_id' => $currency->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -347,7 +357,7 @@ class BusinessDataSeeder extends Seeder
                 'customer_id' => $customer->id,
                 'warehouse_id' => $warehouse->id,
                 'return_date' => now()->subDays(2),
-                'status' => 'approved',
+                'status' => OrderStatus::APPROVED,
                 'currency_id' => $currency->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -372,7 +382,7 @@ class BusinessDataSeeder extends Seeder
                 'settlement_no' => 'SS' . date('Ymd') . '001',
                 'customer_id' => $customer->id,
                 'settlement_date' => now()->subDays(1),
-                'status' => 'approved',
+                'status' => OrderStatus::APPROVED,
                 'currency_id' => $currency->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -411,7 +421,7 @@ class BusinessDataSeeder extends Seeder
                 'plan_date' => now()->subDays(10),
                 'start_date' => now()->subDays(8),
                 'end_date' => now()->subDays(1),
-                'status' => 'approved',
+                'status' => ProductionPlanStatus::APPROVED,
                 'warehouse_id' => $warehouse->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -442,7 +452,7 @@ class BusinessDataSeeder extends Seeder
                 'start_date' => now()->subDays(8),
                 'planned_end_date' => now()->subDays(1),
                 'actual_end_date' => now(),
-                'status' => 'completed',
+                'status' => WorkOrderStatus::COMPLETED,
                 'assigned_to' => $operator->id,
                 'created_by' => $admin->id,
                 'approved_by' => $admin->id,
@@ -466,7 +476,7 @@ class BusinessDataSeeder extends Seeder
                         'planned_end_date' => $endDate,
                         'actual_start_date' => $startDate,
                         'actual_end_date' => $endDate,
-                        'status' => 'completed',
+                        'status' => WorkOrderItemStatus::COMPLETED,
                     ]);
                 }
             }
@@ -476,7 +486,7 @@ class BusinessDataSeeder extends Seeder
                 'work_order_id' => $workOrder->id,
                 'warehouse_id' => $warehouse->id,
                 'issue_date' => now()->subDays(7),
-                'status' => 'completed',
+                'status' => ProductionMaterialIssueStatus::COMPLETED,
                 'created_by' => $admin->id,
             ]);
 
@@ -552,7 +562,7 @@ class BusinessDataSeeder extends Seeder
                     'voucher_no' => 'V' . date('Ymd') . '001',
                     'voucher_date' => now()->subDays(5),
                     'type' => 'general',
-                    'status' => 'posted',
+                    'status' => AccountingVoucherStatus::POSTED,
                     'created_by' => $admin->id,
                     'posted_by' => $admin->id,
                     'posted_at' => now()->subDays(4),
@@ -586,7 +596,7 @@ class BusinessDataSeeder extends Seeder
                     'original_amount' => $salesOrder->total_amount,
                     'received_amount' => 0,
                     'remaining_amount' => $salesOrder->total_amount,
-                    'status' => 'outstanding',
+                    'status' => AccountsReceivableStatus::OUTSTANDING,
                     'currency_id' => $currency->id,
                 ]);
             }
@@ -602,7 +612,7 @@ class BusinessDataSeeder extends Seeder
                     'original_amount' => $purchaseOrder->total_amount,
                     'paid_amount' => 0,
                     'remaining_amount' => $purchaseOrder->total_amount,
-                    'status' => 'outstanding',
+                    'status' => AccountsPayableStatus::OUTSTANDING,
                     'currency_id' => $currency->id,
                 ]);
             }
@@ -653,7 +663,7 @@ class BusinessDataSeeder extends Seeder
                     'reference_type' => 'App\Models\PurchaseOrder',
                     'reference_id' => $purchaseOrder->id,
                     'reference_no' => $purchaseOrder->order_no,
-                    'status' => 'completed',
+                    'status' => WorkflowStatus::APPROVED,
                     'started_by' => $admin->id,
                     'started_at' => now()->subDays(19),
                     'completed_at' => now()->subDays(17),
@@ -664,7 +674,7 @@ class BusinessDataSeeder extends Seeder
                     'node_id' => $workflow->nodes->first()->id,
                     'approver_id' => $manager->id,
                     'action' => 'approve',
-                    'status' => 'approved',
+                    'status' => ApprovalRecordStatus::APPROVED,
                     'comment' => '同意',
                     'approved_at' => now()->subDays(18),
                 ]);

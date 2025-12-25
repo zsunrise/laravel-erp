@@ -34,14 +34,14 @@ class AuthController extends Controller
         // 验证用户是否存在及密码是否正确
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['提供的凭据不正确。'],
             ]);
         }
 
         // 检查账户是否被禁用
         if (!$user->is_active) {
             throw ValidationException::withMessages([
-                'email' => ['Account is disabled.'],
+                'email' => ['账户已被禁用。'],
             ]);
         }
 

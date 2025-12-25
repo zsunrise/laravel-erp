@@ -150,9 +150,11 @@ const getLevelText = (level) => {
 const loadTreeData = async () => {
     try {
         const response = await api.get('/regions', { params: { tree: true } });
-        treeData.value = response.data.data || [];
+        // API直接返回数组，不是包装在data字段中
+        treeData.value = Array.isArray(response.data) ? response.data : (response.data.data || []);
     } catch (error) {
         ElMessage.error('加载地区数据失败');
+        console.error('加载地区数据失败:', error);
     }
 };
 

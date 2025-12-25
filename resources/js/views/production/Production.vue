@@ -41,7 +41,7 @@
                         <el-table-column prop="end_date" label="结束日期" width="120" />
                         <el-table-column prop="status" label="状态" width="100">
                             <template #default="{ row }">
-                                <el-tag :type="getPlanStatusType(row.status)">{{ getPlanStatusText(row.status) }}</el-tag>
+                                <el-tag :type="getPlanStatusType(row.status)">{{ row.status_text || getPlanStatusText(row.status) }}</el-tag>
                             </template>
                         </el-table-column>
                         <el-table-column label="操作" width="250" fixed="right">
@@ -109,7 +109,7 @@
                         <el-table-column prop="planned_end_date" label="计划结束日期" width="120" />
                         <el-table-column prop="status" label="状态" width="100">
                             <template #default="{ row }">
-                                <el-tag :type="getWorkOrderStatusType(row.status)">{{ getWorkOrderStatusText(row.status) }}</el-tag>
+                                <el-tag :type="getWorkOrderStatusType(row.status)">{{ row.status_text || getWorkOrderStatusText(row.status) }}</el-tag>
                             </template>
                         </el-table-column>
                         <el-table-column label="操作" width="250" fixed="right">
@@ -398,7 +398,7 @@
                     <el-descriptions-item label="仓库">{{ currentPlan.warehouse?.name || '-' }}</el-descriptions-item>
                     <el-descriptions-item label="状态">
                         <el-tag :type="getPlanStatusType(currentPlan.status)">
-                            {{ getPlanStatusText(currentPlan.status) }}
+                            {{ currentPlan.status_text || getPlanStatusText(currentPlan.status) }}
                         </el-tag>
                     </el-descriptions-item>
                     <el-descriptions-item label="开始日期">{{ currentPlan.start_date || '-' }}</el-descriptions-item>
@@ -449,7 +449,7 @@
                     <el-descriptions-item label="结束日期">{{ currentWorkOrder.end_date || '-' }}</el-descriptions-item>
                     <el-descriptions-item label="状态">
                         <el-tag :type="getWorkOrderStatusType(currentWorkOrder.status)">
-                            {{ getWorkOrderStatusText(currentWorkOrder.status) }}
+                            {{ currentWorkOrder.status_text || getWorkOrderStatusText(currentWorkOrder.status) }}
                         </el-tag>
                     </el-descriptions-item>
                     <el-descriptions-item label="负责人">{{ currentWorkOrder.assigned_to_user?.name || '-' }}</el-descriptions-item>

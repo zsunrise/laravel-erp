@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\Region;
+use App\Models\Warehouse;
+use App\Models\Customer;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class RegionController extends Controller
@@ -45,8 +48,11 @@ class RegionController extends Controller
         // 如果请求树形结构，返回完整树形数据
         if ($request->has('tree')) {
             $regions = Region::whereNull('parent_id')
-                ->with('children')       // 递归加载子区域
-                ->where('is_active', true)
+                ->with(['children' => function ($query) {
+                    $query->orderBy('sort');
+                }, 'children.children' => function ($query) {
+                    $query->orderBy('sort');
+                }])
                 ->orderBy('sort')
                 ->get();
             return response()->json($regions);
@@ -54,6 +60,37 @@ class RegionController extends Controller
 
         // 返回激活状态的区域列表
         return response()->json($query->where('is_active', true)->orderBy('sort')->paginate($request->get('per_page', 1000)));
+    }
+
+    /**
+     * 创建新地区
+     *
+     * @bodyParam parent_id integer 父地区ID Example: 1
+     * @bodyParam name string required 地区名称 Example: 北京市
+     * @bodyParam code string required 地区编码（唯一） Example: BJ001
+     * @bodyParam level integer required 级别（1-省/直辖市，2-市，3-区/县） Example: 1
+     * @bodyParam sort integer 排序值 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @param Request $request 请求对象，包含地区信息（名称、编码、父地区ID等）
+     * @return \Illuminate\Http\JsonResponse 返回创建的地区信息，状态码 201
+     */
+    public function store(Request $request)
+    {
+        // 验证地区信息参数
+        $validated = $request->validate([
+            'parent_id' => 'nullable|exists:regions,id',                   // 父地区ID
+            'name' => 'required|string|max:255',                           // 地区名称（必填）
+            'code' => 'required|string|max:255|unique:regions,code',      // 地区编码（唯一）
+            'level' => 'required|integer|in:1,2,3',                       // 级别（必填，1-3）
+            'sort' => 'nullable|integer|min:0',                            // 排序值
+            'is_active' => 'sometimes|boolean',                          // 是否激活
+        ]);
+
+        // 创建地区记录
+        $region = Region::create($validated);
+
+        // 返回新建地区信息（包含父地区）
+        return response()->json($region->load('parent'), 201);
     }
 
     /**
@@ -68,6 +105,79 @@ class RegionController extends Controller
         $region = Region::with(['parent', 'children'])->findOrFail($id);
         // 返回标准化成功响应
         return ApiResponse::success($region, '获取成功');
+    }
+
+    /**
+     * 更新地区信息
+     *
+     * @bodyParam parent_id integer 父地区ID（不能是自己） Example: 1
+     * @bodyParam name string 地区名称 Example: 北京市
+     * @bodyParam code string 地区编码（唯一，排除当前地区） Example: BJ001
+     * @bodyParam level integer 级别（1-省/直辖市，2-市，3-区/县） Example: 1
+     * @bodyParam sort integer 排序值 Example: 1
+     * @bodyParam is_active boolean 是否激活 Example: true
+     * @param Request $request 请求对象，包含要更新的地区字段
+     * @param int $id 地区ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的地区信息
+     */
+    public function update(Request $request, $id)
+    {
+        // 根据ID查询地区
+        $region = Region::findOrFail($id);
+
+        // 验证更新参数（父地区不能是自己）
+        $validated = $request->validate([
+            'parent_id' => 'nullable|exists:regions,id|not_in:' . $id,
+            'name' => 'sometimes|required|string|max:255',
+            'code' => 'sometimes|required|string|max:255|unique:regions,code,' . $id,
+            'level' => 'sometimes|required|integer|in:1,2,3',
+            'sort' => 'nullable|integer|min:0',
+            'is_active' => 'sometimes|boolean',
+        ]);
+
+        // 更新地区信息
+        $region->update($validated);
+
+        // 返回更新后的地区信息
+        return response()->json($region->load('parent'));
+    }
+
+    /**
+     * 删除地区
+     *
+     * @param int $id 地区ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，如果地区下有子地区或关联数据则返回错误消息
+     */
+    public function destroy($id)
+    {
+        // 根据ID查询地区
+        $region = Region::findOrFail($id);
+
+        // 检查是否有子地区，有则不允许删除
+        if ($region->children()->count() > 0) {
+            return response()->json(['message' => '该地区下有子地区，无法删除'], 400);
+        }
+
+        // 检查是否有关联的仓库，有则不允许删除
+        if (Warehouse::where('region_id', $id)->count() > 0) {
+            return response()->json(['message' => '该地区下有关联的仓库，无法删除'], 400);
+        }
+
+        // 检查是否有关联的客户，有则不允许删除
+        if (Customer::where('region_id', $id)->count() > 0) {
+            return response()->json(['message' => '该地区下有关联的客户，无法删除'], 400);
+        }
+
+        // 检查是否有关联的供应商，有则不允许删除
+        if (Supplier::where('region_id', $id)->count() > 0) {
+            return response()->json(['message' => '该地区下有关联的供应商，无法删除'], 400);
+        }
+
+        // 删除地区记录
+        $region->delete();
+
+        // 返回删除成功消息
+        return response()->json(['message' => '地区删除成功']);
     }
 }
 

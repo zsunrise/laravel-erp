@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasStatus;
+use App\Constants\WorkOrderStatus;
 use Carbon\Carbon;
 
 class WorkOrder extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasStatus;
 
     protected $fillable = [
         'work_order_no',
@@ -39,7 +41,10 @@ class WorkOrder extends Model
         'planned_end_date' => 'date',
         'actual_end_date' => 'date',
         'approved_at' => 'datetime',
+        'status' => 'integer',
     ];
+
+    protected $appends = ['status_text'];
 
     /**
      * 序列化日期格式
@@ -113,19 +118,27 @@ class WorkOrder extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    /**
+     * 获取状态类名
+     */
+    protected function getStatusClass()
+    {
+        return WorkOrderStatus::class;
+    }
+
     public function updateStatus()
     {
         $totalQuantity = $this->quantity;
         $completedQuantity = $this->completed_quantity;
 
         if ($completedQuantity == 0) {
-            if ($this->status == 'approved') {
-                $this->status = 'material_issued';
+            if ($this->status == WorkOrderStatus::APPROVED) {
+                $this->status = WorkOrderStatus::MATERIAL_ISSUED;
             }
         } elseif ($completedQuantity < $totalQuantity) {
-            $this->status = 'in_progress';
+            $this->status = WorkOrderStatus::IN_PROGRESS;
         } else {
-            $this->status = 'completed';
+            $this->status = WorkOrderStatus::COMPLETED;
             $this->actual_end_date = now();
         }
 

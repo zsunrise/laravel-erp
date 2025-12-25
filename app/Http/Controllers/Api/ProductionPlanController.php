@@ -184,7 +184,26 @@ class ProductionPlanController extends Controller
     }
 
     /**
-     * 审批生产计划
+     * 提交生产计划审核
+     *
+     * @param int $id 生产计划ID
+     * @return \Illuminate\Http\JsonResponse 返回提交后的计划信息，失败时返回错误消息
+     */
+    public function submit($id)
+    {
+        try {
+            // 调用服务层提交审核，将状态从 draft 转为 pending，并启动审批流程
+            $plan = $this->productionService->submitPlanForApproval($id);
+            // 提交成功返回计划信息
+            return response()->json($plan);
+        } catch (\Exception $e) {
+            // 提交失败返回错误消息
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 审批生产计划（直接审批，不通过工作流）
      *
      * @param int $id 生产计划ID
      * @return \Illuminate\Http\JsonResponse 返回审批后的计划信息，失败时返回错误消息

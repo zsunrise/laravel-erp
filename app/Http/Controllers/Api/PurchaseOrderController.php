@@ -48,8 +48,49 @@ class PurchaseOrderController extends Controller
         }
 
         // 按订单状态筛选（draft/approved/receiving/completed/cancelled）
+        // 支持单个状态值或数组（多个状态值）
         if ($request->has('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            $statuses = [];
+            
+            // 如果是数组，处理每个状态
+            if (is_array($status)) {
+                foreach ($status as $s) {
+                    if (is_string($s) && isset(\App\Constants\OrderStatus::STRING_TO_INT_MAP[$s])) {
+                        $statuses[] = \App\Constants\OrderStatus::STRING_TO_INT_MAP[$s];
+                    } elseif (is_numeric($s)) {
+                        $statuses[] = (int)$s;
+                    }
+                }
+            } 
+            // 如果是逗号分隔的字符串
+            elseif (is_string($status) && strpos($status, ',') !== false) {
+                $statusArray = explode(',', $status);
+                foreach ($statusArray as $s) {
+                    $s = trim($s);
+                    if (isset(\App\Constants\OrderStatus::STRING_TO_INT_MAP[$s])) {
+                        $statuses[] = \App\Constants\OrderStatus::STRING_TO_INT_MAP[$s];
+                    } elseif (is_numeric($s)) {
+                        $statuses[] = (int)$s;
+                    }
+                }
+            }
+            // 单个状态值
+            else {
+                if (is_string($status) && isset(\App\Constants\OrderStatus::STRING_TO_INT_MAP[$status])) {
+                    $statuses[] = \App\Constants\OrderStatus::STRING_TO_INT_MAP[$status];
+                } elseif (is_numeric($status)) {
+                    $statuses[] = (int)$status;
+                }
+            }
+            
+            if (!empty($statuses)) {
+                if (count($statuses) === 1) {
+                    $query->where('status', $statuses[0]);
+                } else {
+                    $query->whereIn('status', $statuses);
+                }
+            }
         }
 
         // 按开始日期筛选
@@ -194,7 +235,7 @@ class PurchaseOrderController extends Controller
         $order = PurchaseOrder::findOrFail($id);
 
         // 检查订单状态，只能删除草稿状态的订单
-        if ($order->status != 'draft') {
+        if ($order->status != \App\Constants\OrderStatus::DRAFT) {
             return response()->json(['message' => '只能删除草稿状态的订单'], 400);
         }
 
@@ -206,7 +247,26 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * 审批采购订单
+     * 提交采购订单审核
+     *
+     * @param int $id 采购订单ID
+     * @return \Illuminate\Http\JsonResponse 返回提交后的订单信息，失败时返回错误消息
+     */
+    public function submit($id)
+    {
+        try {
+            // 调用服务层提交审核，将状态从 draft 转为 pending，并启动审批流程
+            $order = $this->purchaseService->submitForApproval($id);
+            // 提交成功返回订单信息
+            return response()->json($order);
+        } catch (\Exception $e) {
+            // 提交失败返回错误消息
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 审批采购订单（直接审批，不通过工作流）
      *
      * @param int $id 采购订单ID
      * @return \Illuminate\Http\JsonResponse 返回审批后的订单信息，失败时返回错误消息
@@ -214,7 +274,7 @@ class PurchaseOrderController extends Controller
     public function approve($id)
     {
         try {
-            // 调用服务层审批订单，将状态从 draft 更新为 approved
+            // 调用服务层审批订单，将状态从 draft/pending 更新为 approved
             $order = $this->purchaseService->approveOrder($id);
             // 审批成功返回订单信息
             return response()->json($order);
@@ -286,9 +346,14 @@ class PurchaseOrderController extends Controller
             $query->where('supplier_id', $request->supplier_id);
         }
 
-        // 按退货单状态筛选
+        // 按退货单状态筛选（支持字符串和整数状态）
         if ($request->has('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            // 如果是字符串状态，转换为数字状态
+            if (is_string($status) && isset(\App\Constants\OrderStatus::STRING_TO_INT_MAP[$status])) {
+                $status = \App\Constants\OrderStatus::STRING_TO_INT_MAP[$status];
+            }
+            $query->where('status', $status);
         }
 
         // 按退货日期倒序排列，返回分页结果
@@ -346,6 +411,84 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+     * 更新采购退货单
+     *
+     * @param Request $request 请求对象，包含要更新的退货单字段和明细项
+     * @param int $id 采购退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回更新后的退货单信息，失败时返回错误消息
+     */
+    public function updateReturn(Request $request, $id)
+    {
+        // 验证更新参数
+        $validated = $request->validate([
+            'purchase_order_id' => 'nullable|exists:purchase_orders,id',
+            'supplier_id' => 'sometimes|required|exists:suppliers,id',
+            'warehouse_id' => 'sometimes|required|exists:warehouses,id',
+            'return_date' => 'sometimes|required|date',
+            'currency_id' => 'nullable|exists:currencies,id',
+            'remark' => 'nullable|string',
+            'items' => 'sometimes|required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.tax_rate' => 'nullable|numeric|min:0|max:100',
+            'items.*.remark' => 'nullable|string',
+        ]);
+
+        try {
+            // 调用服务层更新退货单（只能更新草稿状态的退货单）
+            $return = $this->purchaseService->updateReturn($id, $validated);
+            // 更新成功返回退货单信息
+            return response()->json($return);
+        } catch (\Exception $e) {
+            // 更新失败返回错误消息
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 删除采购退货单
+     *
+     * @param int $id 采购退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回删除结果，只能删除草稿状态的退货单
+     */
+    public function destroyReturn($id)
+    {
+        // 根据ID查询采购退货单
+        $return = PurchaseReturn::findOrFail($id);
+
+        // 检查退货单状态，只能删除草稿状态的退货单
+        if ($return->status != \App\Constants\OrderStatus::DRAFT) {
+            return response()->json(['message' => '只能删除草稿状态的退货单'], 400);
+        }
+
+        // 删除退货单记录
+        $return->delete();
+
+        // 返回删除成功消息
+        return response()->json(['message' => '退货单删除成功']);
+    }
+
+    /**
+     * 提交采购退货单审核
+     *
+     * @param int $id 采购退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回提交后的退货单信息，失败时返回错误消息
+     */
+    public function submitReturn($id)
+    {
+        try {
+            // 调用服务层提交审核，将状态从 draft 转为 pending，并启动审批流程
+            $return = $this->purchaseService->submitReturnForApproval($id);
+            // 提交成功返回退货单信息
+            return response()->json($return);
+        } catch (\Exception $e) {
+            // 提交失败返回错误消息
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
      * 审批采购退货单
      *
      * @param int $id 采购退货单ID
@@ -354,7 +497,7 @@ class PurchaseOrderController extends Controller
     public function approveReturn($id)
     {
         try {
-            // 调用服务层审批退货单，将状态从 pending 更新为 approved
+            // 调用服务层审批退货单，将状态从 draft/pending 更新为 completed
             $return = $this->purchaseService->approveReturn($id);
             // 审批成功返回退货单信息
             return response()->json($return);

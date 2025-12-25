@@ -184,7 +184,26 @@ class SalesOrderController extends Controller
     }
 
     /**
-     * 审批销售订单
+     * 提交销售订单审核
+     *
+     * @param int $id 销售订单ID
+     * @return \Illuminate\Http\JsonResponse 返回提交后的订单信息，失败时返回错误消息
+     */
+    public function submit($id)
+    {
+        try {
+            // 调用服务层提交审核，将状态从 draft 转为 pending，并启动审批流程
+            $order = $this->salesService->submitForApproval($id);
+            // 提交成功返回订单信息
+            return response()->json($order);
+        } catch (\Exception $e) {
+            // 提交失败返回错误消息
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 审批销售订单（直接审批，不通过工作流）
      *
      * @param int $id 销售订单ID
      * @return \Illuminate\Http\JsonResponse 返回审批后的订单信息，失败时返回错误消息
@@ -304,7 +323,23 @@ class SalesOrderController extends Controller
     }
 
     /**
-     * 审批销售退货单
+     * 提交销售退货单审核
+     *
+     * @param int $id 销售退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回提交后的退货单信息，失败时返回错误消息
+     */
+    public function submitReturn($id)
+    {
+        try {
+            $return = $this->salesService->submitForApprovalReturn($id);
+            return response()->json($return);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 审批销售退货单（直接审批，不通过工作流）
      *
      * @param int $id 销售退货单ID
      * @return \Illuminate\Http\JsonResponse 返回审批后的退货单信息，失败时返回错误消息
@@ -313,6 +348,22 @@ class SalesOrderController extends Controller
     {
         try {
             $return = $this->salesService->approveReturn($id);
+            return response()->json($return);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 取消销售退货单
+     *
+     * @param int $id 销售退货单ID
+     * @return \Illuminate\Http\JsonResponse 返回取消后的退货单信息，失败时返回错误消息
+     */
+    public function cancelReturn($id)
+    {
+        try {
+            $return = $this->salesService->cancelReturn($id);
             return response()->json($return);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);

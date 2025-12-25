@@ -6,6 +6,12 @@ use App\Models\Workflow;
 use App\Models\WorkflowInstance;
 use App\Models\WorkflowNode;
 use App\Models\ApprovalRecord;
+use App\Models\PurchaseOrder;
+use App\Models\SalesOrder;
+use App\Models\ProductionPlan;
+use App\Models\WorkOrder;
+use App\Constants\OrderStatus;
+use App\Constants\WorkflowStatus;
 use Illuminate\Support\Facades\DB;
 
 class ApprovalService
@@ -31,7 +37,7 @@ class ApprovalService
                 'reference_type' => $referenceType,
                 'reference_id' => $referenceId,
                 'reference_no' => $referenceNo,
-                'status' => 'pending',
+                'status' => WorkflowStatus::PENDING,
                 'current_node_id' => $startNode->id,
                 'started_by' => auth()->id(),
                 'started_at' => now(),
@@ -47,7 +53,7 @@ class ApprovalService
     {
         $instance = WorkflowInstance::with(['currentNode', 'workflow'])->findOrFail($instanceId);
 
-        if ($instance->status != 'pending') {
+        if ($instance->status != WorkflowStatus::PENDING) {
             throw new \Exception('流程实例状态不允许审批');
         }
 
@@ -78,7 +84,7 @@ class ApprovalService
                 'node_id' => $currentNode->id,
                 'approver_id' => auth()->id(),
                 'action' => 'approve',
-                'status' => 'approved',
+                'status' => \App\Constants\ApprovalRecordStatus::APPROVED,
                 'comment' => $comment,
                 'approved_at' => now(),
             ]);
@@ -94,7 +100,7 @@ class ApprovalService
     {
         $instance = WorkflowInstance::with(['currentNode'])->findOrFail($instanceId);
 
-        if ($instance->status != 'pending') {
+        if ($instance->status != WorkflowStatus::PENDING) {
             throw new \Exception('流程实例状态不允许拒绝');
         }
 
@@ -114,18 +120,98 @@ class ApprovalService
                 'node_id' => $currentNode->id,
                 'approver_id' => auth()->id(),
                 'action' => 'reject',
-                'status' => 'rejected',
+                'status' => \App\Constants\ApprovalRecordStatus::REJECTED,
                 'comment' => $comment,
                 'approved_at' => now(),
             ]);
 
             $instance->update([
-                'status' => 'rejected',
+                'status' => WorkflowStatus::REJECTED,
                 'completed_at' => now(),
             ]);
 
+            // 工作流被拒绝，更新关联订单状态
+            $this->updateReferenceStatus($instance, 'rejected');
+
             return $instance->load(['workflow', 'approvalRecords.approver']);
         });
+    }
+
+    /**
+     * 更新关联单据的状态
+     */
+    protected function updateReferenceStatus(WorkflowInstance $instance, $workflowStatus)
+    {
+        // 获取最后一个审批通过的审批人ID
+        $lastApproval = ApprovalRecord::where('instance_id', $instance->id)
+            ->where('status', \App\Constants\ApprovalRecordStatus::APPROVED)
+            ->orderBy('approved_at', 'desc')
+            ->first();
+
+        // 处理采购订单
+        if ($instance->reference_type === PurchaseOrder::class) {
+            $order = PurchaseOrder::find($instance->reference_id);
+            if ($order) {
+                if ($workflowStatus === WorkflowStatus::APPROVED) {
+                    $order->update([
+                        'status' => OrderStatus::APPROVED,
+                        'approved_by' => $lastApproval ? $lastApproval->approver_id : null,
+                        'approved_at' => now(),
+                    ]);
+                } elseif ($workflowStatus === WorkflowStatus::REJECTED) {
+                    // 被拒绝时，将订单状态改回 draft，允许重新提交
+                    $order->update(['status' => OrderStatus::DRAFT]);
+                }
+            }
+        }
+        // 处理销售订单
+        elseif ($instance->reference_type === SalesOrder::class) {
+            $order = SalesOrder::find($instance->reference_id);
+            if ($order) {
+                if ($workflowStatus === WorkflowStatus::APPROVED) {
+                    $order->update([
+                        'status' => 'approved',
+                        'approved_by' => $lastApproval ? $lastApproval->approver_id : null,
+                        'approved_at' => now(),
+                    ]);
+                } elseif ($workflowStatus === WorkflowStatus::REJECTED) {
+                    // 被拒绝时，将订单状态改回 draft，允许重新提交
+                    $order->update(['status' => 'draft']);
+                }
+            }
+        }
+        // 处理生产计划
+        elseif ($instance->reference_type === ProductionPlan::class) {
+            $plan = ProductionPlan::find($instance->reference_id);
+            if ($plan) {
+                if ($workflowStatus === WorkflowStatus::APPROVED) {
+                    $plan->update([
+                        'status' => 'approved',
+                        'approved_by' => $lastApproval ? $lastApproval->approver_id : null,
+                        'approved_at' => now(),
+                    ]);
+                } elseif ($workflowStatus === WorkflowStatus::REJECTED) {
+                    // 被拒绝时，将计划状态改回 draft，允许重新提交
+                    $plan->update(['status' => 'draft']);
+                }
+            }
+        }
+        // 处理工单
+        elseif ($instance->reference_type === WorkOrder::class) {
+            $workOrder = WorkOrder::find($instance->reference_id);
+            if ($workOrder) {
+                if ($workflowStatus === WorkflowStatus::APPROVED) {
+                    $workOrder->update([
+                        'status' => 'approved',
+                        'approved_by' => $lastApproval ? $lastApproval->approver_id : null,
+                        'approved_at' => now(),
+                    ]);
+                } elseif ($workflowStatus === WorkflowStatus::REJECTED) {
+                    // 被拒绝时，将工单状态改回 draft，允许重新提交
+                    $workOrder->update(['status' => 'draft']);
+                }
+            }
+        }
     }
 
     /**
@@ -137,9 +223,11 @@ class ApprovalService
         // 如果是结束节点，直接完成流程
         if ($currentNode->node_type == 'end') {
             $instance->update([
-                'status' => 'approved',
+                'status' => WorkflowStatus::APPROVED,
                 'completed_at' => now(),
             ]);
+            // 工作流审批完成，更新关联订单状态
+            $this->updateReferenceStatus($instance, WorkflowStatus::APPROVED);
             return;
         }
 
@@ -167,8 +255,8 @@ class ApprovalService
             ->where('node_id', $currentNode->id)
             ->get();
 
-        $approvedCount = $approvalRecords->where('status', 'approved')->count();
-        $rejectedCount = $approvalRecords->where('status', 'rejected')->count();
+        $approvedCount = $approvalRecords->where('status', \App\Constants\ApprovalRecordStatus::APPROVED)->count();
+        $rejectedCount = $approvalRecords->where('status', \App\Constants\ApprovalRecordStatus::REJECTED)->count();
 
         // 如果有拒绝记录，流程应该已经结束（在reject方法中处理）
         if ($rejectedCount > 0) {
@@ -217,14 +305,18 @@ class ApprovalService
                 'status' => 'approved',
                 'completed_at' => now(),
             ]);
+            // 工作流审批完成，更新关联订单状态
+            $this->updateReferenceStatus($instance, 'approved');
             return;
         }
-        
+
         if ($currentNode->node_type == 'end') {
             $instance->update([
                 'status' => 'approved',
                 'completed_at' => now(),
             ]);
+            // 工作流审批完成，更新关联订单状态
+            $this->updateReferenceStatus($instance, 'approved');
             return;
         }
 
@@ -234,6 +326,8 @@ class ApprovalService
                 'status' => 'approved',
                 'completed_at' => now(),
             ]);
+            // 工作流审批完成，更新关联订单状态
+            $this->updateReferenceStatus($instance, 'approved');
             return;
         }
 
@@ -250,6 +344,8 @@ class ApprovalService
                 'status' => 'approved',
                 'completed_at' => now(),
             ]);
+            // 工作流审批完成，更新关联订单状态
+            $this->updateReferenceStatus($instance, 'approved');
         }
     }
 

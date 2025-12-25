@@ -81,8 +81,8 @@ class InventoryController extends Controller
      * @bodyParam location_id integer 库位ID Example: 1
      * @bodyParam quantity integer required 入库数量（最小1） Example: 100
      * @bodyParam unit_cost number 单位成本 Example: 50
-     * @bodyParam reference_type string 关联单据类型 Example: purchase_order
-     * @bodyParam reference_id integer 关联单据ID Example: 1
+     * @bodyParam reference_type string required 关联单据类型（如：App\Models\PurchaseOrder, App\Models\WorkOrder, other） Example: App\Models\PurchaseOrder
+     * @bodyParam reference_id integer required 关联单据ID（当reference_type为other时可为null） Example: 1
      * @bodyParam reference_no string 关联单据号 Example: PO001
      * @bodyParam remark string 备注 Example: 采购入库
      * @param Request $request 请求对象，包含产品ID、仓库ID、数量、单位成本等入库信息
@@ -97,11 +97,16 @@ class InventoryController extends Controller
             'location_id' => 'nullable|exists:warehouse_locations,id', // 库位ID
             'quantity' => 'required|integer|min:1',              // 入库数量（必填）
             'unit_cost' => 'nullable|numeric|min:0',             // 单位成本
-            'reference_type' => 'nullable|string',               // 关联单据类型
+            'reference_type' => 'required|string',               // 关联单据类型（必填）
             'reference_id' => 'nullable|integer',                // 关联单据ID
             'reference_no' => 'nullable|string',                 // 关联单据号
             'remark' => 'nullable|string',                       // 备注
         ]);
+
+        // 验证：如果 reference_type 不是 'other'，则 reference_id 必须提供
+        if ($validated['reference_type'] !== 'other' && empty($validated['reference_id'])) {
+            return response()->json(['message' => '入库操作必须关联原始单据，请提供 reference_id'], 400);
+        }
 
         try {
             // 调用服务层执行入库操作，更新库存数量并记录交易
@@ -130,6 +135,15 @@ class InventoryController extends Controller
     /**
      * 出库操作
      *
+     * @bodyParam product_id integer required 产品ID Example: 1
+     * @bodyParam warehouse_id integer required 仓库ID Example: 1
+     * @bodyParam location_id integer 库位ID Example: 1
+     * @bodyParam quantity integer required 出库数量（最小1） Example: 50
+     * @bodyParam unit_cost number 单位成本 Example: 50
+     * @bodyParam reference_type string required 关联单据类型（如：App\Models\SalesOrder, App\Models\WorkOrder, other） Example: App\Models\SalesOrder
+     * @bodyParam reference_id integer required 关联单据ID（当reference_type为other时可为null） Example: 1
+     * @bodyParam reference_no string 关联单据号 Example: SO001
+     * @bodyParam remark string 备注 Example: 销售出库
      * @param Request $request 请求对象，包含产品ID、仓库ID、数量、单位成本等出库信息
      * @return \Illuminate\Http\JsonResponse 返回出库结果，状态码 201，失败时返回错误消息
      */
@@ -142,11 +156,16 @@ class InventoryController extends Controller
             'location_id' => 'nullable|exists:warehouse_locations,id', // 库位ID
             'quantity' => 'required|integer|min:1',              // 出库数量（必填）
             'unit_cost' => 'nullable|numeric|min:0',             // 单位成本
-            'reference_type' => 'nullable|string',               // 关联单据类型
+            'reference_type' => 'required|string',               // 关联单据类型（必填）
             'reference_id' => 'nullable|integer',                // 关联单据ID
             'reference_no' => 'nullable|string',                 // 关联单据号
             'remark' => 'nullable|string',                       // 备注
         ]);
+
+        // 验证：如果 reference_type 不是 'other'，则 reference_id 必须提供
+        if ($validated['reference_type'] !== 'other' && empty($validated['reference_id'])) {
+            return response()->json(['message' => '出库操作必须关联原始单据，请提供 reference_id'], 400);
+        }
 
         try {
             // 调用服务层执行出库操作，扣减库存并记录交易

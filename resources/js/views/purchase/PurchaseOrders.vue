@@ -20,10 +20,12 @@
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
-                        <el-option label="待审核" value="pending" />
-                        <el-option label="已审核" value="approved" />
-                        <el-option label="已取消" value="cancelled" />
-                        <el-option label="已完成" value="completed" />
+                        <el-option label="草稿" :value="1" />
+                        <el-option label="待审核" :value="2" />
+                        <el-option label="已审核" :value="3" />
+                        <el-option label="部分入库" :value="4" />
+                        <el-option label="已完成" :value="5" />
+                        <el-option label="已取消" :value="6" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="日期">
@@ -58,18 +60,20 @@
                             :class="getStatusClass(row.status)"
                             class="status-badge"
                         >
-                            {{ getStatusText(row.status) }}
+                            {{ row.status_text || getStatusText(row.status) }}
                         </span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="order_date" label="订单日期" width="120" />
                 <el-table-column prop="expected_date" label="预计到货" width="120" />
-                <el-table-column label="操作" width="250" fixed="right">
+                <el-table-column label="操作" width="300" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" @click="handleView(row)" :loading="viewLoadingId === row.id" :disabled="viewLoadingId !== null" class="interactive">查看</el-button>
-                        <el-button type="warning" size="small" @click="handleEdit(row)" v-if="row.status == 'pending'" class="interactive">编辑</el-button>
-                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'" class="interactive">审核</el-button>
-                        <el-button type="danger" size="small" @click="handleDelete(row)" v-if="row.status == 'pending'" class="interactive">删除</el-button>
+                        <el-button type="warning" size="small" @click="handleEdit(row)" v-if="row.status == 1" class="interactive">编辑</el-button>
+                        <el-button type="info" size="small" @click="handleSubmit(row)" v-if="row.status == 1" class="interactive">提交审核</el-button>
+                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 2" class="interactive">审核</el-button>
+                        <el-button type="danger" size="small" @click="handleDelete(row)" v-if="row.status == 1" class="interactive">删除</el-button>
+                        <el-button type="danger" size="small" @click="handleCancel(row)" v-if="row.status != 5 && row.status != 6" class="interactive">取消</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -103,13 +107,19 @@
                 <el-descriptions-item label="预计到货">{{ currentOrder.expected_date }}</el-descriptions-item>
                 <el-descriptions-item label="订单金额">¥{{ currentOrder.total_amount }}</el-descriptions-item>
                 <el-descriptions-item label="状态">
-                    <el-tag :type="getStatusType(currentOrder.status)">{{ getStatusText(currentOrder.status) }}</el-tag>
+                    <el-tag :type="getStatusType(currentOrder.status)">{{ currentOrder.status_text || getStatusText(currentOrder.status) }}</el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ currentOrder.remark || '-' }}</el-descriptions-item>
             </el-descriptions>
                 <el-table :data="currentOrder?.items || []" style="margin-top: 20px;" v-if="currentOrder">
                     <el-table-column prop="product.name" label="商品名称" />
-                    <el-table-column prop="quantity" label="数量" width="100" />
+                    <el-table-column prop="quantity" label="订单数量" width="100" />
+                    <el-table-column prop="received_quantity" label="已收数量" width="100">
+                        <template #default="{ row }">{{ row.received_quantity || 0 }}</template>
+                    </el-table-column>
+                    <el-table-column label="未收数量" width="100">
+                        <template #default="{ row }">{{ (row.quantity || 0) - (row.received_quantity || 0) }}</template>
+                    </el-table-column>
                     <el-table-column prop="unit_price" label="单价" width="120">
                         <template #default="{ row }">¥{{ row.unit_price }}</template>
                     </el-table-column>
@@ -118,8 +128,11 @@
                     </el-table-column>
                 </el-table>
             </div>
-            <template #footer v-if="currentOrder && currentOrder.status == 'approved'">
-                <el-button type="success" @click="handleReceive(currentOrder)">入库</el-button>
+            <template #footer v-if="currentOrder">
+                <el-button v-if="currentOrder.status == 3 || currentOrder.status == 4" type="success" @click="handleReceive(currentOrder)">入库</el-button>
+                <el-button v-if="currentOrder.status == 1" type="info" @click="handleSubmit(currentOrder)">提交审核</el-button>
+                <el-button v-if="currentOrder.status == 2" type="success" @click="handleApprove(currentOrder)">审核</el-button>
+                <el-button v-if="currentOrder.status != 5 && currentOrder.status != 6" type="danger" @click="handleCancel(currentOrder)">取消</el-button>
             </template>
         </el-dialog>
 
@@ -282,34 +295,42 @@ const formTitle = computed(() => {
     return isEdit.value ? '编辑订单' : '新增订单';
 });
 
+// 状态常量映射（数字 => 中文）
+const STATUS_MAP = {
+    1: '草稿',
+    2: '待审核',
+    3: '已审核',
+    4: '部分入库',
+    5: '已完成',
+    6: '已取消'
+};
+
 const getStatusType = (status) => {
     const statusMap = {
-        'pending': 'warning',
-        'approved': 'success',
-        'cancelled': 'danger',
-        'completed': 'info'
+        1: 'info',      // draft
+        2: 'warning',   // pending
+        3: 'success',   // approved
+        4: 'primary',   // partial
+        5: 'success',   // completed
+        6: 'danger'     // cancelled
     };
     return statusMap[status] || 'info';
 };
 
 const getStatusClass = (status) => {
     const classMap = {
-        'pending': 'badge-warning',
-        'approved': 'badge-success',
-        'cancelled': 'badge-muted',
-        'completed': 'badge-success'
+        1: 'badge-info',      // draft
+        2: 'badge-warning',   // pending
+        3: 'badge-success',   // approved
+        4: 'badge-primary',   // partial
+        5: 'badge-success',   // completed
+        6: 'badge-muted'      // cancelled
     };
     return classMap[status] || 'badge-muted';
 };
 
 const getStatusText = (status) => {
-    const statusMap = {
-        'pending': '待审核',
-        'approved': '已审核',
-        'cancelled': '已取消',
-        'completed': '已完成'
-    };
-    return statusMap[status] || status;
+    return STATUS_MAP[status] || status;
 };
 
 const loadOrders = async () => {
@@ -346,27 +367,33 @@ const loadOrders = async () => {
 const loadSuppliers = async () => {
     try {
         const response = await api.get('/suppliers', { params: { per_page: 1000 } });
-        suppliers.value = response.data.data;
+        suppliers.value = response.data.data || [];
     } catch (error) {
         console.error('加载供应商列表失败:', error);
+        ElMessage.error('加载供应商列表失败');
+        suppliers.value = [];
     }
 };
 
 const loadProducts = async () => {
     try {
         const response = await api.get('/products', { params: { per_page: 1000 } });
-        products.value = response.data.data;
+        products.value = response.data.data || [];
     } catch (error) {
         console.error('加载商品列表失败:', error);
+        ElMessage.error('加载商品列表失败');
+        products.value = [];
     }
 };
 
 const loadWarehouses = async () => {
     try {
         const response = await api.get('/warehouses', { params: { per_page: 1000 } });
-        warehouses.value = response.data.data;
+        warehouses.value = response.data.data || [];
     } catch (error) {
         console.error('加载仓库列表失败:', error);
+        ElMessage.error('加载仓库列表失败');
+        warehouses.value = [];
     }
 };
 
@@ -391,6 +418,16 @@ const handleAdd = () => {
     orderForm.warehouse_id = null;
     orderForm.remark = '';
     orderForm.items = [];
+    // 确保数据已加载
+    if (suppliers.value.length === 0) {
+        loadSuppliers();
+    }
+    if (products.value.length === 0) {
+        loadProducts();
+    }
+    if (warehouses.value.length === 0) {
+        loadWarehouses();
+    }
     formVisible.value = true;
 };
 
@@ -512,18 +549,74 @@ const submitOrder = async () => {
 
 const handleReceive = async (order) => {
     try {
-        await ElMessageBox.confirm('确定要执行入库操作吗？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
+        // 检查订单是否有明细项
+        if (!order.items || order.items.length === 0) {
+            ElMessage.warning('订单没有明细项');
+            return;
+        }
+
+        // 构建收货明细项：收货所有未收货完的商品，收货数量为剩余未收货数量
+        const receiveItems = order.items
+            .filter(item => {
+                const receivedQty = item.received_quantity || 0;
+                const orderQty = item.quantity || 0;
+                return receivedQty < orderQty; // 只收货未收货完的商品
+            })
+            .map(item => {
+                const receivedQty = item.received_quantity || 0;
+                const orderQty = item.quantity || 0;
+                const remainingQty = orderQty - receivedQty;
+                return {
+                    item_id: item.id,
+                    quantity: remainingQty // 收货剩余数量
+                };
+            });
+
+        if (receiveItems.length === 0) {
+            ElMessage.warning('所有商品已收货完成');
+            return;
+        }
+
+        await ElMessageBox.confirm(
+            `确定要执行入库操作吗？将收货 ${receiveItems.length} 个商品。`,
+            '提示',
+            {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }
+        );
+
+        await api.post(`/purchase-orders/${order.id}/receive`, {
+            items: receiveItems
         });
-        await api.post(`/purchase-orders/${order.id}/receive`);
+        
         ElMessage.success('入库成功');
         detailVisible.value = false;
         loadOrders();
     } catch (error) {
         if (error !== 'cancel') {
             ElMessage.error(error.response?.data?.message || '入库失败');
+        }
+    }
+};
+
+const handleSubmit = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要提交该订单审核吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/purchase-orders/${row.id}/submit`);
+        ElMessage.success('提交成功');
+        loadOrders();
+        if (detailVisible.value && currentOrder.value?.id === row.id) {
+            detailVisible.value = false;
+        }
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '提交失败');
         }
     }
 };
@@ -538,9 +631,32 @@ const handleApprove = async (row) => {
         await api.post(`/purchase-orders/${row.id}/approve`);
         ElMessage.success('审核成功');
         loadOrders();
+        if (detailVisible.value && currentOrder.value?.id === row.id) {
+            detailVisible.value = false;
+        }
     } catch (error) {
         if (error !== 'cancel') {
-            ElMessage.error('审核失败');
+            ElMessage.error(error.response?.data?.message || '审核失败');
+        }
+    }
+};
+
+const handleCancel = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要取消该订单吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/purchase-orders/${row.id}/cancel`);
+        ElMessage.success('取消成功');
+        loadOrders();
+        if (detailVisible.value && currentOrder.value?.id === row.id) {
+            detailVisible.value = false;
+        }
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '取消失败');
         }
     }
 };
@@ -573,6 +689,9 @@ const handlePageChange = () => {
 
 onMounted(() => {
     loadOrders();
+    loadSuppliers();
+    loadProducts();
+    loadWarehouses();
 });
 </script>
 

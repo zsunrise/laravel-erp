@@ -16,14 +16,20 @@
                         <ArrowRightLeft :size="16" style="margin-right: 6px;" />
                         调拨
                     </el-button>
-                    <el-button type="primary" @click="handleStocktake" class="interactive">
+                    <el-button type="primary" @click="handleStocktake" class="interactive" v-if="activeTab === 'inventory'">
                         <ClipboardList :size="16" style="margin-right: 6px;" />
                         盘点
+                    </el-button>
+                    <el-button type="primary" @click="handleStocktake" class="interactive" v-if="activeTab === 'stocktakes'">
+                        <Plus :size="16" style="margin-right: 6px;" />
+                        创建盘点单
                     </el-button>
                 </div>
             </div>
 
-            <el-form :inline="true" :model="searchForm" class="search-form-modern">
+            <el-tabs v-model="activeTab" @tab-change="handleTabChange">
+                <el-tab-pane label="库存列表" name="inventory">
+                    <el-form :inline="true" :model="searchForm" class="search-form-modern">
                 <el-form-item label="商品">
                     <el-input v-model="searchForm.search" placeholder="商品名称/SKU" clearable />
                 </el-form-item>
@@ -96,6 +102,83 @@
                     @current-change="handlePageChange"
                 />
             </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="盘点单" name="stocktakes">
+                    <el-form :inline="true" :model="stocktakeSearchForm" class="search-form-modern">
+                        <el-form-item label="盘点单号">
+                            <el-input v-model="stocktakeSearchForm.stocktake_no" placeholder="盘点单号" clearable />
+                        </el-form-item>
+                        <el-form-item label="仓库">
+                            <el-select v-model="stocktakeSearchForm.warehouse_id" placeholder="全部" clearable style="width: 200px">
+                                <el-option
+                                    v-for="warehouse in warehouses"
+                                    :key="warehouse.id"
+                                    :label="warehouse.name"
+                                    :value="warehouse.id"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="状态">
+                            <el-select v-model="stocktakeSearchForm.status" placeholder="全部" clearable style="width: 150px">
+                                <el-option label="草稿" value="draft" />
+                                <el-option label="盘点中" value="counting" />
+                                <el-option label="已完成" value="completed" />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="handleStocktakeSearch">查询</el-button>
+                            <el-button @click="handleStocktakeReset">重置</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <div class="modern-table" style="margin: 0 24px;">
+                        <el-table :data="stocktakes" v-loading="stocktakeListLoading" style="width: 100%">
+                            <el-table-column prop="id" label="ID" width="80" />
+                            <el-table-column prop="stocktake_no" label="盘点单号" width="180" />
+                            <el-table-column prop="warehouse.name" label="仓库" />
+                            <el-table-column prop="stocktake_date" label="盘点日期" width="120" />
+                            <el-table-column label="状态" width="100">
+                                <template #default="{ row }">
+                                    <el-tag :type="getStocktakeStatusType(row.status)">
+                                        {{ getStocktakeStatusText(row.status) }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="creator.name" label="创建人" width="120" />
+                            <el-table-column prop="created_at" label="创建时间" width="180" />
+                            <el-table-column prop="completer.name" label="完成人" width="120" v-if="false" />
+                            <el-table-column prop="completed_at" label="完成时间" width="180" />
+                            <el-table-column label="操作" width="200" fixed="right">
+                                <template #default="{ row }">
+                                    <el-button type="primary" size="small" @click="handleViewStocktake(row)" class="interactive">查看</el-button>
+                                    <el-button 
+                                        type="success" 
+                                        size="small" 
+                                        @click="handleCompleteStocktake(row)" 
+                                        v-if="row.status === 'counting'"
+                                        class="interactive"
+                                    >
+                                        完成
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+
+                    <div class="modern-pagination">
+                        <el-pagination
+                            v-model:current-page="stocktakePagination.page"
+                            v-model:page-size="stocktakePagination.per_page"
+                            :total="stocktakePagination.total"
+                            :page-sizes="[10, 20, 50, 100]"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handleStocktakeSizeChange"
+                            @current-change="handleStocktakePageChange"
+                        />
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
         </div>
 
         <!-- 入库对话框 -->
@@ -140,7 +223,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="数量" prop="quantity">
-                    <el-input-number v-model="stockInForm.quantity" :min="0.01" :precision="2" style="width: 100%" />
+                    <el-input-number v-model="stockInForm.quantity" :min="0" :step="1" :precision="0" :controls="true" style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="stockInForm.remark" type="textarea" :rows="3" placeholder="请输入备注" />
@@ -194,7 +277,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="数量" prop="quantity">
-                    <el-input-number v-model="stockOutForm.quantity" :min="0.01" :precision="2" style="width: 100%" />
+                    <el-input-number v-model="stockOutForm.quantity" :min="0" :step="1" :precision="0" :controls="true" style="width: 100%" />
                     <div v-if="currentStock" style="margin-top: 5px; color: #909399; font-size: 12px;">
                         当前库存: {{ currentStock.quantity }} {{ currentStock.product?.unit?.name || '' }}
                     </div>
@@ -263,7 +346,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="数量" prop="quantity">
-                    <el-input-number v-model="transferForm.quantity" :min="0.01" :precision="2" style="width: 100%" />
+                    <el-input-number v-model="transferForm.quantity" :min="0" :step="1" :precision="0" :controls="true" style="width: 100%" />
                     <div v-if="fromStock" style="margin-top: 5px; color: #909399; font-size: 12px;">
                         调出库存: {{ fromStock.quantity }} {{ fromStock.product?.unit?.name || '' }}
                     </div>
@@ -354,6 +437,99 @@
                 style="margin-top: 20px;"
             />
         </el-dialog>
+
+        <!-- 盘点单详情对话框 -->
+        <el-dialog v-model="stocktakeDetailVisible" title="盘点单详情" width="1200px" :close-on-click-modal="false">
+            <div v-loading="stocktakeDetailLoading">
+                <el-descriptions :column="2" border v-if="currentStocktake" style="margin-bottom: 20px;">
+                    <el-descriptions-item label="盘点单号">{{ currentStocktake.stocktake_no }}</el-descriptions-item>
+                    <el-descriptions-item label="仓库">{{ currentStocktake.warehouse?.name }}</el-descriptions-item>
+                    <el-descriptions-item label="盘点日期">{{ currentStocktake.stocktake_date }}</el-descriptions-item>
+                    <el-descriptions-item label="状态">
+                        <el-tag :type="getStocktakeStatusType(currentStocktake.status)">
+                            {{ getStocktakeStatusText(currentStocktake.status) }}
+                        </el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="创建人">{{ currentStocktake.creator?.name }}</el-descriptions-item>
+                    <el-descriptions-item label="创建时间">{{ currentStocktake.created_at }}</el-descriptions-item>
+                    <el-descriptions-item label="完成人" v-if="currentStocktake.completer">{{ currentStocktake.completer?.name }}</el-descriptions-item>
+                    <el-descriptions-item label="完成时间" v-if="currentStocktake.completed_at">{{ currentStocktake.completed_at }}</el-descriptions-item>
+                    <el-descriptions-item label="备注" :span="2">{{ currentStocktake.remark || '-' }}</el-descriptions-item>
+                </el-descriptions>
+
+                <el-divider>
+                    <span>盘点明细</span>
+                    <el-button 
+                        type="primary" 
+                        size="small" 
+                        @click="handleAddStocktakeItem" 
+                        v-if="currentStocktake && (currentStocktake.status === 'draft' || currentStocktake.status === 'counting')"
+                        style="margin-left: 10px;"
+                    >
+                        <Plus :size="14" style="margin-right: 4px;" />
+                        添加明细
+                    </el-button>
+                </el-divider>
+                <el-table :data="currentStocktake?.items || []" border style="width: 100%">
+                    <el-table-column prop="product.name" label="商品名称" />
+                    <el-table-column prop="product.sku" label="SKU" width="120" />
+                    <el-table-column prop="location.name" label="库位" width="120" />
+                    <el-table-column prop="book_quantity" label="账面数量" width="120" />
+                    <el-table-column prop="actual_quantity" label="实盘数量" width="120" />
+                    <el-table-column label="差异数量" width="120">
+                        <template #default="{ row }">
+                            <span :style="{ color: row.difference_quantity > 0 ? '#67C23A' : row.difference_quantity < 0 ? '#F56C6C' : '#909399' }">
+                                {{ row.difference_quantity > 0 ? '+' : '' }}{{ row.difference_quantity }}
+                            </span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="unit_cost" label="单位成本" width="120" />
+                    <el-table-column prop="remark" label="备注" />
+                </el-table>
+            </div>
+        </el-dialog>
+
+        <!-- 添加盘点明细对话框 -->
+        <el-dialog v-model="addItemVisible" title="添加盘点明细" width="600px">
+            <el-form :model="stocktakeItemForm" :rules="stocktakeItemRules" ref="stocktakeItemFormRef" label-width="100px">
+                <el-form-item label="商品" prop="product_id">
+                    <el-select v-model="stocktakeItemForm.product_id" filterable placeholder="请选择商品" @change="handleItemProductChange" style="width: 100%">
+                        <el-option
+                            v-for="product in products"
+                            :key="product.id"
+                            :label="`${product.name} (${product.sku})`"
+                            :value="product.id"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="库位" prop="location_id">
+                    <el-select v-model="stocktakeItemForm.location_id" placeholder="请选择库位（可选）" clearable style="width: 100%">
+                        <el-option
+                            v-for="location in stocktakeLocations"
+                            :key="location.id"
+                            :label="location.name"
+                            :value="location.id"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="账面数量">
+                    <el-input-number v-model="stocktakeItemForm.book_quantity" :disabled="true" style="width: 100%" />
+                    <div style="margin-top: 5px; color: #909399; font-size: 12px;">
+                        系统自动获取当前库存数量
+                    </div>
+                </el-form-item>
+                <el-form-item label="实盘数量" prop="actual_quantity">
+                    <el-input-number v-model="stocktakeItemForm.actual_quantity" :min="0" :step="1" :precision="0" :controls="true" style="width: 100%" />
+                </el-form-item>
+                <el-form-item label="备注" prop="remark">
+                    <el-input v-model="stocktakeItemForm.remark" type="textarea" :rows="3" placeholder="请输入备注" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="addItemVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitStocktakeItem" :loading="addItemLoading">确定</el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -385,6 +561,16 @@ const detailLoading = ref(false);
 const viewLoadingId = ref(null);
 const transactionsVisible = ref(false);
 const currentInventory = ref(null);
+const activeTab = ref('inventory');
+const stocktakes = ref([]);
+const stocktakeListLoading = ref(false);
+const stocktakeDetailVisible = ref(false);
+const stocktakeDetailLoading = ref(false);
+const currentStocktake = ref(null);
+const addItemVisible = ref(false);
+const addItemLoading = ref(false);
+const stocktakeItemFormRef = ref(null);
+const stocktakeLocations = ref([]);
 
 const stockInLoading = ref(false);
 const stockOutLoading = ref(false);
@@ -442,6 +628,34 @@ const stocktakeForm = reactive({
     remark: ''
 });
 
+const stocktakeSearchForm = reactive({
+    stocktake_no: '',
+    warehouse_id: null,
+    status: null
+});
+
+const stocktakePagination = reactive({
+    page: 1,
+    per_page: 10,
+    total: 0
+});
+
+const stocktakeItemForm = reactive({
+    product_id: null,
+    location_id: null,
+    actual_quantity: null,
+    remark: '',
+    book_quantity: 0
+});
+
+const stocktakeItemRules = {
+    product_id: [{ required: true, message: '请选择商品', trigger: 'change' }],
+    actual_quantity: [
+        { required: true, message: '请输入实盘数量', trigger: 'blur' },
+        { type: 'number', min: 0, message: '实盘数量不能小于0', trigger: 'blur' }
+    ]
+};
+
 const transactionsPagination = reactive({
     page: 1,
     per_page: 10,
@@ -452,21 +666,30 @@ const stockInRules = {
     type: [{ required: true, message: '请选择入库类型', trigger: 'change' }],
     product_id: [{ required: true, message: '请选择商品', trigger: 'change' }],
     warehouse_id: [{ required: true, message: '请选择仓库', trigger: 'change' }],
-    quantity: [{ required: true, message: '请输入数量', trigger: 'blur' }]
+    quantity: [
+        { required: true, message: '请输入数量', trigger: 'blur' },
+        { type: 'number', min: 1, message: '数量必须大于0', trigger: 'blur' }
+    ]
 };
 
 const stockOutRules = {
     type: [{ required: true, message: '请选择出库类型', trigger: 'change' }],
     product_id: [{ required: true, message: '请选择商品', trigger: 'change' }],
     warehouse_id: [{ required: true, message: '请选择仓库', trigger: 'change' }],
-    quantity: [{ required: true, message: '请输入数量', trigger: 'blur' }]
+    quantity: [
+        { required: true, message: '请输入数量', trigger: 'blur' },
+        { type: 'number', min: 1, message: '数量必须大于0', trigger: 'blur' }
+    ]
 };
 
 const transferRules = {
     product_id: [{ required: true, message: '请选择商品', trigger: 'change' }],
     from_warehouse_id: [{ required: true, message: '请选择调出仓库', trigger: 'change' }],
     to_warehouse_id: [{ required: true, message: '请选择调入仓库', trigger: 'change' }],
-    quantity: [{ required: true, message: '请输入数量', trigger: 'blur' }]
+    quantity: [
+        { required: true, message: '请输入数量', trigger: 'blur' },
+        { type: 'number', min: 1, message: '数量必须大于0', trigger: 'blur' }
+    ]
 };
 
 const stocktakeRules = {
@@ -729,7 +952,21 @@ const submitStockIn = async () => {
         if (valid) {
             stockInLoading.value = true;
             try {
-                await api.post('/inventory/stock-in', stockInForm);
+                // 库存管理页面的直接入库操作统一设置为"其他入库"
+                // 真正的采购入库、生产入库等应通过对应的业务模块操作
+                const submitData = {
+                    ...stockInForm,
+                    location_id: stockInForm.warehouse_location_id,
+                    reference_type: 'other', // 直接入库操作统一为"其他"
+                    reference_id: null,
+                    reference_no: null
+                };
+                
+                // 删除不需要的字段
+                delete submitData.warehouse_location_id;
+                delete submitData.type;
+                
+                await api.post('/inventory/stock-in', submitData);
                 ElMessage.success('入库成功');
                 stockInVisible.value = false;
                 loadInventory();
@@ -752,7 +989,21 @@ const submitStockOut = async () => {
             }
             stockOutLoading.value = true;
             try {
-                await api.post('/inventory/stock-out', stockOutForm);
+                // 库存管理页面的直接出库操作统一设置为"其他出库"
+                // 真正的销售出库、生产领料等应通过对应的业务模块操作
+                const submitData = {
+                    ...stockOutForm,
+                    location_id: stockOutForm.warehouse_location_id,
+                    reference_type: 'other', // 直接出库操作统一为"其他"
+                    reference_id: null,
+                    reference_no: null
+                };
+                
+                // 删除不需要的字段
+                delete submitData.warehouse_location_id;
+                delete submitData.type;
+                
+                await api.post('/inventory/stock-out', submitData);
                 ElMessage.success('出库成功');
                 stockOutVisible.value = false;
                 loadInventory();
@@ -801,6 +1052,9 @@ const submitStocktake = async () => {
                 await api.post('/inventory-stocktakes', stocktakeForm);
                 ElMessage.success('盘点单创建成功');
                 stocktakeVisible.value = false;
+                if (activeTab.value === 'stocktakes') {
+                    loadStocktakes();
+                }
             } catch (error) {
                 ElMessage.error(error.response?.data?.message || '创建盘点单失败');
             } finally {
@@ -808,6 +1062,174 @@ const submitStocktake = async () => {
             }
         }
     });
+};
+
+const loadStocktakes = async () => {
+    stocktakeListLoading.value = true;
+    try {
+        const params = {
+            page: stocktakePagination.page,
+            per_page: stocktakePagination.per_page
+        };
+        if (stocktakeSearchForm.stocktake_no) {
+            params.stocktake_no = stocktakeSearchForm.stocktake_no;
+        }
+        if (stocktakeSearchForm.warehouse_id) {
+            params.warehouse_id = stocktakeSearchForm.warehouse_id;
+        }
+        if (stocktakeSearchForm.status) {
+            params.status = stocktakeSearchForm.status;
+        }
+        const response = await api.get('/inventory-stocktakes', { params });
+        stocktakes.value = response.data.data;
+        stocktakePagination.total = response.data.total;
+    } catch (error) {
+        ElMessage.error('加载盘点单列表失败');
+    } finally {
+        stocktakeListLoading.value = false;
+    }
+};
+
+const handleStocktakeSearch = () => {
+    stocktakePagination.page = 1;
+    loadStocktakes();
+};
+
+const handleStocktakeReset = () => {
+    stocktakeSearchForm.stocktake_no = '';
+    stocktakeSearchForm.warehouse_id = null;
+    stocktakeSearchForm.status = null;
+    handleStocktakeSearch();
+};
+
+const handleStocktakeSizeChange = (size) => {
+    stocktakePagination.per_page = size;
+    loadStocktakes();
+};
+
+const handleStocktakePageChange = (page) => {
+    stocktakePagination.page = page;
+    loadStocktakes();
+};
+
+const handleTabChange = (tab) => {
+    if (tab === 'stocktakes') {
+        loadStocktakes();
+    }
+};
+
+const handleViewStocktake = async (row) => {
+    stocktakeDetailLoading.value = true;
+    stocktakeDetailVisible.value = true;
+    currentStocktake.value = null;
+    try {
+        const response = await api.get(`/inventory-stocktakes/${row.id}`);
+        currentStocktake.value = response.data.data;
+        // 加载该仓库的库位列表
+        if (currentStocktake.value.warehouse_id) {
+            stocktakeLocations.value = await loadLocations(currentStocktake.value.warehouse_id);
+        }
+    } catch (error) {
+        ElMessage.error('加载盘点单详情失败');
+        stocktakeDetailVisible.value = false;
+    } finally {
+        stocktakeDetailLoading.value = false;
+    }
+};
+
+const handleAddStocktakeItem = () => {
+    if (!currentStocktake.value) return;
+    stocktakeItemForm.product_id = null;
+    stocktakeItemForm.location_id = null;
+    stocktakeItemForm.actual_quantity = null;
+    stocktakeItemForm.remark = '';
+    stocktakeItemForm.book_quantity = 0;
+    addItemVisible.value = true;
+};
+
+const handleItemProductChange = async () => {
+    if (!stocktakeItemForm.product_id || !currentStocktake.value) return;
+    // 获取当前库存数量
+    try {
+        const response = await api.get('/inventory', {
+            params: {
+                product_id: stocktakeItemForm.product_id,
+                warehouse_id: currentStocktake.value.warehouse_id,
+                location_id: stocktakeItemForm.location_id || null
+            }
+        });
+        if (response.data.data && response.data.data.length > 0) {
+            stocktakeItemForm.book_quantity = response.data.data[0].quantity || 0;
+        } else {
+            stocktakeItemForm.book_quantity = 0;
+        }
+    } catch (error) {
+        stocktakeItemForm.book_quantity = 0;
+    }
+};
+
+const submitStocktakeItem = async () => {
+    if (!stocktakeItemFormRef.value || !currentStocktake.value) return;
+    await stocktakeItemFormRef.value.validate(async (valid) => {
+        if (valid) {
+            addItemLoading.value = true;
+            try {
+                await api.post(`/inventory-stocktakes/${currentStocktake.value.id}/items`, {
+                    product_id: stocktakeItemForm.product_id,
+                    location_id: stocktakeItemForm.location_id || null,
+                    actual_quantity: stocktakeItemForm.actual_quantity,
+                    remark: stocktakeItemForm.remark || null
+                });
+                ElMessage.success('添加明细成功');
+                addItemVisible.value = false;
+                // 重新加载盘点单详情
+                await handleViewStocktake({ id: currentStocktake.value.id });
+            } catch (error) {
+                ElMessage.error(error.response?.data?.message || '添加明细失败');
+            } finally {
+                addItemLoading.value = false;
+            }
+        }
+    });
+};
+
+const handleCompleteStocktake = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要完成该盘点单吗？完成后将自动调整库存差异。', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/inventory-stocktakes/${row.id}/complete`);
+        ElMessage.success('盘点单完成成功');
+        loadStocktakes();
+        // 如果当前正在查看该盘点单，刷新详情
+        if (currentStocktake.value && currentStocktake.value.id === row.id) {
+            await handleViewStocktake({ id: row.id });
+        }
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '完成盘点单失败');
+        }
+    }
+};
+
+const getStocktakeStatusText = (status) => {
+    const statusMap = {
+        'draft': '草稿',
+        'counting': '盘点中',
+        'completed': '已完成'
+    };
+    return statusMap[status] || status;
+};
+
+const getStocktakeStatusType = (status) => {
+    const typeMap = {
+        'draft': 'info',
+        'counting': 'warning',
+        'completed': 'success'
+    };
+    return typeMap[status] || 'info';
 };
 
 const handleView = async (row) => {

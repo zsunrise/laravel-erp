@@ -27,9 +27,11 @@
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 150px">
-                        <el-option label="待审核" value="pending" />
-                        <el-option label="已审核" value="approved" />
-                        <el-option label="已取消" value="cancelled" />
+                        <el-option label="草稿" :value="1" />
+                        <el-option label="待审核" :value="2" />
+                        <el-option label="已审核" :value="3" />
+                        <el-option label="已完成" :value="5" />
+                        <el-option label="已取消" :value="6" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -53,10 +55,12 @@
                         <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="200" fixed="right">
+                <el-table-column label="操作" width="280" fixed="right">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
-                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 'pending'">审核</el-button>
+                        <el-button type="warning" size="small" @click="handleSubmitForApproval(row)" v-if="row.status == 1">提交审核</el-button>
+                        <el-button type="success" size="small" @click="handleApprove(row)" v-if="row.status == 2">审核</el-button>
+                        <el-button type="danger" size="small" @click="handleCancel(row)" v-if="row.status == 1 || row.status == 2">取消</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -224,6 +228,8 @@
                 <el-descriptions-item label="状态">
                     <el-tag :type="getStatusType(currentReturn.status)">{{ getStatusText(currentReturn.status) }}</el-tag>
                 </el-descriptions-item>
+                <el-descriptions-item label="审核人" v-if="currentReturn.approver">{{ currentReturn.approver?.name }}</el-descriptions-item>
+                <el-descriptions-item label="审核时间" v-if="currentReturn.approved_at">{{ currentReturn.approved_at }}</el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ currentReturn.remark || '-' }}</el-descriptions-item>
             </el-descriptions>
                 <el-table :data="currentReturn?.items || []" style="margin-top: 20px;" v-if="currentReturn">
@@ -306,20 +312,24 @@ const totalAmount = computed(() => {
 
 const getStatusType = (status) => {
     const statusMap = {
-        'pending': 'warning',
-        'approved': 'success',
-        'cancelled': 'danger'
+        1: 'info',      // 草稿
+        2: 'warning',   // 待审核
+        3: 'success',   // 已审核
+        5: 'success',   // 已完成
+        6: 'danger'     // 已取消
     };
     return statusMap[status] || 'info';
 };
 
 const getStatusText = (status) => {
     const statusMap = {
-        'pending': '待审核',
-        'approved': '已审核',
-        'cancelled': '已取消'
+        1: '草稿',
+        2: '待审核',
+        3: '已审核',
+        5: '已完成',
+        6: '已取消'
     };
-    return statusMap[status] || status;
+    return statusMap[status] || '未知';
 };
 
 const loadReturns = async () => {
@@ -391,10 +401,28 @@ const loadProducts = async () => {
 
 const loadSalesOrders = async () => {
     try {
-        const response = await api.get('/sales-orders', { params: { per_page: 1000, status: 'approved' } });
-        salesOrders.value = response.data.data;
+        // 获取已审核和已完成的销售订单，用于退货
+        // 状态 3=已审核, 5=已完成
+        const response = await api.get('/sales-orders', { 
+            params: { 
+                per_page: 1000
+            } 
+        });
+        // API 返回的是分页格式，数据在 response.data.data 中
+        const allOrders = response.data?.data || response.data || [];
+        // 过滤出已审核和已完成的订单（状态 3 或 5）
+        salesOrders.value = Array.isArray(allOrders) ? allOrders.filter(order => 
+            order && (order.status === 3 || order.status === 5)
+        ) : [];
+        
+        // 调试信息
+        if (salesOrders.value.length === 0) {
+            console.log('销售订单列表为空，响应数据:', response.data);
+        }
     } catch (error) {
         console.error('加载销售订单列表失败:', error);
+        ElMessage.error('加载销售订单列表失败: ' + (error.response?.data?.message || error.message));
+        salesOrders.value = [];
     }
 };
 
@@ -446,9 +474,26 @@ const handleView = async (row) => {
     }
 };
 
+const handleSubmitForApproval = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要提交该退货单审核吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/sales-returns/${row.id}/submit`);
+        ElMessage.success('提交成功');
+        loadReturns();
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '提交失败');
+        }
+    }
+};
+
 const handleApprove = async (row) => {
     try {
-        await ElMessageBox.confirm('确定要审核该退货单吗？', '提示', {
+        await ElMessageBox.confirm('确定要审核该退货单吗？审核通过后将自动入库。', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
@@ -456,9 +501,32 @@ const handleApprove = async (row) => {
         await api.post(`/sales-returns/${row.id}/approve`);
         ElMessage.success('审核成功');
         loadReturns();
+        if (detailVisible.value && currentReturn.value?.id === row.id) {
+            handleView(row);
+        }
     } catch (error) {
         if (error !== 'cancel') {
             ElMessage.error(error.response?.data?.message || '审核失败');
+        }
+    }
+};
+
+const handleCancel = async (row) => {
+    try {
+        await ElMessageBox.confirm('确定要取消该退货单吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        });
+        await api.post(`/sales-returns/${row.id}/cancel`);
+        ElMessage.success('取消成功');
+        loadReturns();
+        if (detailVisible.value && currentReturn.value?.id === row.id) {
+            handleView(row);
+        }
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error(error.response?.data?.message || '取消失败');
         }
     }
 };

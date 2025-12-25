@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasStatus;
+use App\Constants\ProductionPlanStatus;
 use Carbon\Carbon;
 
 class ProductionPlan extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasStatus;
 
     protected $fillable = [
         'plan_no',
@@ -30,7 +32,10 @@ class ProductionPlan extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'approved_at' => 'datetime',
+        'status' => 'integer',
     ];
+
+    protected $appends = ['status_text'];
 
     /**
      * 序列化日期格式
@@ -74,17 +79,25 @@ class ProductionPlan extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    /**
+     * 获取状态类名
+     */
+    protected function getStatusClass()
+    {
+        return ProductionPlanStatus::class;
+    }
+
     public function updateStatus()
     {
         $totalQuantity = $this->items->sum('planned_quantity');
         $completedQuantity = $this->items->sum('completed_quantity');
 
         if ($completedQuantity == 0) {
-            $this->status = 'approved';
+            $this->status = ProductionPlanStatus::APPROVED;
         } elseif ($completedQuantity < $totalQuantity) {
-            $this->status = 'in_progress';
+            $this->status = ProductionPlanStatus::IN_PROGRESS;
         } else {
-            $this->status = 'completed';
+            $this->status = ProductionPlanStatus::COMPLETED;
         }
 
         $this->save();
