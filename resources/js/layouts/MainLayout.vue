@@ -41,6 +41,7 @@
                     <el-menu-item index="/permissions" v-if="hasMenuPermission('permissions.manage')">权限管理</el-menu-item>
                     <el-menu-item index="/workflows" v-if="hasMenuPermission('workflows.manage')">审批流程</el-menu-item>
                     <el-menu-item index="/data-dictionaries" v-if="hasMenuPermission('system.config')">数据字典</el-menu-item>
+                    <el-menu-item index="/notification-templates" v-if="hasMenuPermission('system.config')">消息模板</el-menu-item>
                 </el-sub-menu>
 
                 <el-menu-item index="/products" class="menu-item">
@@ -157,6 +158,7 @@
                         <el-menu-item index="/permissions" v-if="hasMenuPermission('permissions.manage')">权限管理</el-menu-item>
                         <el-menu-item index="/workflows" v-if="hasMenuPermission('workflows.manage')">审批流程</el-menu-item>
                         <el-menu-item index="/data-dictionaries" v-if="hasMenuPermission('system.config')">数据字典</el-menu-item>
+                        <el-menu-item index="/notification-templates" v-if="hasMenuPermission('system.config')">消息模板</el-menu-item>
                     </el-sub-menu>
 
                     <el-menu-item index="/products" class="menu-item">

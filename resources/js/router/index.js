@@ -44,6 +44,12 @@ const routes = [
                 meta: { title: '审批流程', icon: 'DocumentChecked' }
             },
             {
+                path: 'notification-templates',
+                name: 'NotificationTemplates',
+                component: () => import('../views/system/NotificationTemplates.vue'),
+                meta: { title: '消息模板', icon: 'MessageSquare', permission: 'system.config' }
+            },
+            {
                 path: 'products',
                 name: 'Products',
                 component: () => import('../views/product/Products.vue'),
